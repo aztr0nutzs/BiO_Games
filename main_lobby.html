@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiO-Games // Underground Lab Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-cyan: #26fff6;
+            --neon-cyan-bright: #00ffff;
+            --neon-purple: #7f2bff;
+            --neon-purple-bright: #aa00ff;
+            --mint-green: #00ffb4;
+            --mint-green-bright: #00ffaa;
+            --minimal-pink: #ff00aa;
+            --bio-dark: #030615;
+            --bio-darker: #040013;
+            --bio-black: #000000;
+            --bio-space: #050816;
+            --bio-space-dark: #02030a;
+        }
+
+        body {
+            background: radial-gradient(circle at top, var(--bio-space) 0, var(--bio-space-dark) 40%, var(--bio-black) 100%);
+            font-family: 'Orbitron', 'Courier New', monospace;
+            overflow-x: hidden;
+            color: white;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Animated Nebula Background */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: -20%;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at 10% 0, rgba(0,255,255,0.05) 0, transparent 50%),
+                radial-gradient(circle at 90% 20%, rgba(180,0,255,0.08) 0, transparent 55%),
+                radial-gradient(circle at 40% 90%, rgba(0,255,180,0.06) 0, transparent 50%);
+            mix-blend-mode: screen;
+            opacity: 0.7;
+            animation: nebulaDrift 60s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes nebulaDrift {
+            0% { transform: translate3d(0,0,0) scale(1); }
+            50% { transform: translate3d(-3%,2%,0) scale(1.06); }
+            100% { transform: translate3d(0,0,0) scale(1); }
+        }
+
+        /* Scanlines Effect */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 255, 0.03) 2px,
+                rgba(0, 255, 255, 0.03) 4px
+            );
+            z-index: 1;
+        }
+
+        /* Electrified Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(3, 6, 21, 0.85);
+            border-bottom: 2px solid var(--neon-cyan);
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0 50px rgba(38, 255, 246, 0.2),
+                0 0 30px rgba(127, 43, 255, 0.15);
+            z-index: 100;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent,
+                var(--neon-cyan),
+                var(--neon-purple),
+                var(--mint-green),
+                var(--neon-cyan),
+                transparent);
+            animation: electricScan 3s infinite linear;
+            filter: blur(1px);
+        }
+
+        @keyframes electricScan {
+            0% { transform: translateX(-100%); opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0.5; }
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(90deg, transparent 0%, rgba(38, 255, 246, 0.1) 50%, transparent 100%);
+            animation: electricPulse 2s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes electricPulse {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.3; }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-icon {
+            font-size: 60px;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--mint-green), var(--neon-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px var(--neon-cyan));
+            animation: logoGlow 3s infinite ease-in-out;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 20px var(--neon-cyan)) drop-shadow(0 0 30px var(--neon-purple));
+            }
+            50% { 
+                filter: drop-shadow(0 0 30px var(--neon-cyan)) drop-shadow(0 0 40px var(--mint-green)) drop-shadow(0 0 50px var(--neon-purple));
+            }
+        }
+
+        .logo-text {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--mint-green), var(--neon-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 
+                0 0 30px rgba(38, 255, 246, 0.5),
+                0 0 60px rgba(127, 43, 255, 0.3);
+        }
+
+        .logo-subtitle {
+            font-size: 14px;
+            color: var(--neon-cyan);
+            letter-spacing: 3px;
+            margin-top: -10px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(38, 255, 246, 0.6);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .currency-display {
+            display: flex;
+            gap: 15px;
+        }
+
+        .currency-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid;
+            border-radius: 10px;
+            backdrop-filter: blur(4px);
+        }
+
+        .currency-item.credits {
+            border-color: var(--mint-green);
+            color: var(--mint-green);
+            box-shadow: 0 0 15px rgba(0, 255, 180, 0.3);
+        }
+
+        .currency-item.tickets {
+            border-color: var(--minimal-pink);
+            color: var(--minimal-pink);
+            box-shadow: 0 0 15px rgba(255, 0, 170, 0.3);
+        }
+
+        .currency-amount {
+            font-size: 22px;
+            font-weight: bold;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Game Hub Grid */
+        .game-hub {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Game Card */
+        .game-card {
+            background: linear-gradient(145deg, 
+                rgba(3, 6, 21, 0.9) 0%,
+                rgba(4, 0, 19, 0.95) 100%);
+            border: 3px solid;
+            border-radius: 20px;
+            padding: 40px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(38, 255, 246, 0.1), 
+                transparent);
+            transition: left 0.5s;
+        }
+
+        .game-card:hover::before {
+            left: 100%;
+        }
+
+        .game-card.bioslotz {
+            border-color: var(--neon-cyan);
+            box-shadow: 
+                0 0 40px rgba(38, 255, 246, 0.3),
+                inset 0 0 30px rgba(38, 255, 246, 0.1);
+        }
+
+        .game-card.bioslotz:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 20px 60px rgba(38, 255, 246, 0.4),
+                inset 0 0 40px rgba(38, 255, 246, 0.2);
+        }
+
+        .game-card.knxt4 {
+            border-color: var(--neon-purple);
+            box-shadow: 
+                0 0 40px rgba(127, 43, 255, 0.3),
+                inset 0 0 30px rgba(127, 43, 255, 0.1);
+            opacity: 0.7;
+        }
+
+        .game-card.knxt4:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 20px 60px rgba(127, 43, 255, 0.4),
+                inset 0 0 40px rgba(127, 43, 255, 0.2);
+        }
+
+        .game-card.store {
+            border-color: var(--mint-green);
+            box-shadow: 
+                0 0 40px rgba(0, 255, 180, 0.3),
+                inset 0 0 30px rgba(0, 255, 180, 0.1);
+        }
+
+        .game-card.store:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 20px 60px rgba(0, 255, 180, 0.4),
+                inset 0 0 40px rgba(0, 255, 180, 0.2);
+        }
+
+        .game-card.settings {
+            border-color: var(--minimal-pink);
+            box-shadow: 
+                0 0 40px rgba(255, 0, 170, 0.3),
+                inset 0 0 30px rgba(255, 0, 170, 0.1);
+        }
+
+        .game-card.settings:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 20px 60px rgba(255, 0, 170, 0.4),
+                inset 0 0 40px rgba(255, 0, 170, 0.2);
+        }
+
+        .game-card.multiplayer {
+            border-color: var(--neon-purple);
+            box-shadow: 
+                0 0 40px rgba(127, 43, 255, 0.3),
+                inset 0 0 30px rgba(127, 43, 255, 0.1);
+            opacity: 0.7;
+        }
+
+        .game-card.multiplayer:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 20px 60px rgba(127, 43, 255, 0.4),
+                inset 0 0 40px rgba(127, 43, 255, 0.2);
+        }
+
+        .game-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .game-icon {
+            font-size: 60px;
+            filter: drop-shadow(0 0 15px currentColor);
+            animation: iconFloat 3s infinite ease-in-out;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .game-title {
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 0 0 15px currentColor;
+        }
+
+        .game-desc {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            flex-grow: 1;
+        }
+
+        .game-status {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid currentColor;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .game-button {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid currentColor;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .game-button:hover {
+            background: currentColor;
+            color: black;
+            transform: scale(1.05);
+            box-shadow: 0 0 30px currentColor;
+        }
+
+        /* Animated Test Tubes */
+        .test-tubes {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            pointer-events: none;
+            z-index: 2;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding: 0 10%;
+        }
+
+        .test-tube {
+            width: 60px;
+            height: 150px;
+            position: relative;
+            animation: tubeFloat 4s infinite ease-in-out;
+        }
+
+        .test-tube:nth-child(1) { animation-delay: 0s; }
+        .test-tube:nth-child(2) { animation-delay: 0.5s; }
+        .test-tube:nth-child(3) { animation-delay: 1s; }
+        .test-tube:nth-child(4) { animation-delay: 1.5s; }
+        .test-tube:nth-child(5) { animation-delay: 2s; }
+
+        @keyframes tubeFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(2deg); }
+            50% { transform: translateY(-10px) rotate(0deg); }
+            75% { transform: translateY(-20px) rotate(-2deg); }
+        }
+
+        .tube-body {
+            width: 100%;
+            height: 80%;
+            background: linear-gradient(to top,
+                rgba(38, 255, 246, 0.3),
+                rgba(127, 43, 255, 0.2),
+                rgba(0, 255, 180, 0.3));
+            border: 3px solid var(--neon-cyan);
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 20px rgba(38, 255, 246, 0.4),
+                inset 0 0 20px rgba(127, 43, 255, 0.2);
+        }
+
+        .tube-liquid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background: linear-gradient(to top,
+                var(--neon-cyan),
+                var(--neon-purple),
+                var(--mint-green));
+            animation: liquidBubble 3s infinite ease-in-out;
+            opacity: 0.7;
+        }
+
+        @keyframes liquidBubble {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.1); }
+        }
+
+        .tube-neck {
+            width: 30%;
+            height: 20%;
+            background: rgba(38, 255, 246, 0.2);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 5px 5px 0 0;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Dripping Ooze Effects */
+        .ooze-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            pointer-events: none;
+            z-index: 3;
+            overflow: hidden;
+        }
+
+        .ooze-drop {
+            position: absolute;
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(to bottom,
+                var(--neon-cyan),
+                var(--neon-purple));
+            border-radius: 0 0 50% 50%;
+            opacity: 0.6;
+            filter: blur(1px);
+            animation: oozeDrip 8s infinite;
+        }
+
+        .ooze-drop:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .ooze-drop:nth-child(2) { left: 30%; animation-delay: 2s; }
+        .ooze-drop:nth-child(3) { left: 50%; animation-delay: 4s; }
+        .ooze-drop:nth-child(4) { left: 70%; animation-delay: 1s; }
+        .ooze-drop:nth-child(5) { left: 90%; animation-delay: 3s; }
+
+        @keyframes oozeDrip {
+            0% {
+                top: -20px;
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                top: 100%;
+                opacity: 0;
+            }
+        }
+
+        /* Bio-themed Decorative Elements */
+        .bio-particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-cyan);
+            animation: particleFloat 15s infinite linear;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .game-hub {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .game-hub {
+                grid-template-columns: 1fr;
+            }
+
+            .test-tubes {
+                display: none;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--neon-cyan), var(--neon-purple));
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--neon-purple), var(--neon-cyan));
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="shared/memorybank.js"></script>
+</head>
+<body>
+    <!-- Electrified Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">🧬</div>
+            <div>
+                <div class="logo-text">BiO-GAMES</div>
+                <div class="logo-subtitle">UNDERGROUND LAB HUB v2.0</div>
+            </div>
+        </div>
+        
+        <div class="user-info">
+            <div class="currency-display">
+                <div class="currency-item credits">
+                    <i class="fas fa-coins"></i>
+                    <div class="currency-amount" id="creditsAmount">0</div>
+                </div>
+                <div class="currency-item tickets">
+                    <i class="fas fa-ticket-alt"></i>
+                    <div class="currency-amount" id="ticketsAmount">0</div>
+                </div>
+            </div>
+            <div class="user-profile" id="userProfile" style="display: flex; align-items: center; gap: 15px; padding: 10px 20px; background: rgba(0, 0, 0, 0.6); border: 2px solid var(--neon-cyan); border-radius: 12px; cursor: pointer;">
+                <div style="font-size: 32px;" id="userAvatar">🧬</div>
+                <div>
+                    <div style="color: var(--neon-cyan); font-size: 16px; font-weight: bold;" id="userName">RESEARCHER</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 12px;">Level <span id="userLevel">1</span></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dripping Ooze Effects -->
+    <div class="ooze-container">
+        <div class="ooze-drop"></div>
+        <div class="ooze-drop"></div>
+        <div class="ooze-drop"></div>
+        <div class="ooze-drop"></div>
+        <div class="ooze-drop"></div>
+            </div>
+
+    <!-- Bio Particles -->
+    <div class="bio-particles" id="bioParticles"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Game Hub -->
+        <div class="game-hub">
+            <!-- Bio_Slotz Game Card -->
+            <div class="game-card bioslotz" onclick="navigateToGame('bioslotz')">
+                <div class="game-header">
+                    <div class="game-icon" style="color: var(--neon-cyan);">🎰</div>
+                    <div class="game-title" style="color: var(--neon-cyan);">BiO-Slotz</div>
+                </div>
+                <div class="game-desc">
+                    Spin the genetic slot machine in this underground bio-lab. Extract stable genomes while managing contamination levels. Each spin could unlock new genetic sequences or trigger containment protocols.
+                </div>
+                <div class="game-button" style="color: var(--neon-cyan); border-color: var(--neon-cyan);">
+                    <i class="fas fa-play"></i> PLAY NOW
+            </div>
+        </div>
+
+            <!-- KNXT-4 Game Card -->
+            <div class="game-card knxt4" onclick="navigateToGame('knxt4')">
+                <div class="game-header">
+                    <div class="game-icon" style="color: var(--neon-purple);">🧪</div>
+                    <div class="game-title" style="color: var(--neon-purple);">KNXT-4</div>
+                    </div>
+                <div class="game-desc">
+                    Strategic genome sequencing puzzle game. Solve complex genetic puzzles to maintain stability and prevent contamination. Master the art of bio-engineering in this challenging lab environment.
+                    </div>
+                <div class="game-status" style="color: var(--neon-purple); border-color: var(--neon-purple);">
+                    <i class="fas fa-clock"></i> COMING SOON
+                </div>
+                <div class="game-button" style="color: var(--neon-purple); border-color: var(--neon-purple); opacity: 0.5; cursor: not-allowed;">
+                    <i class="fas fa-lock"></i> LOCKED
+                    </div>
+                </div>
+
+            <!-- Store Card -->
+            <div class="game-card store" onclick="navigateToGame('store')">
+                <div class="game-header">
+                    <div class="game-icon" style="color: var(--mint-green);">🛒</div>
+                    <div class="game-title" style="color: var(--mint-green);">LAB STORE</div>
+                    </div>
+                <div class="game-desc">
+                    Purchase genetic enhancements, lab equipment upgrades, and exclusive bio-modifications. Expand your collection with rare genome samples and experimental tools.
+                    </div>
+                <div class="game-button" style="color: var(--mint-green); border-color: var(--mint-green);">
+                    <i class="fas fa-shopping-cart"></i> ENTER STORE
+                    </div>
+                </div>
+
+            <!-- Settings Card -->
+            <div class="game-card settings" onclick="navigateToGame('settings')">
+                <div class="game-header">
+                    <div class="game-icon" style="color: var(--minimal-pink);">⚙️</div>
+                    <div class="game-title" style="color: var(--minimal-pink);">SETTINGS</div>
+                    </div>
+                <div class="game-desc">
+                    Configure your lab environment, adjust visual effects, manage audio settings, and customize your bio-lab experience to your preferences.
+                    </div>
+                <div class="game-button" style="color: var(--minimal-pink); border-color: var(--minimal-pink);">
+                    <i class="fas fa-cog"></i> OPEN SETTINGS
+                    </div>
+                </div>
+
+            <!-- Multiplayer Bay Card -->
+            <div class="game-card multiplayer" onclick="navigateToGame('multiplayer')">
+                <div class="game-header">
+                    <div class="game-icon" style="color: var(--neon-purple);">🌐</div>
+                    <div class="game-title" style="color: var(--neon-purple);">MULTIPLAYER BAY</div>
+                    </div>
+                <div class="game-desc">
+                    Connect with other researchers in the underground network. Collaborate on experiments, compete in challenges, and share genetic discoveries with the global bio-lab community.
+                    </div>
+                <div class="game-status" style="color: var(--neon-purple); border-color: var(--neon-purple);">
+                    <i class="fas fa-clock"></i> COMING SOON
+                    </div>
+                <div class="game-button" style="color: var(--neon-purple); border-color: var(--neon-purple); opacity: 0.5; cursor: not-allowed;">
+                    <i class="fas fa-lock"></i> LOCKED
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Animated Test Tubes -->
+    <div class="test-tubes">
+        <div class="test-tube">
+            <div class="tube-neck"></div>
+            <div class="tube-body">
+                <div class="tube-liquid"></div>
+                </div>
+                </div>
+        <div class="test-tube">
+            <div class="tube-neck"></div>
+            <div class="tube-body">
+                <div class="tube-liquid"></div>
+                    </div>
+                    </div>
+        <div class="test-tube">
+            <div class="tube-neck"></div>
+            <div class="tube-body">
+                <div class="tube-liquid"></div>
+                    </div>
+                    </div>
+        <div class="test-tube">
+            <div class="tube-neck"></div>
+            <div class="tube-body">
+                <div class="tube-liquid"></div>
+                </div>
+            </div>
+        <div class="test-tube">
+            <div class="tube-neck"></div>
+            <div class="tube-body">
+                <div class="tube-liquid"></div>
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize bio particles
+        function initBioParticles() {
+            const container = document.getElementById('bioParticles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                
+                // Random color
+                const colors = ['var(--neon-cyan)', 'var(--neon-purple)', 'var(--mint-green)'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.boxShadow = `0 0 10px ${particle.style.background}`;
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Navigation function
+        function navigateToGame(game) {
+            // Save current state before navigation
+            if (window.memoryBank) {
+                window.memoryBank.save();
+            }
+            
+            if (game === 'bioslotz') {
+                // Navigate to Bio_Slotz game with return path
+                sessionStorage.setItem('returnToLobby', 'true');
+                window.location.href = 'Bio_Slotz_web_v1.1/index.html';
+            } else if (game === 'knxt4') {
+                // Navigate to KNXT4 game
+                sessionStorage.setItem('returnToLobby', 'true');
+                window.location.href = 'KNXT4/bio_knxt4.html';
+            } else if (game === 'store') {
+                // Navigate to store (you can create a store page)
+                showNotification('Store feature coming soon!', 'info');
+            } else if (game === 'settings') {
+                // Open settings modal or page
+                showNotification('Settings panel coming soon!', 'info');
+            } else if (game === 'multiplayer') {
+                // Coming soon - show notification
+                showNotification('Multiplayer Bay is coming soon! Connect with other researchers soon.', 'info');
+            }
+        }
+
+        // Load user data from MemoryBank
+        function loadUserData() {
+            if (!window.memoryBank) {
+                console.warn('MemoryBank not loaded');
+                return;
+            }
+
+            const data = window.memoryBank.getAll();
+            
+            // Update currency displays
+            const credits = data.currencies.credits || 0;
+            const tickets = data.currencies.tickets || 0;
+            const creditsEl = document.getElementById('creditsAmount');
+            const ticketsEl = document.getElementById('ticketsAmount');
+            if (creditsEl) creditsEl.textContent = credits.toLocaleString();
+            if (ticketsEl) ticketsEl.textContent = tickets.toLocaleString();
+            
+            // Update profile
+            const profile = data.profile;
+            const userNameEl = document.getElementById('userName');
+            const userAvatarEl = document.getElementById('userAvatar');
+            const userLevelEl = document.getElementById('userLevel');
+            if (userNameEl) userNameEl.textContent = profile.username || 'RESEARCHER';
+            if (userAvatarEl) userAvatarEl.textContent = profile.avatar || '🧬';
+            if (userLevelEl) userLevelEl.textContent = profile.level || 1;
+        }
+
+        // Listen for currency updates and storage events
+        function setupMemoryBankListeners() {
+            if (!window.memoryBank) return;
+            
+            // Listen for MemoryBank updates
+            window.memoryBank.on('update', (data) => {
+                if (data.section === 'currencies' || data.path && data.path.startsWith('currencies')) {
+                    loadUserData();
+                }
+                if (data.section === 'profile' || data.path && data.path.startsWith('profile')) {
+                    loadUserData();
+                }
+            });
+
+            // Listen for storage events (cross-page sync)
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'bio_games_memory_bank') {
+                    loadUserData();
+                }
+            });
+
+            // Listen for custom same-tab events
+            window.addEventListener('memorybank:save', function() {
+                loadUserData();
+            });
+        }
+
+        // Profile editing
+        function setupProfileEditing() {
+            const userProfile = document.getElementById('userProfile');
+            if (!userProfile) return;
+
+            userProfile.addEventListener('click', function() {
+                const currentUsername = window.memoryBank.get('profile', 'username');
+                const newUsername = prompt('Enter new username:', currentUsername);
+                if (newUsername && newUsername.trim()) {
+                    window.memoryBank.set('profile', 'username', newUsername.trim());
+                    loadUserData();
+                }
+            });
+        }
+
+        // Reset profile with double confirmation
+        function setupResetProfile() {
+            // Add reset button to UI if not exists
+            const resetBtn = document.createElement('button');
+            resetBtn.textContent = 'RESET PROFILE';
+            resetBtn.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 20px;
+                background: rgba(255, 0, 0, 0.2);
+                border: 2px solid #ff0000;
+                border-radius: 8px;
+                color: #ff0000;
+                font-family: 'Orbitron', monospace;
+                font-weight: bold;
+                cursor: pointer;
+                z-index: 10000;
+            `;
+            resetBtn.onclick = function() {
+                const confirm1 = confirm('Are you sure you want to reset your profile? This cannot be undone!');
+                if (confirm1) {
+                    const confirm2 = prompt('Type "RESET" to confirm:');
+                    if (confirm2 === 'RESET') {
+                        window.memoryBank.reset('RESET_CONFIRMED');
+                        loadUserData();
+                        alert('Profile reset!');
+                    }
+                }
+            };
+            document.body.appendChild(resetBtn);
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: ${type === 'info' ? 'rgba(38, 255, 246, 0.9)' : 'rgba(127, 43, 255, 0.9)'};
+                color: black;
+                padding: 20px 30px;
+                border-radius: 10px;
+                font-weight: bold;
+                z-index: 10000;
+                box-shadow: 0 0 30px rgba(38, 255, 246, 0.5);
+                animation: slideInRight 0.3s ease-out;
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add notification animations
+            const style = document.createElement('style');
+            style.textContent = `
+            @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            @keyframes slideOutRight {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+        // Initialize on load
+        window.onload = function() {
+            initBioParticles();
+            
+            // Wait for MemoryBank to be ready
+            if (window.memoryBank) {
+                loadUserData();
+                setupMemoryBankListeners();
+                setupProfileEditing();
+                setupResetProfile();
+            } else {
+                // Retry after a short delay
+                setTimeout(() => {
+                    if (window.memoryBank) {
+                        loadUserData();
+                        setupMemoryBankListeners();
+                        setupProfileEditing();
+                        setupResetProfile();
+                    }
+                }, 100);
+            }
+        };
+
+        // Save on page unload
+        window.addEventListener('beforeunload', () => {
+            if (window.memoryBank) {
+                window.memoryBank.save();
+            }
+        });
+    </script>
+</body>
+</html>

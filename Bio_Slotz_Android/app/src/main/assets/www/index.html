@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>BiO-Slotz</title>
+  <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+  <div id="stage">
+    <div id="cabinetWrap">
+      <img id="cabinet" src="assets/cabinet.png" alt="BiO-Slotz Cabinet" draggable="false" />
+      <div id="screenWrap" aria-hidden="true">
+        <canvas id="reels"></canvas>
+<img id="headerBanner" src="assets/header2.jpg" alt="" draggable="false" />
+        <div id="hud" aria-hidden="true">
+          <div class="hudItem"><div class="lbl">CREDITS</div><div id="hudCredits" class="val">0</div></div>
+          <div class="hudItem"><div class="lbl">BET</div><div id="hudBet" class="val">0</div></div>
+          <div class="hudItem"><div class="lbl">LINES</div><div id="hudLines" class="val">3</div></div>
+          <div class="hudItem"><div class="lbl">WIN</div><div id="hudWin" class="val">0</div></div>
+          <div class="hudItem"><div class="lbl">FREE</div><div id="hudFS" class="val">0</div></div>
+        </div>
+        <canvas id="fx"></canvas>
+
+        <img id="gridOverlay" src="assets/grid_overlay.png" alt="" draggable="false" />
+        <img id="frameOverlay" src="assets/screen_frame.png" alt="" draggable="false" />
+      </div>
+
+      <button id="btn-spin" class="hitbox" aria-label="Spin"></button>
+      <button id="btn-auto" class="hitbox" aria-label="Auto"></button>
+      <button id="btn-bet" class="hitbox" aria-label="Bet"></button>
+
+      <div id="toast" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <script src="game.js?v=3"></script>
+  <script src="memory-bank.js"></script>
+  <script src="bioslotz-integration.js"></script>
+</body>
+</html>

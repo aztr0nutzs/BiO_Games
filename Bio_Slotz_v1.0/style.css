@@ -1,0 +1,126 @@
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: #000;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+#stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at top, #050816 0, #02030a 40%, #000 100%);
+}
+
+#stage::before {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 10% 0, rgba(0,255,255,0.05) 0, transparent 50%),
+    radial-gradient(circle at 90% 20%, rgba(180,0,255,0.08) 0, transparent 55%),
+    radial-gradient(circle at 40% 90%, rgba(0,255,180,0.06) 0, transparent 50%);
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  animation: nebulaDrift 60s linear infinite;
+}
+
+@keyframes nebulaDrift {
+  0% { transform: translate3d(0,0,0) scale(1); }
+  50% { transform: translate3d(-3%,2%,0) scale(1.06); }
+  100% { transform: translate3d(0,0,0) scale(1); }
+}
+
+#cabinetWrap {
+  position: relative;
+  width: min(100vw, calc(100vh * 0.57));
+  height: min(100vh, calc(100vw * 1.75));
+  display: grid;
+  place-items: center;
+}
+
+#cabinet {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+#screenWrap {
+  position: absolute;
+  left: 0; top: 0;
+  width: 10px; height: 10px;
+  pointer-events: none;
+}
+
+#reels, #gridOverlay, #frameOverlay, #headerBanner {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#gridOverlay, #frameOverlay {
+  image-rendering: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#headerBanner {
+  /* "Banner somewhere relevant" without breaking the cabinet art */
+  left: 6%;
+  top: 4%;
+  width: 38%;
+  height: 18%;
+  object-fit: cover;
+  opacity: 0.65;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 10px rgba(0,255,220,0.35)) drop-shadow(0 0 16px rgba(160,0,255,0.35));
+  border-radius: 10px;
+}
+
+.hitbox {
+  position: absolute;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#toast {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 6%;
+  font-size: clamp(12px, 1.7vmin, 16px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(233, 213, 255, 0.92);
+  text-shadow:
+    0 0 6px rgba(0, 255, 255, 0.55),
+    0 0 16px rgba(156, 0, 255, 0.85);
+  opacity: 0;
+  transition: opacity 160ms linear, transform 160ms ease-out;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+/* Calibration visuals (toggled by JS) */
+.calib #screenWrap { pointer-events: auto; }
+.calib .hitbox { outline: 2px solid rgba(0,255,255,0.75); background: rgba(0,255,255,0.08); }
+.calib #screenWrap { outline: 2px solid rgba(255,0,255,0.8); }

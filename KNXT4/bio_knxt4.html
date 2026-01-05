@@ -1,0 +1,1351 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KnXT 4 | Bio-Lab Connect 4</title>
+  <style>
+:root{
+  --bg:#000;
+  --neonC:#00ffff;
+  --neonM:#ff2bd6;
+  --neonG:#39ff14;
+  --text:#e9f6ff;
+  --muted:#6a9db8;
+  --panel:rgba(8,12,18,.9);
+  --stroke:rgba(0,255,255,.2);
+  --cell:min(10vmin,72px);
+  --gap:min(1.4vmin,12px);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:system-ui,-apple-system,sans-serif;
+  color:var(--text);
+  background:#000;
+}
+
+.bg{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:radial-gradient(800px 600px at 15% 20%,rgba(0,20,40,.2),transparent 60%),
+             radial-gradient(700px 500px at 85% 70%,rgba(20,0,30,.18),transparent 55%),
+             #000;
+}
+
+.scanlines{
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(to bottom,rgba(0,255,255,.03) 0,rgba(0,255,255,.03) 1px,transparent 2px,transparent 4px);
+  opacity:.4;
+  animation:scan 8s linear infinite;
+}
+@keyframes scan{to{transform:translateY(4px)}}
+
+.testTube{
+  position:absolute;
+  width:24px;
+  height:80px;
+  background:linear-gradient(180deg,rgba(0,255,255,.1) 0%,rgba(57,255,20,.25) 100%);
+  border:1px solid rgba(0,255,255,.25);
+  border-radius:4px 4px 8px 8px;
+  box-shadow:inset 0 0 20px rgba(0,255,255,.15),0 0 30px rgba(0,255,255,.1);
+  animation:float 4s ease-in-out infinite;
+}
+.testTube::after{
+  content:"";
+  position:absolute;
+  bottom:10px;
+  left:4px;
+  right:4px;
+  height:50%;
+  background:radial-gradient(circle at 50% 80%,rgba(57,255,20,.35),rgba(0,255,255,.15));
+  border-radius:0 0 6px 6px;
+  animation:bubble 3s ease-in-out infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0) rotate(-2deg)}
+  50%{transform:translateY(-15px) rotate(2deg)}
+}
+@keyframes bubble{
+  0%,100%{opacity:.6}
+  50%{opacity:.8}
+}
+
+.testTube1{left:5%;top:15%}
+.testTube2{right:8%;top:25%;animation-delay:1.2s;filter:hue-rotate(45deg)}
+.testTube3{left:12%;bottom:20%;animation-delay:2s;filter:hue-rotate(-30deg)}
+.testTube4{right:15%;bottom:30%;animation-delay:.8s}
+
+.container{
+  position:relative;
+  width:100%;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  z-index:1;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  padding:16px 24px;
+  background:linear-gradient(180deg,rgba(0,0,0,.85),rgba(0,0,0,.5));
+  border-bottom:1px solid var(--stroke);
+  box-shadow:0 4px 30px rgba(0,0,0,.5);
+  z-index:10;
+}
+
+.logo{
+  font-size:clamp(28px,4vw,42px);
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  background:linear-gradient(135deg,var(--neonC),var(--neonM),var(--neonG));
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 12px rgba(0,255,255,.4));
+  animation:logoGlow 3s ease-in-out infinite;
+}
+@keyframes logoGlow{
+  0%,100%{filter:drop-shadow(0 0 12px rgba(0,255,255,.4))}
+  50%{filter:drop-shadow(0 0 20px rgba(0,255,255,.6))}
+}
+
+.subtitle{
+  font-size:11px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.hud{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.statBox{
+  background:var(--panel);
+  border:1px solid var(--stroke);
+  border-radius:16px;
+  padding:8px 14px;
+  min-width:80px;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+}
+
+.statLabel{
+  font-size:9px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+
+.statValue{
+  font-size:16px;
+  font-weight:900;
+  color:var(--neonC);
+  text-shadow:0 0 8px rgba(0,255,255,.4);
+}
+
+.statValue.p2{color:var(--neonM);text-shadow:0 0 8px rgba(255,43,214,.4)}
+
+.progressWrap{min-width:160px}
+
+.progressBar{
+  height:8px;
+  background:rgba(0,0,0,.6);
+  border:1px solid rgba(0,255,255,.2);
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:4px;
+}
+
+.progressFill{
+  height:100%;
+  width:20%;
+  background:linear-gradient(90deg,var(--neonC),var(--neonM),var(--neonG));
+  box-shadow:0 0 12px rgba(0,255,255,.5);
+  transition:width .5s ease;
+}
+
+.gameArea{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  overflow:auto;
+}
+
+.boardContainer{
+  position:relative;
+  max-width:800px;
+  width:100%;
+}
+
+.oozeTop{
+  position:absolute;
+  top:-20px;
+  left:10%;
+  right:10%;
+  height:80px;
+  pointer-events:none;
+  z-index:5;
+}
+
+.oozeDrip{
+  position:absolute;
+  width:16px;
+  border-radius:8px 8px 0 0;
+  background:linear-gradient(180deg,rgba(57,255,20,.6) 0%,rgba(57,255,20,.3) 100%);
+  box-shadow:inset 0 0 8px rgba(57,255,20,.4),0 0 16px rgba(57,255,20,.3);
+  animation:drip 4s ease-in-out infinite;
+}
+@keyframes drip{
+  0%,100%{transform:translateY(0) scaleY(1)}
+  50%{transform:translateY(8px) scaleY(1.15)}
+}
+
+.oozeDrip:nth-child(1){left:8%;height:45px}
+.oozeDrip:nth-child(2){left:24%;height:38px;animation-delay:1.2s}
+.oozeDrip:nth-child(3){left:42%;height:52px;animation-delay:.6s}
+.oozeDrip:nth-child(4){left:58%;height:40px;animation-delay:1.8s}
+.oozeDrip:nth-child(5){left:76%;height:48px;animation-delay:.4s}
+.oozeDrip:nth-child(6){left:90%;height:42px;animation-delay:1.4s}
+
+.boardWrap{
+  position:relative;
+  padding:32px;
+  background:
+    radial-gradient(circle at 30% 30%,rgba(0,255,255,.08),transparent 60%),
+    radial-gradient(circle at 70% 60%,rgba(255,43,214,.06),transparent 60%),
+    linear-gradient(180deg,rgba(5,8,15,.88),rgba(0,0,0,.92));
+  border:2px solid var(--stroke);
+  border-radius:24px;
+  box-shadow:
+    inset 0 0 60px rgba(0,0,0,.6),
+    0 20px 60px rgba(0,0,0,.7),
+    0 0 40px rgba(0,255,255,.08);
+}
+
+.boardWrap::before{
+  content:"";
+  position:absolute;
+  inset:-4px;
+  background:linear-gradient(135deg,rgba(0,255,255,.15),rgba(255,43,214,.12),rgba(57,255,20,.10));
+  border-radius:24px;
+  filter:blur(12px);
+  opacity:.5;
+  pointer-events:none;
+  z-index:-1;
+}
+
+.board{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(7,var(--cell));
+  grid-template-rows:repeat(6,var(--cell));
+  gap:var(--gap);
+  padding:24px;
+  background:
+    radial-gradient(circle at 30% 30%,rgba(0,255,255,.10),transparent 50%),
+    radial-gradient(circle at 70% 60%,rgba(255,43,214,.08),transparent 50%),
+    linear-gradient(180deg,rgba(0,5,12,.75),rgba(0,0,0,.85));
+  border:2px solid rgba(0,255,255,.25);
+  border-radius:20px;
+  box-shadow:
+    inset 0 0 40px rgba(0,0,0,.7),
+    inset 0 8px 20px rgba(0,255,255,.08),
+    0 12px 40px rgba(0,0,0,.6);
+  transform-style:preserve-3d;
+  transform:perspective(1200px) rotateX(12deg) rotateY(-8deg);
+}
+
+.cell{
+  position:relative;
+  width:var(--cell);
+  height:var(--cell);
+  border-radius:50%;
+  cursor:pointer;
+  background:
+    radial-gradient(circle at 35% 35%,
+      rgba(0,0,0,.85) 0%,
+      rgba(0,0,0,.92) 45%,
+      rgba(0,255,255,.12) 48%,
+      rgba(255,43,214,.10) 52%,
+      rgba(0,0,0,.95) 60%,
+      rgba(0,0,0,1) 100%);
+  box-shadow:
+    inset 0 8px 20px rgba(0,0,0,.8),
+    inset 0 -6px 16px rgba(0,255,255,.08),
+    0 4px 12px rgba(0,0,0,.5);
+  border:none;
+  outline:none;
+  transform-style:preserve-3d;
+  transition:box-shadow .2s;
+}
+
+.cell:hover{
+  box-shadow:
+    inset 0 8px 20px rgba(0,0,0,.8),
+    inset 0 -6px 20px rgba(0,255,255,.18),
+    0 4px 12px rgba(0,0,0,.5),
+    0 0 20px rgba(0,255,255,.15);
+}
+
+.cell.colHint{
+  box-shadow:
+    inset 0 8px 20px rgba(0,0,0,.8),
+    inset 0 -6px 24px rgba(0,255,255,.25),
+    0 4px 12px rgba(0,0,0,.5),
+    0 0 24px rgba(0,255,255,.20);
+}
+
+.chip{
+  position:absolute;
+  inset:8%;
+  border-radius:50%;
+  transform:translateZ(16px);
+  overflow:hidden;
+  box-shadow:
+    inset 0 0 16px rgba(255,255,255,.06),
+    0 10px 20px rgba(0,0,0,.6),
+    0 0 20px rgba(0,255,255,.12);
+  border:1px solid rgba(255,255,255,.10);
+}
+
+.chip.p1{
+  box-shadow:
+    inset 0 0 20px rgba(0,255,255,.18),
+    0 10px 20px rgba(0,0,0,.6),
+    0 0 28px rgba(0,255,255,.18);
+  border-color:rgba(0,255,255,.20);
+}
+
+.chip.p2{
+  box-shadow:
+    inset 0 0 20px rgba(255,43,214,.16),
+    0 10px 20px rgba(0,0,0,.6),
+    0 0 28px rgba(255,43,214,.18);
+  border-color:rgba(255,43,214,.20);
+}
+
+.chip .pattern{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+}
+
+.chip .sheen{
+  position:absolute;
+  inset:-40%;
+  background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.16),transparent 65%);
+  transform:rotate(25deg);
+  opacity:.85;
+}
+
+.drop{
+  animation:chipDrop .35s cubic-bezier(.15,.8,.25,1.1);
+}
+@keyframes chipDrop{
+  0%{transform:translateZ(16px) translateY(-200%) scale(.96);opacity:.8}
+  70%{transform:translateZ(16px) translateY(6%) scale(1.03);opacity:1}
+  100%{transform:translateZ(16px) translateY(0) scale(1);opacity:1}
+}
+
+.win{
+  animation:winPulse 1s ease-in-out infinite;
+}
+@keyframes winPulse{
+  0%,100%{
+    box-shadow:inset 0 0 20px rgba(57,255,20,.25),0 0 20px rgba(57,255,20,.15),0 10px 20px rgba(0,0,0,.6);
+  }
+  50%{
+    box-shadow:inset 0 0 32px rgba(57,255,20,.45),0 0 40px rgba(57,255,20,.35),0 10px 20px rgba(0,0,0,.6);
+  }
+}
+
+.sidePanel{
+  position:fixed;
+  top:100px;
+  right:20px;
+  width:280px;
+  max-height:calc(100vh - 300px);
+  background:var(--panel);
+  border:1px solid var(--stroke);
+  border-radius:24px;
+  padding:18px;
+  box-shadow:0 12px 40px rgba(0,0,0,.6);
+  overflow-y:auto;
+  z-index:8;
+}
+
+.panelTitle{
+  font-size:11px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:12px;
+  padding-bottom:8px;
+  border-bottom:1px solid rgba(0,255,255,.15);
+}
+
+.controls{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.btn{
+  width:100%;
+  padding:12px 16px;
+  border:1px solid var(--stroke);
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(0,255,255,.12),rgba(0,0,0,.3));
+  color:var(--text);
+  font-weight:800;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all .2s;
+  box-shadow:0 4px 12px rgba(0,0,0,.4);
+  font-size:12px;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 20px rgba(0,255,255,.15);
+  border-color:rgba(0,255,255,.3);
+}
+
+.btn:active{transform:translateY(0)}
+
+.btn:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+  transform:none;
+}
+
+.btn.primary{
+  background:linear-gradient(180deg,rgba(0,255,255,.25),rgba(0,255,255,.08));
+  border-color:rgba(0,255,255,.35);
+  box-shadow:inset 0 0 20px rgba(0,255,255,.12),0 4px 12px rgba(0,0,0,.4);
+}
+
+.btn.danger{
+  background:linear-gradient(180deg,rgba(255,77,77,.25),rgba(255,77,77,.08));
+  border-color:rgba(255,77,77,.35);
+}
+
+.messageBox{
+  padding:12px 14px;
+  border:1px solid rgba(0,255,255,.2);
+  border-radius:16px;
+  background:rgba(0,0,0,.5);
+  color:var(--text);
+  font-size:13px;
+  line-height:1.4;
+  margin-top:12px;
+  box-shadow:inset 0 0 20px rgba(0,0,0,.4);
+}
+
+.chipSelector{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.92));
+  border-top:2px solid var(--stroke);
+  padding:16px 24px;
+  box-shadow:0 -8px 40px rgba(0,0,0,.6);
+  z-index:9;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.chipSelectorHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.chipSelectorTitle{
+  font-size:12px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.playerChipSelect{
+  display:flex;
+  gap:16px;
+}
+
+.playerChipBtn{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  background:rgba(0,0,0,.6);
+  border:1px solid var(--stroke);
+  border-radius:16px;
+  cursor:pointer;
+  transition:all .2s;
+}
+
+.playerChipBtn:hover{
+  border-color:rgba(0,255,255,.4);
+  box-shadow:0 0 16px rgba(0,255,255,.15);
+}
+
+.playerLabel{
+  font-weight:900;
+  font-size:11px;
+  letter-spacing:.12em;
+}
+
+.playerLabel.p1{color:var(--neonC)}
+.playerLabel.p2{color:var(--neonM)}
+
+.chipPreview{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow:inset 0 0 12px rgba(0,0,0,.5);
+  position:relative;
+  overflow:hidden;
+}
+
+.chipGrid{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:4px 0;
+}
+
+.chipGrid::-webkit-scrollbar{height:6px}
+.chipGrid::-webkit-scrollbar-track{background:rgba(0,0,0,.4)}
+.chipGrid::-webkit-scrollbar-thumb{background:rgba(0,255,255,.3);border-radius:3px}
+
+.chipCard{
+  flex-shrink:0;
+  width:70px;
+  height:70px;
+  position:relative;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(0,0,0,.6);
+  cursor:pointer;
+  transition:all .2s;
+  overflow:hidden;
+}
+
+.chipCard:hover{
+  transform:translateY(-4px);
+  border-color:rgba(0,255,255,.35);
+  box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 20px rgba(0,255,255,.15);
+}
+
+.chipCard.locked{
+  opacity:.4;
+  cursor:not-allowed;
+  filter:grayscale(.5);
+}
+
+.chipCard.locked:hover{
+  transform:none;
+  border-color:rgba(255,255,255,.12);
+  box-shadow:none;
+}
+
+.chipCardPattern{
+  position:absolute;
+  inset:8%;
+  border-radius:50%;
+  box-shadow:inset 0 0 12px rgba(0,0,0,.4);
+}
+
+.chipCardBadge{
+  position:absolute;
+  bottom:4px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:8px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  padding:3px 6px;
+  border-radius:999px;
+  background:rgba(0,0,0,.7);
+  border:1px solid rgba(255,255,255,.15);
+  white-space:nowrap;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:100;
+  backdrop-filter:blur(4px);
+}
+
+.modal.show{display:flex}
+
+.modalPanel{
+  width:min(600px,90vw);
+  background:var(--panel);
+  border:2px solid var(--stroke);
+  border-radius:24px;
+  box-shadow:0 20px 80px rgba(0,0,0,.8);
+  overflow:hidden;
+}
+
+.modalHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 20px;
+  border-bottom:1px solid var(--stroke);
+}
+
+.modalTitle{
+  font-weight:900;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  font-size:14px;
+}
+
+.closeBtn{
+  width:36px;
+  height:36px;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:8px;
+  background:rgba(0,0,0,.4);
+  color:var(--text);
+  cursor:pointer;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.modalBody{
+  padding:20px;
+}
+
+.modalGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
+  gap:12px;
+}
+
+.modalChipCard{
+  aspect-ratio:1;
+  position:relative;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+  background:rgba(0,0,0,.6);
+  cursor:pointer;
+  transition:all .2s;
+  overflow:hidden;
+}
+
+.modalChipCard:hover{
+  transform:scale(1.05);
+  border-color:rgba(0,255,255,.35);
+  box-shadow:0 8px 24px rgba(0,0,0,.6),0 0 24px rgba(0,255,255,.2);
+}
+
+.modalFooter{
+  padding:16px 20px;
+  border-top:1px solid var(--stroke);
+  display:flex;
+  justify-content:flex-end;
+}
+
+@media (max-width:1200px){
+  .sidePanel{
+    position:static;
+    width:100%;
+    max-width:400px;
+    margin:0 auto 20px;
+    max-height:none;
+  }
+}
+
+@media (max-width:768px){
+  .topbar{flex-direction:column;align-items:flex-start;padding:12px 16px}
+  .hud{width:100%}
+  .chipSelector{padding:12px 16px}
+  .chipGrid{gap:8px}
+  .chipCard{width:60px;height:60px}
+  :root{
+    --cell:min(11vmin,60px);
+    --gap:min(1.8vmin,10px);
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .board{transform:none}
+}
+  </style>
+</head>
+
+<body>
+  <div class="bg">
+    <div class="scanlines"></div>
+  </div>
+
+  <div class="testTube testTube1"></div>
+  <div class="testTube testTube2"></div>
+  <div class="testTube testTube3"></div>
+  <div class="testTube testTube4"></div>
+
+  <div class="container">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">KnXT 4</div>
+        <div class="subtitle">Bio-Lab Connect 4</div>
+      </div>
+
+      <div class="hud">
+        <div class="statBox">
+          <div class="statLabel">Turn</div>
+          <div id="turnStat" class="statValue">P1</div>
+        </div>
+        <div class="statBox">
+          <div class="statLabel">Games</div>
+          <div id="gamesStat" class="statValue">0</div>
+        </div>
+        <div class="statBox">
+          <div class="statLabel">Wins</div>
+          <div id="winsStat" class="statValue">0</div>
+        </div>
+        <div class="statBox progressWrap">
+          <div class="statLabel">Unlock Progress</div>
+          <div class="progressBar">
+            <div id="progressFill" class="progressFill"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="gameArea">
+      <div class="boardContainer">
+        <div class="oozeTop">
+          <div class="oozeDrip"></div>
+          <div class="oozeDrip"></div>
+          <div class="oozeDrip"></div>
+          <div class="oozeDrip"></div>
+          <div class="oozeDrip"></div>
+          <div class="oozeDrip"></div>
+        </div>
+
+        <div class="boardWrap">
+          <div id="board" class="board"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidePanel">
+      <div class="panelTitle">Game Controls</div>
+      <div class="controls">
+        <button id="newGameBtn" class="btn primary">New Game</button>
+        <button id="undoBtn" class="btn" disabled>Undo Move</button>
+        <button id="aiBtn" class="btn">Solo: OFF</button>
+        <button id="resetProgressBtn" class="btn danger">Reset Progress</button>
+      </div>
+      
+      <div class="panelTitle">Status</div>
+      <div id="messageBox" class="messageBox">
+        Drop a chip to begin. Win to unlock more specimens.
+      </div>
+    </div>
+
+    <div class="chipSelector">
+      <div class="chipSelectorHeader">
+        <div class="chipSelectorTitle">Chip Selection Bay</div>
+        <div class="playerChipSelect">
+          <button id="p1SelectBtn" class="playerChipBtn">
+            <span class="playerLabel p1">P1</span>
+            <div id="p1Preview" class="chipPreview"></div>
+          </button>
+          <button id="p2SelectBtn" class="playerChipBtn">
+            <span class="playerLabel p2">P2</span>
+            <div id="p2Preview" class="chipPreview"></div>
+          </button>
+        </div>
+      </div>
+      <div id="chipGrid" class="chipGrid"></div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal">
+    <div class="modalPanel">
+      <div class="modalHeader">
+        <div id="modalTitle" class="modalTitle">Select Chip</div>
+        <button id="closeModal" class="closeBtn">✕</button>
+      </div>
+      <div id="modalBody" class="modalBody"></div>
+      <div class="modalFooter">
+        <button id="modalCancel" class="btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+(() => {
+  const COLS = 7, ROWS = 6;
+
+  // Generate 10 chip patterns (no external images needed)
+  const chipPatterns = [
+    {id:0, color1:'#00ffff', color2:'#0088ff', name:'Cyan Spiral'},
+    {id:1, color1:'#ff2bd6', color2:'#8800ff', name:'Magenta Pulse'},
+    {id:2, color1:'#39ff14', color2:'#00aa00', name:'Neon Green'},
+    {id:3, color1:'#ffff00', color2:'#ff8800', name:'Solar Flare'},
+    {id:4, color1:'#ff4d4d', color2:'#aa0000', name:'Crimson Wave'},
+    {id:5, color1:'#00ffaa', color2:'#0088aa', name:'Aqua Matrix'},
+    {id:6, color1:'#ff6600', color2:'#cc0000', name:'Ember Core'},
+    {id:7, color1:'#aa00ff', color2:'#6600aa', name:'Violet Storm'},
+    {id:8, color1:'#00ff99', color2:'#004466', name:'Biohazard Swirl'},
+    {id:9, color1:'#ff00aa', color2:'#220022', name:'Toxic Bloom'}
+  ];
+
+  // DOM refs
+  const boardEl = document.getElementById('board');
+  const turnStat = document.getElementById('turnStat');
+  const gamesStat = document.getElementById('gamesStat');
+  const winsStat = document.getElementById('winsStat');
+  const progressFill = document.getElementById('progressFill');
+  const messageBox = document.getElementById('messageBox');
+  const newGameBtn = document.getElementById('newGameBtn');
+  const undoBtn = document.getElementById('undoBtn');
+  const aiBtn = document.getElementById('aiBtn');
+  const resetProgressBtn = document.getElementById('resetProgressBtn');
+  const p1SelectBtn = document.getElementById('p1SelectBtn');
+  const p2SelectBtn = document.getElementById('p2SelectBtn');
+  const p1Preview = document.getElementById('p1Preview');
+  const p2Preview = document.getElementById('p2Preview');
+  const chipGrid = document.getElementById('chipGrid');
+  const modal = document.getElementById('modal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalBody = document.getElementById('modalBody');
+  const closeModalBtn = document.getElementById('closeModal');
+  const modalCancel = document.getElementById('modalCancel');
+
+  // Game state
+  let board = [];
+  let currentPlayer = 1; // 1 or 2
+  let gameOver = false;
+  let moveHistory = []; // {row,col,player}
+  let soloMode = false; // AI is player 2
+  let lockedPatternsCount = 0;
+
+  // Progress / unlocks state (persisted)
+  const STORAGE_KEY = 'knxt4_biolab_progress_v1';
+  let stats = {
+    games: 0,
+    wins: 0, // wins by human player (P1)
+    p1PatternId: 0,
+    p2PatternId: 1
+  };
+
+  function loadStats() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        stats = Object.assign(stats, parsed);
+      }
+    } catch(e) {}
+  }
+
+  function saveStats() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+    } catch(e) {}
+  }
+
+  function resetStats() {
+    stats = {
+      games: 0,
+      wins: 0,
+      p1PatternId: 0,
+      p2PatternId: 1
+    };
+    saveStats();
+    updateHud();
+    updateProgressAndChipLocks();
+    renderChipPreviews();
+    messageBox.textContent = 'Progress reset. Specimens returned to baseline.';
+  }
+
+  function computeUnlockThresholds() {
+    // Simple scheme: unlock 2 base chips, then 2 more every 3 wins.
+    // Result: at 0 wins -> 2 unlocked, at 3 wins -> 4, 6 wins -> 6, 9 -> 8, 12 -> 10 (all).
+    const base = 2;
+    const extra = Math.min(8, Math.floor(stats.wins / 3) * 2);
+    const unlocked = Math.min(chipPatterns.length, base + extra);
+    return unlocked;
+  }
+
+  function updateProgressAndChipLocks() {
+    const unlocked = computeUnlockThresholds();
+    lockedPatternsCount = chipPatterns.length - unlocked;
+
+    // Progress bar: percent of patterns unlocked
+    const pct = (unlocked / chipPatterns.length) * 100;
+    progressFill.style.width = pct.toFixed(1) + '%';
+
+    // Update chip cards lock state
+    const cards = chipGrid.querySelectorAll('.chipCard');
+    cards.forEach(card => {
+      const id = parseInt(card.dataset.id, 10);
+      if (id < unlocked) {
+        card.classList.remove('locked');
+        const badge = card.querySelector('.chipCardBadge');
+        if (badge) badge.textContent = 'UNLOCKED';
+      } else {
+        card.classList.add('locked');
+        const badge = card.querySelector('.chipCardBadge');
+        if (badge) badge.textContent = 'LOCKED';
+      }
+    });
+  }
+
+  function updateHud() {
+    turnStat.textContent = currentPlayer === 1 ? 'P1' : 'P2';
+    turnStat.classList.toggle('p2', currentPlayer === 2);
+    gamesStat.textContent = String(stats.games);
+    winsStat.textContent = String(stats.wins);
+  }
+
+  function createEmptyBoard() {
+    board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+    moveHistory = [];
+    gameOver = false;
+    Array.from(boardEl.children).forEach(c => {
+      c.innerHTML = '';
+      c.classList.remove('colHint');
+      c.classList.remove('win');
+    });
+    undoBtn.disabled = true;
+    updateHud();
+  }
+
+  function buildBoardDom() {
+    boardEl.innerHTML = '';
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const cell = document.createElement('button');
+        cell.className = 'cell';
+        cell.dataset.row = String(r);
+        cell.dataset.col = String(c);
+
+        cell.addEventListener('click', () => handleColumnClick(c));
+        cell.addEventListener('mouseenter', () => highlightColumn(c, true));
+        cell.addEventListener('mouseleave', () => highlightColumn(c, false));
+
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function highlightColumn(col, on) {
+    const cells = boardEl.querySelectorAll(`.cell[data-col="${col}"]`);
+    cells.forEach(cell => {
+      cell.classList.toggle('colHint', on && !gameOver);
+    });
+  }
+
+  function getDropRow(col) {
+    for (let r = ROWS - 1; r >= 0; r--) {
+      if (board[r][col] === 0) return r;
+    }
+    return -1;
+  }
+
+  function getCellEl(row, col) {
+    return boardEl.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+  }
+
+  function createChipElement(player, drop) {
+    const chip = document.createElement('div');
+    chip.className = 'chip ' + (player === 1 ? 'p1' : 'p2') + (drop ? ' drop' : '');
+    const pattern = document.createElement('div');
+    pattern.className = 'pattern';
+
+    const patternId = player === 1 ? stats.p1PatternId : stats.p2PatternId;
+    const def = chipPatterns.find(p => p.id === patternId) || chipPatterns[0];
+
+    // Simple pattern: radial gradient plus stripes using background-image layering
+    pattern.style.background = `
+      radial-gradient(circle at 30% 30%, ${def.color1}, transparent 60%),
+      radial-gradient(circle at 70% 70%, ${def.color2}, transparent 65%),
+      conic-gradient(from 45deg, ${def.color1} 0 25%, ${def.color2} 25% 50%, ${def.color1} 50% 75%, ${def.color2} 75% 100%)
+    `;
+
+    const sheen = document.createElement('div');
+    sheen.className = 'sheen';
+
+    chip.appendChild(pattern);
+    chip.appendChild(sheen);
+    return chip;
+  }
+
+  function placeChip(row, col, player, recordMove = true) {
+    if (row < 0) return false;
+    board[row][col] = player;
+    const cell = getCellEl(row, col);
+    if (!cell) return false;
+    cell.innerHTML = '';
+    const chip = createChipElement(player, true);
+    cell.appendChild(chip);
+    if (recordMove) {
+      moveHistory.push({row, col, player});
+      undoBtn.disabled = moveHistory.length === 0;
+    }
+    return true;
+  }
+
+  function handleColumnClick(col) {
+    if (gameOver) return;
+    if (soloMode && currentPlayer === 2) return; // Wait for AI
+
+    const row = getDropRow(col);
+    if (row === -1) {
+      messageBox.textContent = 'Column is full. Try another.';
+      return;
+    }
+
+    placeChip(row, col, currentPlayer, true);
+    const winner = checkWinFrom(row, col);
+    if (winner) {
+      handleWin(winner);
+      return;
+    }
+
+    if (isBoardFull()) {
+      handleDraw();
+      return;
+    }
+
+    switchTurn();
+
+    if (soloMode && currentPlayer === 2 && !gameOver) {
+      // Slight delay for feel
+      setTimeout(aiMove, 400);
+    }
+  }
+
+  function switchTurn() {
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    updateHud();
+    messageBox.textContent = currentPlayer === 1 ? 'P1, deploy your specimen.' : (soloMode ? 'Bio-AI analyzing...':'P2, your turn.');
+  }
+
+  function checkWinFrom(row, col) {
+    const player = board[row][col];
+    if (!player) return 0;
+
+    const directions = [
+      {dr:0, dc:1},   // horizontal
+      {dr:1, dc:0},   // vertical
+      {dr:1, dc:1},   // diag down-right
+      {dr:1, dc:-1}   // diag down-left
+    ];
+
+    for (const {dr, dc} of directions) {
+      const line = [{r:row, c:col}];
+
+      let r = row + dr, c = col + dc;
+      while (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === player) {
+        line.push({r, c});
+        r += dr; c += dc;
+      }
+
+      r = row - dr; c = col - dc;
+      while (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === player) {
+        line.unshift({r, c});
+        r -= dr; c -= dc;
+      }
+
+      if (line.length >= 4) {
+        // highlight first 4 (or all) in line
+        line.forEach(pos => {
+          const cell = getCellEl(pos.r, pos.c);
+          if (cell) {
+            const chip = cell.querySelector('.chip');
+            if (chip) chip.classList.add('win');
+          }
+        });
+        return player;
+      }
+    }
+    return 0;
+  }
+
+  function isBoardFull() {
+    return board.every(row => row.every(cell => cell !== 0));
+  }
+
+  function handleWin(player) {
+    gameOver = true;
+    stats.games++;
+    if (player === 1) {
+      stats.wins++;
+      messageBox.textContent = 'P1 has connected 4! New specimens unlocking...';
+    } else {
+      messageBox.textContent = soloMode ? 'Bio-AI has outmaneuvered you.' : 'P2 has connected 4!';
+    }
+    saveStats();
+    updateHud();
+    updateProgressAndChipLocks();
+    undoBtn.disabled = true;
+  }
+
+  function handleDraw() {
+    gameOver = true;
+    stats.games++;
+    messageBox.textContent = 'Stalemate. The lab notes it as a draw.';
+    saveStats();
+    updateHud();
+    undoBtn.disabled = true;
+  }
+
+  function undoLastMove() {
+    if (moveHistory.length === 0 || gameOver) return;
+    const last = moveHistory.pop();
+    board[last.row][last.col] = 0;
+    const cell = getCellEl(last.row, last.col);
+    if (cell) {
+      cell.innerHTML = '';
+    }
+    currentPlayer = last.player;
+    gameOver = false;
+    undoBtn.disabled = moveHistory.length === 0;
+    updateHud();
+    messageBox.textContent = 'Last deployment reverted.';
+  }
+
+  // AI logic for P2 in solo mode
+  function aiMove() {
+    if (!soloMode || gameOver || currentPlayer !== 2) return;
+
+    // 1. Try to win
+    let col = findWinningMove(2);
+    if (col === -1) {
+      // 2. Try to block P1
+      col = findWinningMove(1);
+    }
+    if (col === -1) {
+      // 3. Prefer center-ish columns randomly
+      const order = [3,2,4,1,5,0,6];
+      const available = order.filter(c => getDropRow(c) !== -1);
+      if (available.length > 0) {
+        col = available[Math.floor(Math.random() * available.length)];
+      }
+    }
+    if (col === -1) return; // no move
+
+    const row = getDropRow(col);
+    placeChip(row, col, 2, true);
+    const winner = checkWinFrom(row, col);
+    if (winner) {
+      handleWin(winner);
+      return;
+    }
+    if (isBoardFull()) {
+      handleDraw();
+      return;
+    }
+    switchTurn();
+  }
+
+  function findWinningMove(player) {
+    for (let c = 0; c < COLS; c++) {
+      const r = getDropRow(c);
+      if (r === -1) continue;
+      board[r][c] = player;
+      const win = checkWinFrom(r, c);
+      board[r][c] = 0;
+      // Need to clear any temporary win classes if checkWinFrom added them
+      clearWinHighlights();
+      if (win === player) return c;
+    }
+    return -1;
+  }
+
+  function clearWinHighlights() {
+    const chips = boardEl.querySelectorAll('.chip.win');
+    chips.forEach(chip => chip.classList.remove('win'));
+  }
+
+  // Chip selection UI
+  let modalTargetPlayer = 1; // which player is selecting in modal
+
+  function renderChipGrid() {
+    chipGrid.innerHTML = '';
+    chipPatterns.forEach(pattern => {
+      const card = document.createElement('div');
+      card.className = 'chipCard';
+      card.dataset.id = String(pattern.id);
+
+      const circle = document.createElement('div');
+      circle.className = 'chipCardPattern';
+      circle.style.background = `
+        radial-gradient(circle at 30% 30%, ${pattern.color1}, transparent 60%),
+        radial-gradient(circle at 70% 70%, ${pattern.color2}, transparent 65%),
+        conic-gradient(from 45deg, ${pattern.color1} 0 25%, ${pattern.color2} 25% 50%, ${pattern.color1} 50% 75%, ${pattern.color2} 75% 100%)
+      `;
+
+      const badge = document.createElement('div');
+      badge.className = 'chipCardBadge';
+      badge.textContent = 'LOCKED';
+
+      card.appendChild(circle);
+      card.appendChild(badge);
+      chipGrid.appendChild(card);
+    });
+  }
+
+  function renderChipPreviews() {
+    renderPreviewForPlayer(p1Preview, stats.p1PatternId);
+    renderPreviewForPlayer(p2Preview, stats.p2PatternId);
+  }
+
+  function renderPreviewForPlayer(container, patternId) {
+    container.innerHTML = '';
+    const pattern = chipPatterns.find(p => p.id === patternId) || chipPatterns[0];
+    const inner = document.createElement('div');
+    inner.style.position = 'absolute';
+    inner.style.inset = '0';
+    inner.style.borderRadius = '50%';
+    inner.style.background = `
+      radial-gradient(circle at 30% 30%, ${pattern.color1}, transparent 60%),
+      radial-gradient(circle at 70% 70%, ${pattern.color2}, transparent 65%),
+      conic-gradient(from 45deg, ${pattern.color1} 0 25%, ${pattern.color2} 25% 50%, ${pattern.color1} 50% 75%, ${pattern.color2} 75% 100%)
+    `;
+    container.appendChild(inner);
+  }
+
+  function openChipModal(forPlayer) {
+    modalTargetPlayer = forPlayer;
+    modalTitle.textContent = forPlayer === 1 ? 'Select P1 Chip' : 'Select P2 Chip';
+    modalBody.innerHTML = '';
+
+    const grid = document.createElement('div');
+    grid.className = 'modalGrid';
+
+    const unlocked = computeUnlockThresholds();
+
+    chipPatterns.forEach(pattern => {
+      const card = document.createElement('div');
+      card.className = 'modalChipCard';
+      card.dataset.id = String(pattern.id);
+
+      const circle = document.createElement('div');
+      circle.className = 'chipCardPattern';
+      circle.style.background = `
+        radial-gradient(circle at 30% 30%, ${pattern.color1}, transparent 60%),
+        radial-gradient(circle at 70% 70%, ${pattern.color2}, transparent 65%),
+        conic-gradient(from 45deg, ${pattern.color1} 0 25%, ${pattern.color2} 25% 50%, ${pattern.color1} 50% 75%, ${pattern.color2} 75% 100%)
+      `;
+
+      const badge = document.createElement('div');
+      badge.className = 'chipCardBadge';
+      if (pattern.id < unlocked) {
+        badge.textContent = 'UNLOCKED';
+      } else {
+        badge.textContent = 'LOCKED';
+        card.classList.add('locked');
+      }
+
+      card.appendChild(circle);
+      card.appendChild(badge);
+
+      card.addEventListener('click', () => {
+        if (pattern.id >= unlocked) return;
+        if (modalTargetPlayer === 1) {
+          stats.p1PatternId = pattern.id;
+        } else {
+          stats.p2PatternId = pattern.id;
+        }
+        saveStats();
+        renderChipPreviews();
+        modal.classList.remove('show');
+      });
+
+      grid.appendChild(card);
+    });
+
+    modalBody.appendChild(grid);
+    modal.classList.add('show');
+  }
+
+  function closeChipModal() {
+    modal.classList.remove('show');
+  }
+
+  // Button wiring
+  newGameBtn.addEventListener('click', () => {
+    createEmptyBoard();
+    messageBox.textContent = 'New assay initiated. P1 begins.';
+  });
+
+  undoBtn.addEventListener('click', () => {
+    undoLastMove();
+  });
+
+  aiBtn.addEventListener('click', () => {
+    soloMode = !soloMode;
+    aiBtn.textContent = soloMode ? 'Solo: ON' : 'Solo: OFF';
+    messageBox.textContent = soloMode
+      ? 'Solo mode enabled. P2 is controlled by Bio-AI.'
+      : 'Solo mode disabled. P2 is human-controlled.';
+  });
+
+  resetProgressBtn.addEventListener('click', () => {
+    if (confirm('Reset all unlock progress and chip selections?')) {
+      resetStats();
+    }
+  });
+
+  p1SelectBtn.addEventListener('click', () => openChipModal(1));
+  p2SelectBtn.addEventListener('click', () => openChipModal(2));
+
+  closeModalBtn.addEventListener('click', closeChipModal);
+  modalCancel.addEventListener('click', closeChipModal);
+  modal.addEventListener('click', e => {
+    if (e.target === modal) closeChipModal();
+  });
+
+  // Init
+  loadStats();
+  buildBoardDom();
+  createEmptyBoard();
+  renderChipGrid();
+  renderChipPreviews();
+  updateProgressAndChipLocks();
+  messageBox.textContent = 'Drop a chip to begin. Win to unlock more specimens.';
+})();
+  </script>
+  <script src="../memory-bank.js"></script>
+  <script src="../knxt4-integration.js"></script>
+</body>
+</html>

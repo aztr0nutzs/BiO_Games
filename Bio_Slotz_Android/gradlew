@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# Placeholder gradlew script.
+# NOTE: The gradle wrapper JAR is not bundled in this zip. Android Studio can regenerate it,
+# or you can create a fresh project and copy the /app module in.
+echo "This project zip omits gradle-wrapper.jar (binary). Use Android Studio to import and regenerate Gradle wrapper, or create a new project and copy the app/ folder."
+exit 1

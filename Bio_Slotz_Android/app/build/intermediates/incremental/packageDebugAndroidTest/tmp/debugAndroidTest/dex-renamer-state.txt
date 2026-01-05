@@ -1,0 +1,4 @@
+#Sun Jan 04 20:50:41 EST 2026
+base.0=/home/aztr0nutzs/Desktop/bio_games/Bio_Slotz_Android/app/build/intermediates/dex/debugAndroidTest/mergeProjectDexDebugAndroidTest/0/classes.dex
+path.0=0/classes.dex
+renamed.0=classes.dex

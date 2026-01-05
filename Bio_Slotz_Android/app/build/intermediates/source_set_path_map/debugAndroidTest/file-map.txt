@@ -1,0 +1,4 @@
+com.bioslotz.app.test.app-androidTest-0 /home/aztr0nutzs/Desktop/bio_games/Bio_Slotz_Android/app/build/generated/res/resValues/androidTest/debug
+com.bioslotz.app.test.app-mergeDebugAndroidTestResources-1 /home/aztr0nutzs/Desktop/bio_games/Bio_Slotz_Android/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
+com.bioslotz.app.test.app-mergeDebugAndroidTestResources-2 /home/aztr0nutzs/Desktop/bio_games/Bio_Slotz_Android/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
+com.bioslotz.app.test.app-merged_res-3 /home/aztr0nutzs/Desktop/bio_games/Bio_Slotz_Android/app/build/intermediates/merged_res/debugAndroidTest

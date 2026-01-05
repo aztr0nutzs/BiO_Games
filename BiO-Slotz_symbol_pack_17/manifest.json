@@ -1,0 +1,104 @@
+[
+  {
+    "id": 0,
+    "name": "s00",
+    "png": "png_256/s00.png",
+    "jpg": "jpg_originals/s00.jpeg"
+  },
+  {
+    "id": 1,
+    "name": "s01",
+    "png": "png_256/s01.png",
+    "jpg": "jpg_originals/s01.jpeg"
+  },
+  {
+    "id": 2,
+    "name": "s02",
+    "png": "png_256/s02.png",
+    "jpg": "jpg_originals/s02.jpeg"
+  },
+  {
+    "id": 3,
+    "name": "s03",
+    "png": "png_256/s03.png",
+    "jpg": "jpg_originals/s03.jpeg"
+  },
+  {
+    "id": 4,
+    "name": "s04",
+    "png": "png_256/s04.png",
+    "jpg": "jpg_originals/s04.jpeg"
+  },
+  {
+    "id": 5,
+    "name": "s05",
+    "png": "png_256/s05.png",
+    "jpg": "jpg_originals/s05.jpeg"
+  },
+  {
+    "id": 6,
+    "name": "s06",
+    "png": "png_256/s06.png",
+    "jpg": "jpg_originals/s06.jpeg"
+  },
+  {
+    "id": 7,
+    "name": "s07",
+    "png": "png_256/s07.png",
+    "jpg": "jpg_originals/s07.jpeg"
+  },
+  {
+    "id": 8,
+    "name": "s08",
+    "png": "png_256/s08.png",
+    "jpg": "jpg_originals/s08.jpeg"
+  },
+  {
+    "id": 9,
+    "name": "s09",
+    "png": "png_256/s09.png",
+    "jpg": "jpg_originals/s09.jpeg"
+  },
+  {
+    "id": 10,
+    "name": "s10",
+    "png": "png_256/s10.png",
+    "jpg": "jpg_originals/s10.jpeg"
+  },
+  {
+    "id": 11,
+    "name": "s11",
+    "png": "png_256/s11.png",
+    "jpg": "jpg_originals/s11.jpeg"
+  },
+  {
+    "id": 12,
+    "name": "s12",
+    "png": "png_256/s12.png",
+    "jpg": "jpg_originals/s12.jpeg"
+  },
+  {
+    "id": 13,
+    "name": "s13",
+    "png": "png_256/s13.png",
+    "jpg": "jpg_originals/s13.jpeg"
+  },
+  {
+    "id": 14,
+    "name": "s14",
+    "png": "png_256/s14.png",
+    "jpg": "jpg_originals/s14.jpeg"
+  },
+  {
+    "id": 15,
+    "name": "s15",
+    "png": "png_256/s15.png",
+    "jpg": "jpg_originals/s15.jpeg"
+  },
+  {
+    "id": 16,
+    "name": "s16",
+    "png": "png_256/s16.png",
+    "jpg": "jpg_originals/s16.jpeg"
+  }
+]
