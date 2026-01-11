@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cyber Wheel</title>
+<link rel="stylesheet" href="wheel_style.css">
+</head>
+<body>
+<div class="app">
+<h1>Cyber Fortune Wheel</h1>
+<div id="hud">
+<span id="coins">Coins: 0</span>
+<span id="cooldown"></span>
+<span id="rarity"></span>
+</div>
+<div class="wheelWrap">
+<div id="pointer"></div>
+<canvas id="wheel" width="600" height="600"></canvas>
+</div>
+<button id="spinBtn">SPIN</button>
+</div>
+<script>window.segments=['chip0.png', 'chip1.png', 'chip2.png', 'chip3.png', 'chip4.png', 'chip5.png', 'chip6.png', 'chip7.png'];</script>
+<script src="wheel_script.js"></script>
+</body>
+</html>
