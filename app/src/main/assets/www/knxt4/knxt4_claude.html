@@ -1564,6 +1564,43 @@ html,body{ background:#000 !important; }
   pointer-events:none;
 }
 
+/* Chips Menu Styles */
+#chips-menu {
+    position: relative;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 0 10px #00ff00;
+    z-index: 1000;
+    margin: 0 auto;
+}
+.chip {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+.chip:hover {
+    border-color: #00ff00;
+    box-shadow: 0 0 10px #00ff00;
+}
+.chip.selected {
+    border-color: #ff0000;
+    box-shadow: 0 0 15px #ff0000;
+}
+@media (max-width: 600px) {
+    .chip {
+        width: 40px;
+        height: 40px;
+    }
+}
+
 </style>
 </head>
 
@@ -1638,6 +1675,26 @@ html,body{ background:#000 !important; }
       </div>
     </div>
   </header>
+<div id="chips-menu">
+<img src="assets/knxt4_chips/s03.png" alt="Chip s03" class="chip" data-chip="s03">
+<img src="assets/knxt4_chips/s04.png" alt="Chip s04" class="chip" data-chip="s04">
+<img src="assets/knxt4_chips/s06.png" alt="Chip s06" class="chip" data-chip="s06">
+<img src="assets/knxt4_chips/s09.png" alt="Chip s09" class="chip" data-chip="s09">
+<img src="assets/knxt4_chips/s11.png" alt="Chip s11" class="chip" data-chip="s11">
+<img src="assets/knxt4_chips/s14.png" alt="Chip s14" class="chip" data-chip="s14">
+<img src="assets/knxt4_chips/s21.png" alt="Chip s21" class="chip" data-chip="s21">
+<img src="assets/knxt4_chips/s28.jpeg" alt="Chip s28" class="chip" data-chip="s28">
+<img src="assets/knxt4_chips/s29.jpeg" alt="Chip s29" class="chip" data-chip="s29">
+<img src="assets/knxt4_chips/s30.jpeg" alt="Chip s30" class="chip" data-chip="s30">
+<img src="assets/knxt4_chips/s31.jpeg" alt="Chip s31" class="chip" data-chip="s31">
+<img src="assets/knxt4_chips/s32.jpeg" alt="Chip s32" class="chip" data-chip="s32">
+<img src="assets/knxt4_chips/s33.jpeg" alt="Chip s33" class="chip" data-chip="s33">
+<img src="assets/knxt4_chips/s34.jpeg" alt="Chip s34" class="chip" data-chip="s34">
+<img src="assets/knxt4_chips/s35.jpeg" alt="Chip s35" class="chip" data-chip="s35">
+<img src="assets/knxt4_chips/s36.jpeg" alt="Chip s36" class="chip" data-chip="s36">
+<img src="assets/knxt4_chips/s37.jpeg" alt="Chip s37" class="chip" data-chip="s37">
+</div>
+
 
   <!-- Main game area -->
   <main class="stage">
@@ -1867,6 +1924,27 @@ html,body{ background:#000 !important; }
     window.KNXT4_CHIPS = ["s03.png", "s04.png", "s06.png", "s09.png", "s11.png", "s14.png", "s21.png", "s28.jpeg", "s29.jpeg", "s30.jpeg"];
   </script>
   <script src="game.js"></script>
+<script>
+let selectedChip = null;
+
+document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+        // Remove selected class from all chips
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        
+        // Add selected class to clicked chip
+        this.classList.add('selected');
+        
+        // Store selected chip
+        selectedChip = this.dataset.chip;
+        
+        // Optional: Log or send to bridge
+        console.log('Selected chip:', selectedChip);
+        BioGameJS.selectChip(selectedChip);
+    });
+});
+</script>
+
 
 <script>
 /* ===== Chip Bubbles (backdrop) =====
