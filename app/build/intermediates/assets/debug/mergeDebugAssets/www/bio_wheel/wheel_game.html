@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ARCADE CORE: TOXIC SPIN [OVERCHARGED]</title>
+<style>
+    /* --- CSS RESET & CORE VARIABLES --- */
+    :root {
+        --neon-green: #39ff14;
+        --neon-red: #ff073a;
+        --neon-blue: #00eaff;
+        --neon-purple: #bc13fe;
+        --bg-dark: #050505;
+        --glass-border: rgba(57, 255, 20, 0.5);
+        --glass-shadow: rgba(57, 255, 20, 0.2);
+    }
+
+    body {
+        background-color: var(--bg-dark);
+        color: var(--neon-green);
+        font-family: 'Consolas', 'Courier New', monospace;
+        margin: 0;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* --- ELECTRICITY CANVAS LAYER --- */
+    #electricity-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1; /* Behind UI, in front of background */
+        pointer-events: none;
+    }
+
+    /* --- BACKGROUND EFFECTS --- */
+    .background-vignette {
+        position: absolute;
+        width: 100%; height: 100%;
+        z-index: 0;
+        background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+    }
+
+    .scanline-overlay {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 999; /* On top of everything */
+        pointer-events: none;
+        background: repeating-linear-gradient(
+            0deg,
+            rgba(0, 0, 0, 0.1),
+            rgba(0, 0, 0, 0.1) 1px,
+            transparent 1px,
+            transparent 3px
+        );
+    }
+
+    /* --- LAYOUT --- */
+    .main-layout {
+        position: relative;
+        z-index: 10; /* UI sits above electricity */
+        width: 95%;
+        height: 95%;
+        display: grid;
+        grid-template-areas: 
+            "menu-left center-area"
+            "menu-bottom menu-bottom";
+        grid-template-columns: 300px auto; 
+        grid-template-rows: auto 160px; 
+        gap: 20px;
+        box-sizing: border-box;
+    }
+
+    .side-menu { grid-area: menu-left; }
+    .center-area { grid-area: center-area; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+    .bottom-menu { grid-area: menu-bottom; }
+
+    /* --- PANELS & UI --- */
+    .panel {
+        background: rgba(10, 10, 15, 0.85);
+        backdrop-filter: blur(10px);
+        border: 2px solid var(--neon-blue); /* Changed to blue for contrast */
+        border-radius: 12px;
+        box-shadow: 0 0 25px rgba(0, 234, 255, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.8);
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .panel-title {
+        color: var(--neon-red);
+        text-shadow: 0 0 10px var(--neon-red);
+        border-bottom: 2px solid var(--neon-red);
+        padding-bottom: 8px;
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    /* --- BUTTONS ENHANCED --- */
+    .btn-core {
+        background: rgba(0, 0, 0, 0.6);
+        border: 2px solid var(--neon-green);
+        color: var(--neon-green);
+        padding: 12px 20px;
+        font-family: inherit;
+        font-weight: bold;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-transform: uppercase;
+        box-shadow: 0 0 10px rgba(57, 255, 20, 0.1);
+        margin-bottom: 10px;
+    }
+
+    .btn-core:hover:not(:disabled) {
+        background: var(--neon-green);
+        color: #000;
+        box-shadow: 0 0 30px var(--neon-green);
+        transform: translateY(-2px);
+    }
+
+    .btn-core:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        border-color: #555;
+        color: #555;
+    }
+
+    .big-btn {
+        width: 100%;
+        font-size: 1.5rem;
+        padding: 20px;
+        background: rgba(255, 7, 58, 0.1);
+        border-color: var(--neon-red);
+        color: var(--neon-red);
+    }
+    .big-btn:hover:not(:disabled) {
+        background: var(--neon-red);
+        color: #fff;
+        box-shadow: 0 0 40px var(--neon-red);
+    }
+
+    /* --- WHEEL STAGE (ENLARGED) --- */
+    .wheel-stage {
+        position: relative;
+        /* Made significantly larger */
+        width: 550px; 
+        height: 550px; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    canvas {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        box-shadow: 
+            0 0 80px rgba(188, 19, 254, 0.4), /* Purple outer glow */
+            0 0 30px rgba(0, 234, 255, 0.6); /* Blue inner glow */
+        border: 4px solid #333;
+    }
+
+    .ticker-arrow {
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 50px;
+        height: 70px;
+        background: linear-gradient(to bottom, #ff073a, #800000);
+        clip-path: polygon(15% 0, 85% 0, 100% 60%, 50% 100%, 0 60%);
+        z-index: 20;
+        filter: drop-shadow(0 0 15px #ff073a);
+        transform-origin: top center;
+    }
+
+    /* --- HUD STATS --- */
+    .hud {
+        margin-bottom: 20px;
+        text-align: center;
+        width: 100%;
+    }
+    .glitch-text {
+        font-size: 3rem;
+        font-weight: 900;
+        letter-spacing: 5px;
+        color: #fff;
+        text-shadow: 4px 4px 0px var(--neon-purple);
+        margin: 0;
+    }
+    .stats-row {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 15px;
+    }
+    .stat-box {
+        background: #000;
+        border: 1px solid var(--neon-blue);
+        padding: 10px 20px;
+        font-size: 1.2rem;
+        box-shadow: 0 0 10px rgba(0, 234, 255, 0.3);
+    }
+
+    /* --- BOTTOM MENU --- */
+    .bottom-menu {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .bet-controls {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex: 1;
+    }
+    .bet-input-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .bet-input {
+        background: #000;
+        border: 2px solid var(--neon-green);
+        color: #fff;
+        padding: 10px;
+        font-size: 1.2rem;
+        width: 100px;
+        text-align: center;
+    }
+
+    /* --- OVERLAYS --- */
+    .result-pop {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.95);
+        border: 4px solid var(--neon-green);
+        padding: 40px;
+        z-index: 100;
+        text-align: center;
+        box-shadow: 0 0 100px var(--neon-green);
+    }
+    .win-flash {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: white;
+        pointer-events: none;
+        z-index: 200;
+        opacity: 0;
+        transition: opacity 0.1s;
+    }
+    .hidden { display: none !important; }
+
+    /* --- PROGRESS BARS --- */
+    .progress-bar-container {
+        margin-bottom: 20px;
+    }
+    .progress-label {
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+        color: #fff;
+    }
+    .progress-track {
+        background: #222;
+        height: 10px;
+        width: 100%;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    .progress-bar {
+        background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s;
+        box-shadow: 0 0 10px var(--neon-blue);
+    }
+
+    @media (max-width: 900px) {
+        .main-layout {
+            grid-template-areas: "center-area" "menu-left" "menu-bottom";
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto auto;
+            overflow-y: auto;
+        }
+        .wheel-stage { width: 90vw; height: 90vw; }
+    }
+</style>
+</head>
+<body>
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.min.js'></script>
+    <script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/490192/GPUParticleSystem.js'></script>
+
+    <div class="background-vignette"></div>
+    
+    <div id="electricity-container"></div>
+    
+    <div class="scanline-overlay"></div>
+
+    <div id="flashOverlay" class="win-flash hidden"></div>
+
+    <div class="main-layout" id="app">
+        
+        <div class="side-menu panel">
+            <div>
+                <h3 class="panel-title">SYSTEM OPTIONS</h3>
+                <button class="menu-btn btn-core" style="width:100%">LOAD PROFILE</button>
+                <button class="menu-btn btn-core" style="width:100%">VIEW LOGS</button>
+            </div>
+            
+            <div>
+                <h3 class="panel-title">DAILY PROTOCOL</h3>
+                <div class="progress-bar-container">
+                    <div class="progress-label">Goal 1: 5 Spins (<span id="spinCount">0</span>/5)</div>
+                    <div class="progress-track"><div class="progress-bar" id="progress1"></div></div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-label">Goal 2: X10 Win</div>
+                    <div class="progress-track"><div class="progress-bar" id="progress2" style="width: 30%;"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="center-area">
+            <div class="hud">
+                <h1 class="glitch-text" data-text="ARCADE CORE">TOXIC SPIN</h1>
+                <div class="stats-row">
+                    <div class="stat-box">CREDITS: <span id="credits" style="color:var(--neon-green)">1000</span></div>
+                    <div class="stat-box">STATUS: <span id="status" class="status-indicator">READY</span></div>
+                </div>
+            </div>
+
+            <div class="wheel-stage">
+                <div class="ticker-arrow"></div>
+                <canvas id="wheelCanvas" width="1000" height="1000"></canvas>
+            </div>
+        </div>
+
+        <div class="bottom-menu panel">
+            <div class="bet-controls">
+                <div class="bet-input-group">
+                    <label style="color:#aaa; font-size:0.8rem">BET AMOUNT</label>
+                    <input type="number" id="betAmount" value="10" min="10" max="1000" step="10" class="bet-input">
+                </div>
+                <button id="spinBtn" class="btn-core big-btn">INJECT MUTAGEN</button>
+            </div>
+            
+            <div style="text-align: right; opacity: 0.8;">
+                <div style="color:var(--neon-red); font-size: 0.8rem;">HAZARD LEVEL: HIGH</div>
+                <div style="color:var(--neon-blue); font-size: 0.8rem;">ODDS: VOLATILE</div>
+            </div>
+
+            <div id="resultOverlay" class="result-pop hidden">
+                <h1 id="winText" style="font-size: 3rem; margin: 0 0 20px 0;">WIN</h1>
+                <button id="resetBtn" class="btn-core" style="width: 200px;">CONTINUE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CONFIGURATION ---
+        // I've mapped your weird images here. 
+        // NOTE: Ensure these files exist in the same folder as this HTML file!
+        window.segments = [
+            { text: "GENGAR", color: "#4b0082", labelColor: "#ffffff", src: "s21.jpeg", multiplier: 50 },
+            { text: "BUNNY", color: "#ff69b4", labelColor: "#000000", src: "s11 (2).png", multiplier: 69 },
+            { text: "STAR", color: "#330066", labelColor: "#ffffff", src: "s31.jpeg", multiplier: 25 },
+            { text: "BAG", color: "#00ff00", labelColor: "#000000", src: "s03 (2).png", multiplier: 100 },
+            { text: "PILL", color: "#ff4500", labelColor: "#ffffff", src: "s29 (2).jpeg", multiplier: 15 },
+            { text: "SPIDER", color: "#800080", labelColor: "#ffffff", src: "s34.jpg", multiplier: 30 },
+            { text: "SHROOM", color: "#0000ff", labelColor: "#ffffff", src: "s32.jpeg", multiplier: 10 },
+            { text: "TOXIC", color: "#39ff14", labelColor: "#000000", src: "s29 (2).jpeg", multiplier: 5 }, // Reusing pill as toxic filler
+            { text: "JACKPOT", color: "#00eaff", labelColor: "#000000", src: "s11 (2).png", multiplier: 500 }, // Bunny Jackpot
+            { text: "X2", color: "#333333", labelColor: "#ffffff", src: "s03 (2).png", multiplier: 2 } 
+        ];
+
+        // --- 2. AUDIO SYSTEM ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, duration, gainValue = 0.1) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(gainValue, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        // --- 3. WHEEL RENDERER (Enhanced) ---
+        const SEGMENTS = window.segments;
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const spinBtn = document.getElementById('spinBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultOverlay = document.getElementById('resultOverlay');
+        const creditsDisplay = document.getElementById('credits');
+
+        const SEG_COUNT = SEGMENTS.length;
+        const ARC = (2 * Math.PI) / SEG_COUNT;
+        
+        // We set canvas width/height to 1000 in HTML for high res, so radius is 500
+        const RADIUS = canvas.width / 2; 
+        const IMAGE_SIZE = 180; // Big images!
+
+        let currentAngle = 0;
+        let angleVelocity = 0;
+        let isSpinning = false;
+        let loadedImages = {};
+        let credits = 1000;
+        let spinCount = 0;
+
+        // Preload Images
+        SEGMENTS.forEach((seg, i) => {
+            const img = new Image();
+            img.src = seg.src;
+            img.onload = () => { loadedImages[i] = img; };
+            img.onerror = () => { console.warn("Missing image:", seg.src); };
+        });
+
+        function drawWheel() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(currentAngle);
+
+            SEGMENTS.forEach((seg, i) => {
+                const startAngle = i * ARC;
+                const endAngle = startAngle + ARC;
+
+                // 1. Draw Wedge
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, RADIUS - 20, startAngle, endAngle);
+                
+                // Fancy Gradient Wedge
+                const grad = ctx.createRadialGradient(0, 0, 10, 0, 0, RADIUS);
+                grad.addColorStop(0, '#000');
+                grad.addColorStop(0.6, seg.color);
+                grad.addColorStop(1, '#000'); // Dark rim
+                ctx.fillStyle = grad;
+                ctx.fill();
+                
+                // Borders
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 8;
+                ctx.stroke();
+
+                // 2. Draw Image (Rotated and Embedded)
+                ctx.save();
+                ctx.rotate(startAngle + ARC / 2);
+                ctx.translate(RADIUS * 0.65, 0); // Push image out
+                ctx.rotate(Math.PI / 2); // Orient image upright relative to rim
+
+                if (loadedImages[i] && loadedImages[i].complete) {
+                    // Circular clipping for the image
+                    ctx.beginPath();
+                    ctx.arc(0, 0, IMAGE_SIZE / 2, 0, Math.PI * 2);
+                    ctx.closePath();
+                    ctx.save();
+                    ctx.clip();
+                    ctx.drawImage(loadedImages[i], -IMAGE_SIZE / 2, -IMAGE_SIZE / 2, IMAGE_SIZE, IMAGE_SIZE);
+                    ctx.restore();
+
+                    // Glassy overlay on top of image
+                    ctx.beginPath();
+                    ctx.arc(0, 0, IMAGE_SIZE / 2, 0, Math.PI * 2);
+                    ctx.strokeStyle = seg.labelColor;
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                } else {
+                    // Fallback Text
+                    ctx.fillStyle = seg.labelColor;
+                    ctx.font = "bold 60px Consolas";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(seg.text, 0, 0);
+                }
+                ctx.restore();
+            });
+
+            // 3. Center Hub (Reactor)
+            ctx.beginPath();
+            ctx.arc(0, 0, 100, 0, Math.PI * 2);
+            const hubGrad = ctx.createRadialGradient(0,0,10,0,0,100);
+            hubGrad.addColorStop(0, '#fff');
+            hubGrad.addColorStop(0.2, '#39ff14');
+            hubGrad.addColorStop(1, '#000');
+            ctx.fillStyle = hubGrad;
+            ctx.fill();
+            
+            // Spinning rim on hub
+            ctx.strokeStyle = '#39ff14';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.arc(0, 0, 90, 0 + Date.now()/100, Math.PI + Date.now()/100);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // --- 4. GAME LOGIC ---
+        let lastIndex = -1;
+        function updateGame() {
+            if (isSpinning) {
+                currentAngle += angleVelocity;
+                angleVelocity *= 0.99; // Friction
+
+                // Ticker logic
+                const normAngle = (currentAngle % (2 * Math.PI));
+                const rawIndex = Math.floor(SEG_COUNT - (normAngle / (2 * Math.PI)) * SEG_COUNT) % SEG_COUNT;
+                
+                if (rawIndex !== lastIndex) {
+                    lastIndex = rawIndex;
+                    playTone(800, 'square', 0.05, 0.1);
+                    // Shake the ticker
+                    const arrow = document.querySelector('.ticker-arrow');
+                    arrow.style.transform = `translateX(-50%) rotate(${Math.random() * 20 - 10}deg)`;
+                }
+
+                if (angleVelocity < 0.002) {
+                    isSpinning = false;
+                    checkWin(lastIndex);
+                }
+            }
+            drawWheel();
+            requestAnimationFrame(updateGame);
+        }
+
+        function startSpin() {
+            const bet = parseInt(document.getElementById('betAmount').value);
+            if (credits < bet) return alert("BROKE? GET MORE CREDITS.");
+            
+            credits -= bet;
+            creditsDisplay.innerText = credits;
+            spinCount++;
+            document.getElementById('spinCount').innerText = spinCount;
+            document.getElementById('progress1').style.width = Math.min((spinCount/5)*100, 100) + "%";
+
+            isSpinning = true;
+            angleVelocity = Math.random() * 0.3 + 0.5; // Fast spin
+            spinBtn.disabled = true;
+            resultOverlay.classList.add('hidden');
+            document.getElementById('status').innerText = "CRITICAL";
+            document.getElementById('status').style.color = "red";
+        }
+
+        function checkWin(index) {
+            const bet = parseInt(document.getElementById('betAmount').value);
+            const winner = SEGMENTS[index];
+            const winAmount = bet * winner.multiplier;
+            
+            credits += winAmount;
+            creditsDisplay.innerText = credits;
+            spinBtn.disabled = false;
+            document.getElementById('status').innerText = "READY";
+            document.getElementById('status').style.color = "var(--neon-green)";
+
+            const winText = document.getElementById('winText');
+            winText.innerHTML = `${winner.text}<br><span style="color:${winner.color}">+${winAmount}</span>`;
+            winText.style.textShadow = `0 0 20px ${winner.color}`;
+            
+            document.getElementById('flashOverlay').style.opacity = 1;
+            setTimeout(() => document.getElementById('flashOverlay').style.opacity = 0, 100);
+            
+            resultOverlay.classList.remove('hidden');
+            playTone(200, 'sawtooth', 0.2);
+            setTimeout(() => playTone(400, 'sine', 0.4), 100);
+        }
+
+        spinBtn.onclick = startSpin;
+        resetBtn.onclick = () => resultOverlay.classList.add('hidden');
+        requestAnimationFrame(updateGame);
+
+
+        // --- 5. ELECTRICITY EFFECT (Modified for TOP and BOTTOM) ---
+        // Adapting the provided Three.js script to run in the background
+        function initElectricity() {
+            const container = document.getElementById('electricity-container');
+            const camera = new THREE.PerspectiveCamera(28, window.innerWidth/window.innerHeight, 1, 10000);
+            camera.position.z = 200;
+
+            const scene = new THREE.Scene();
+            const particleSystem = new THREE.GPUParticleSystem({ maxParticles: 20000 });
+            scene.add(particleSystem);
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true }); // Alpha true for transparent bg
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            const clock = new THREE.Clock();
+            let tick = 0;
+
+            const options = {
+                position: new THREE.Vector3(),
+                positionRandomness: 0.5,
+                velocity: new THREE.Vector3(),
+                velocityRandomness: 0.5,
+                color: 0x39ff14, // Neon Green
+                colorRandomness: 0.2,
+                turbulence: 0.2,
+                lifetime: 2,
+                size: 2,
+                sizeRandomness: 1
+            };
+
+            const spawnerOptions = {
+                spawnRate: 1000,
+                timeScale: 1
+            };
+
+            function animateElec() {
+                requestAnimationFrame(animateElec);
+                const delta = clock.getDelta() * spawnerOptions.timeScale;
+                tick += delta;
+                if (tick < 0) tick = 0;
+
+                particleSystem.update(tick);
+
+                // LOGIC: Spawn particles at Top AND Bottom
+                // Top Stream
+                for (let x = 0; x < spawnerOptions.spawnRate * delta / 2; x++) {
+                    options.position.x = (Math.random() * 100) - 50; // Spread across width
+                    options.position.y = 35; // TOP position relative to camera
+                    options.velocity.x = (Math.random() - 0.5) * 2; // Move left/right
+                    options.color = 0x39ff14; // Green for top
+                    particleSystem.spawnParticle(options);
+                }
+
+                // Bottom Stream
+                for (let x = 0; x < spawnerOptions.spawnRate * delta / 2; x++) {
+                    options.position.x = (Math.random() * 100) - 50;
+                    options.position.y = -35; // BOTTOM position
+                    options.velocity.x = (Math.random() - 0.5) * 2;
+                    options.color = 0x00eaff; // Blue for bottom
+                    particleSystem.spawnParticle(options);
+                }
+
+                renderer.render(scene, camera);
+            }
+            
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            animateElec();
+        }
+
+        // Initialize Electricity
+        initElectricity();
+
+    </script>
+</body>
+</html>

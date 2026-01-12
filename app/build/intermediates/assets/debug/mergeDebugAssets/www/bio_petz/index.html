@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiO_PETZ // Virtual Bio-Pet Laboratory</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="crt-overlay"></div>
+    <div class="vignette"></div>
+    <canvas id="background-canvas" class="background-canvas"></canvas>
+
+    <!-- Main Game Container -->
+    <div class="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <div class="logo">
+                <h1>BiO<span style="color: var(--neon-pink)">_PETZ</span></h1>
+                <div class="subtitle">// Virtual Bio-Pet Laboratory</div>
+            </div>
+            <div class="header-stats">
+                <div class="currency">
+                    <i class="fas fa-coins"></i>
+                    <span id="credits-display">100</span>
+                </div>
+                <div class="currency">
+                    <i class="fas fa-flask"></i>
+                    <span id="toxins-display">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="game-nav">
+            <button class="nav-btn active" data-screen="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </button>
+            <button class="nav-btn" data-screen="lab">
+                <i class="fas fa-flask"></i>
+                <span>Lab</span>
+            </button>
+            <button class="nav-btn" data-screen="inventory">
+                <i class="fas fa-box"></i>
+                <span>Inventory</span>
+            </button>
+            <button class="nav-btn" data-screen="shop">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Shop</span>
+            </button>
+        </nav>
+
+        <!-- Game Screens -->
+        <main class="game-content">
+            <!-- Home Screen -->
+            <div id="home-screen" class="screen active">
+                <div class="home-layout">
+                    <!-- Pet Display Area -->
+                    <div class="pet-display-section">
+                        <div id="pet-display" class="pet-display">
+                            <!-- Pet visual and stats will be populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Care Actions Panel -->
+                    <div class="care-panel">
+                        <h3>Care Actions</h3>
+                        <div class="care-buttons">
+                            <button id="feed-btn" class="care-btn" onclick="window.game.feedPet()">
+                                <i class="fas fa-utensils"></i>
+                                <span>Feed</span>
+                            </button>
+                            <button id="clean-btn" class="care-btn" onclick="window.game.cleanPet()">
+                                <i class="fas fa-shower"></i>
+                                <span>Clean</span>
+                            </button>
+                            <button id="play-btn" class="care-btn" onclick="window.game.playWithPet()">
+                                <i class="fas fa-gamepad"></i>
+                                <span>Play</span>
+                            </button>
+                            <button id="medicate-btn" class="care-btn">
+                                <i class="fas fa-pills"></i>
+                                <span>Medicate</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pet Status Panel -->
+                    <div class="status-panel">
+                        <h3>Pet Status</h3>
+                        <div id="pet-status" class="status-info">
+                            <!-- Status information will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lab Screen -->
+            <div id="lab-screen" class="screen">
+                <div class="lab-layout">
+                    <div class="lab-header">
+                        <h2>Genetic Research Laboratory</h2>
+                        <div class="lab-level">Level <span id="lab-level">1</span></div>
+                    </div>
+
+                    <div class="lab-workspace">
+                        <!-- Experiment selection -->
+                        <div class="experiment-panel">
+                            <h3>Available Experiments</h3>
+                            <div class="experiment-buttons">
+                                <button class="experiment-btn" data-experiment="breeding">
+                                    <i class="fas fa-dna"></i>
+                                    <span>Breeding</span>
+                                </button>
+                                <button class="experiment-btn" data-experiment="radiation">
+                                    <i class="fas fa-radiation"></i>
+                                    <span>Radiation</span>
+                                </button>
+                                <button class="experiment-btn" data-experiment="chemical">
+                                    <i class="fas fa-flask"></i>
+                                    <span>Chemical</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Experiment results -->
+                        <div class="results-panel">
+                            <h3>Experiment Results</h3>
+                            <div id="experiment-results" class="results-display">
+                                Select an experiment to begin...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Screen -->
+            <div id="inventory-screen" class="screen">
+                <div class="inventory-layout">
+                    <h2>Inventory</h2>
+                    <div class="inventory-grid" id="inventory-grid">
+                        <!-- Items will be populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shop Screen -->
+            <div id="shop-screen" class="screen">
+                <div class="shop-layout">
+                    <h2>Bio-Shop</h2>
+                    <div class="shop-grid" id="shop-grid">
+                        <!-- Shop items will be populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="game-footer">
+            <button class="back-btn" onclick="window.location.href='../bio_lobby3.html'">
+                <i class="fas fa-arrow-left"></i>
+                Back to Lobby
+            </button>
+            <div class="version">v1.0.0</div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data/specimens.js"></script>
+    <script src="data/items.js"></script>
+    <script src="data/mutations.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
