@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURO-MARKET // BIO-LAB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #050505;
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff0055;
+            --neon-purple: #bc13fe;
+            --neon-mint: #0affba;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--neon-purple) var(--bg-color);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #eee;
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            padding-bottom: 50px;
+        }
+
+        /* CRT Scanline Effect Overlay */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 1000;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* Header Styling */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 20px var(--neon-cyan);
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            color: #fff;
+            text-transform: uppercase;
+            text-shadow: 4px 4px 0px var(--neon-pink);
+            letter-spacing: 5px;
+            animation: glitch 3s infinite;
+        }
+
+        .currency-display {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 1.5rem;
+            color: var(--neon-mint);
+            border: 1px solid var(--neon-mint);
+            padding: 10px 20px;
+            background: rgba(10, 255, 186, 0.1);
+            box-shadow: 0 0 10px var(--neon-mint);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Section Styling */
+        .game-section {
+            max-width: 1200px;
+            margin: 0 auto 60px auto;
+            padding: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            margin-left: 20px;
+            text-transform: uppercase;
+        }
+
+        .section-icon {
+            font-size: 2.5rem;
+        }
+
+        /* Grid Layout */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        /* Item Card Styling */
+        .item-card {
+            background: var(--bg-color);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 20px;
+            position: relative;
+            transition: 0.3s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%);
+            background-size: 200% 200%;
+            transition: 0.5s;
+            opacity: 0;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .item-card:hover::before {
+            opacity: 1;
+            background-position: 100% 100%;
+        }
+
+        /* Icon Container */
+        .item-visual {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.02);
+            font-size: 3rem;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .item-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .item-desc {
+            font-size: 0.9rem;
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .buy-btn {
+            margin-top: auto;
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            color: #fff;
+            border: 1px solid;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* --- THEME 1: CONNECT 4 (CYAN) --- */
+        .theme-connect4 .section-title { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
+        .theme-connect4 .section-icon { color: var(--neon-cyan); }
+        .theme-connect4 .item-card { border-color: var(--neon-cyan); box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.1); }
+        .theme-connect4 .item-visual { color: var(--neon-cyan); filter: drop-shadow(0 0 10px var(--neon-cyan)); }
+        .theme-connect4 .buy-btn { border-color: var(--neon-cyan); color: var(--neon-cyan); }
+        .theme-connect4 .buy-btn:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 25px var(--neon-cyan); }
+
+        /* --- THEME 2: SLOTS (PINK) --- */
+        .theme-slots .section-title { color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink); }
+        .theme-slots .section-icon { color: var(--neon-pink); }
+        .theme-slots .item-card { border-color: var(--neon-pink); box-shadow: inset 0 0 20px rgba(255, 0, 85, 0.1); }
+        .theme-slots .item-visual { color: var(--neon-pink); filter: drop-shadow(0 0 10px var(--neon-pink)); }
+        .theme-slots .buy-btn { border-color: var(--neon-pink); color: var(--neon-pink); }
+        .theme-slots .buy-btn:hover { background: var(--neon-pink); color: #000; box-shadow: 0 0 25px var(--neon-pink); }
+
+        /* --- THEME 3: WHEEL (MINT) --- */
+        .theme-wheel .section-title { color: var(--neon-mint); text-shadow: 0 0 10px var(--neon-mint); }
+        .theme-wheel .section-icon { color: var(--neon-mint); }
+        .theme-wheel .item-card { border-color: var(--neon-mint); box-shadow: inset 0 0 20px rgba(10, 255, 186, 0.1); }
+        .theme-wheel .item-visual { color: var(--neon-mint); filter: drop-shadow(0 0 10px var(--neon-mint)); }
+        .theme-wheel .buy-btn { border-color: var(--neon-mint); color: var(--neon-mint); }
+        .theme-wheel .buy-btn:hover { background: var(--neon-mint); color: #000; box-shadow: 0 0 25px var(--neon-mint); }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 4px 4px 0px var(--neon-pink); transform: skew(0deg); }
+            20% { text-shadow: -4px -4px 0px var(--neon-cyan); transform: skew(-2deg); }
+            40% { text-shadow: 3px -3px 0px var(--neon-purple); transform: skew(3deg); }
+            60% { text-shadow: -2px 2px 0px var(--neon-mint); transform: skew(0deg); }
+            100% { text-shadow: 4px 4px 0px var(--neon-pink); transform: skew(0deg); }
+        }
+
+        /* --- INTERACTIVITY STATES (NEW) --- */
+
+        /* Owned Item State */
+        .item-card.owned {
+            opacity: 0.5;
+            filter: grayscale(100%);
+            pointer-events: none;
+            border-color: #333 !important;
+            box-shadow: none !important;
+        }
+
+        .item-card.owned .buy-btn {
+            border-color: #555 !important;
+            color: #555 !important;
+        }
+
+        /* Insufficient Funds Animation */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); border-color: red !important; color: red !important; }
+            50% { transform: translateX(5px); border-color: red !important; color: red !important; }
+            75% { transform: translateX(-5px); border-color: red !important; color: red !important; }
+            100% { transform: translateX(0); }
+        }
+
+        .error-shake {
+            animation: shake 0.4s ease-in-out;
+            border-color: red !important;
+            color: red !important;
+            box-shadow: 0 0 15px red !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .section-header { flex-direction: column; text-align: center; }
+            .section-title { margin-left: 0; margin-top: 10px; }
+            .currency-display { position: relative; top: auto; right: auto; display: inline-block; margin-top: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Neuro-Market</h1>
+        <div class="currency-display">
+            <i class="fas fa-dna"></i> 4,520 CREDITS
+        </div>
+    </header>
+
+    <section class="game-section theme-connect4">
+        <div class="section-header">
+            <i class="fas fa-th section-icon"></i>
+            <h2 class="section-title">Connect 4: Synapse Grid</h2>
+        </div>
+        <div class="items-grid">
+            <div class="item-card">
+                <div class="item-visual">
+                    <i class="fas fa-atom"></i>
+                </div>
+                <div class="item-name">Isotope Chips</div>
+                <div class="item-desc">Replaces standard red/yellow chips with unstable, glowing radioactive isotopes.</div>
+                <button class="buy-btn">500 <i class="fas fa-bolt"></i></button>
+            </div>
+            <div class="item-card">
+                <div class="item-visual">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="item-name">Predictor OS</div>
+                <div class="item-desc">Consumable. The AI calculates the win probability of your next move.</div>
+                <button class="buy-btn">150 <i class="fas fa-bolt"></i></button>
+            </div>
+            <div class="item-card">
+                <div class="item-visual">
+                    <i class="fas fa-border-none"></i>
+                </div>
+                <div class="item-name">Void Board</div>
+                <div class="item-desc">A deep-space black board skin with zero reflection. Pure contrast.</div>
+                <button class="buy-btn">800 <i class="fas fa-bolt"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <section class="game-section theme-slots">
+        <div class="section-header">
+            <i class="fas fa-dice-d20 section-icon"></i>
+            <h2 class="section-title">Slots: The Mutator</h2>
+        </div>
+        <div class="items-grid">
+            <div class="item-card">
+                <div class="item-visual">
+                    <i class="fas fa-snowflake"></i>
+                </div>
+                <div class="item-name">Cryo-Reels</div>
+                <div class="item-desc">Encases your slot symbols in cryo-stasis ice. Shatters upon winning.</div>
+                <button class="buy-btn">650 <i class="fas fa-bolt"></i></button>
+            </div>
+            <div class="item-card">
+                <div class="item-visual">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <div class="item-name">Glitch Token</div>
+                <div class="item-desc">One-time use. Forces a "glitch" that re-spins the last reel if you lose.</div>
+                <button class="buy-btn">300 <i class="fas fa-bolt"></i></button>
+            </div>
+            <div class="item-card">
+                <div class="item-visual">
+                    <i class="fas fa-syringe"></i>
+                </div>
+                <div class="item-name">Jackpot Serum</div>
+                <div class="item-desc">Visual FX: Massive wins inject neon green fluid into the UI piping.</div>
+                <button class="buy-btn">1200 <i class="fas fa-bolt"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <section class="game-section theme-wheel">
+        <div class="section-header">
+            <i class="fas fa-circle-notch section-icon"></i>
+            <h2 class="section-title">Wheel: Centrifuge</h2>
+        </div>
+        <div class="items-grid">
+            <div class="item-card">
+                <div class="item-visual">
+                    <i class="fas fa-crosshairs"></i>
+                </div>
+                <div class="item-name">Laser Needle</div>
+                <div class="item-desc">Replaces the physical ticker with a high-intensity cutting laser.</div>
+                <button class="buy-btn">550 <i class="fas fa-bolt"></i></button>
+            </div>
+            <div class="item-card">
+                <div class="item-visual">
+                    <i class="fas fa-weight-hanging"></i>
+                </div>
+                <div class="item-name">Heavy Matter</div>
+                <div class="item-desc">Increases the friction of the wheel, slowing the spin for dramatic tension.</div>
+                <button class="buy-btn">400 <i class="fas fa-bolt"></i></button>
+            </div>
+            <div class="item-card">
+                <div class="item-visual">
+                    <i class="fas fa-biohazard"></i>
+                </div>
+                <div class="item-name">Bio-Hazard Skin</div>
+                <div class="item-desc">Transforms the wheel into a rusted, radioactive warning sign.</div>
+                <button class="buy-btn">900 <i class="fas fa-bolt"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // 1. Initialize Starting Credits
+        let userCredits = 4520;
+        
+        // Select DOM elements
+        const creditDisplay = document.querySelector('.currency-display');
+        const buyButtons = document.querySelectorAll('.buy-btn');
+
+        // Function to update the top display
+        function updateDisplay() {
+            // Update the display, keeping formatting
+            creditDisplay.innerHTML = `<i class="fas fa-dna"></i> ${userCredits.toLocaleString()} CREDITS`;
+        }
+
+        // 2. Add Logic to Buttons
+        buyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Parse integer from button text (e.g. "500")
+                const price = parseInt(this.innerText);
+                const card = this.closest('.item-card');
+
+                // Check Funds
+                if (userCredits >= price) {
+                    // SUCCESS: Deduct and update
+                    userCredits -= price;
+                    updateDisplay();
+
+                    // Visual updates
+                    this.innerHTML = "INSTALLED";
+                    card.classList.add('owned');
+                    
+                } else {
+                    // FAILURE: Not enough money
+                    const originalText = this.innerHTML;
+                    
+                    // Add error class for animation and color change
+                    this.classList.add('error-shake');
+                    this.innerHTML = "ERROR: FUNDS";
+                    
+                    // Remove error class after animation finishes (1 second)
+                    setTimeout(() => {
+                        this.classList.remove('error-shake');
+                        this.innerHTML = originalText;
+                    }, 1000);
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
