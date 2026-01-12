@@ -1,5 +1,6 @@
 R_DEF: Internal format may change without notice
 local
 id webView
+layout activity_game
 layout activity_main
 style AppTheme

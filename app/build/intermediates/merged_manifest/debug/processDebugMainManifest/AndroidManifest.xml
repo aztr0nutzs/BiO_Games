@@ -23,8 +23,7 @@
         android:extractNativeLibs="true"
         android:hardwareAccelerated="true"
         android:label="BiO Games"
-        android:testOnly="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+        android:theme="@style/AppTheme" >
         <activity
             android:name="com.bio.games.MainActivity"
             android:exported="true"
@@ -35,6 +34,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.bio.games.GameActivity"
+            android:screenOrientation="portrait" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"

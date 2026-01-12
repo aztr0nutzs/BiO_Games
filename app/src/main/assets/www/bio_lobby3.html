@@ -154,7 +154,7 @@
         }
         .spin-emblem {
             width: 140px; height: 140px;
-            background: url('bio_wheel/assets/s11 (2).png') center/contain no-repeat; /* Use placeholder or asset */
+            background: url('assets/bio_slotz_icon.png') center/contain no-repeat;
             filter: drop-shadow(0 0 15px var(--toxic-green));
             animation: spinSlow 8s linear infinite;
         }
@@ -228,12 +228,12 @@
             <div class="nav-btn active"><i class="fas fa-gamepad"></i></div>
             <div class="nav-btn"><i class="fas fa-flask"></i></div>
             <div class="nav-btn"><i class="fas fa-dna"></i></div>
-            <div class="nav-btn" style="margin-top:auto"><i class="fas fa-power-off"></i></div>
+            <div class="nav-btn" style="margin-top:auto" onclick="BioGameJS.testBridge()"><i class="fas fa-vial"></i></div>
         </nav>
 
         <div class="profile-panel">
             <div class="glitch-banner">
-                <img src="lobby_top.png"
+                <img src="assets/lobby_top.png"
      class="banner-img operator-avatar"
      id="bannerImg"
      alt="Operator Avatar">
@@ -272,7 +272,7 @@
                         High-voltage gambling. Spin the toxic core to match mutagen sequences. 
                         <span style="color:var(--toxic-green)">Jackpot: 5,000 Credits.</span>
                     </p>
-                    <a onclick="console.log('JS calling Bridge: playSlotz'); BioGameJS.playSlotz()" class="action-btn">iNiTiALiZE</a>
+                    <a onclick="BioGameJS.playSlotz()" class="action-btn">iNiTiALiZE</a>
                 </div>
                 
                 <div class="hero-visual">
@@ -281,7 +281,7 @@
 
             <div class="sub-grid">
                 
-                <div class="std-card" onclick="console.log('JS calling Bridge: playKNXT4'); BioGameJS.playKNXT4()">
+                <div class="std-card" onclick="BioGameJS.playKNXT4()">
                     <img src="https://placehold.co/100x100/111/00f3ff?text=K4&font=orbitron" class="card-thumb" style="border-color:var(--neon-cyan);">
                     <div>
                         <div style="font-family:'Orbitron'; color:var(--neon-cyan); font-size:1.1rem;">KNXT 4</div>
@@ -290,7 +290,7 @@
                     </div>
                 </div>
 
-                <div class="std-card" onclick="console.log('JS calling Bridge: playWheel'); BioGameJS.playWheel()">
+                <div class="std-card" onclick="BioGameJS.playWheel()">
                     <img src="https://placehold.co/100x100/111/bc13fe?text=WHEEL&font=orbitron" class="card-thumb" style="border-color:var(--neon-purple);">
                     <div>
                         <div style="font-family:'Orbitron'; color:var(--neon-purple); font-size:1.1rem;">BiO WHEEL</div>
@@ -299,7 +299,7 @@
                     </div>
                 </div>
 
-                <div class="std-card" onclick="console.log('JS calling Bridge: playBioPetz'); BioGameJS.playBioPetz()">
+                <div class="std-card" onclick="BioGameJS.playBioPetz()">
                     <img src="https://placehold.co/100x100/111/39ff14?text=PETZ&font=orbitron" class="card-thumb" style="border-color:var(--toxic-green);">
                     <div>
                         <div style="font-family:'Orbitron'; color:var(--toxic-green); font-size:1.1rem;">BiO PETZ</div>
@@ -315,15 +315,15 @@
             <div class="teaser-label" style="font-size: 0.7rem; color:#444; writing-mode: vertical-rl; text-orientation: mixed;">COLLECTiON</div>
             
             <div class="containment-unit">
-                <img src="https://placehold.co/150x150/000/333?text=s29" class="teaser-img">
+                <img src="assets/s29 (2).jpeg" class="teaser-img">
                 <div style="position:absolute; bottom:0; width:100%; text-align:center; background:rgba(255,0,85,0.8); font-size:0.6rem;">LOCKED</div>
             </div>
             <div class="containment-unit">
-                <img src="https://placehold.co/150x150/000/333?text=s14" class="teaser-img">
+                <img src="assets/s14 (2).png" class="teaser-img">
                 <div style="position:absolute; bottom:0; width:100%; text-align:center; background:rgba(255,0,85,0.8); font-size:0.6rem;">LOCKED</div>
             </div>
             <div class="containment-unit">
-                <img src="https://placehold.co/150x150/000/333?text=s06" class="teaser-img">
+                <img src="assets/s06 (2).png" class="teaser-img">
                 <div style="position:absolute; bottom:0; width:100%; text-align:center; background:rgba(255,0,85,0.8); font-size:0.6rem;">LOCKED</div>
             </div>
         </div>
@@ -380,7 +380,7 @@
         let cIdx = 0;
         setInterval(() => {
             cIdx = (cIdx + 1) % colors.length;
-            bannerImg.src = `https://placehold.co/600x400/1a1a1a/${colors[cIdx]}?text=OPERATOR+AVATAR&font=orbitron`;
+            bannerImg.src = `assets/lobby_top.png`;
         }, 4000);
     </script>
 
@@ -422,7 +422,7 @@ html,body{height:100%}
   <div class="multiplayer-panel">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div><strong>Multiplayer</strong><div style="font-size:12px;color:#9ff">Host or join by code (Firebase required for online play)</div></div>
-      <div><a class="link-btn" onclick="console.log('JS calling Bridge: openStore'); BioGameJS.openStore()">STORE</a></div>
+      <div><a class="link-btn" onclick="BioGameJS.openStore()">STORE</a></div>
     </div>
     <div style="margin-top:8px">
       <button id="hostBtn" class="link-btn">Create Game</button>
@@ -433,8 +433,8 @@ html,body{height:100%}
   </div>
 </div>
 
-<script type="module">
-import firebaseConfig from './firebase-config.js';
+<script>
+const firebaseConfig = null;
 
 const mpStatus = document.getElementById('mpStatus');
 const hostBtn = document.getElementById('hostBtn');
@@ -536,6 +536,6 @@ joinBtn.addEventListener('click', joinGame);
 </script>
 <!-- END: Multiplayer & Boot Injection -->
 
-<script type="module" src="multiplayer_core.js"></script>
+<script src="multiplayer_core.js"></script>
 </body>
 </html>

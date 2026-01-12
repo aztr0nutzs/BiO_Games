@@ -1,6 +1,8 @@
 package com.bio.games;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.webkit.ConsoleMessage;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -34,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        BioGameBridge bridge = new BioGameBridge(webView);
+        BioGameBridge bridge = new BioGameBridge(this, webView);
         webView.addJavascriptInterface(bridge, "BioGameJS");
         webView.loadUrl("file:///android_asset/www/bio_lobby3.html");
     }

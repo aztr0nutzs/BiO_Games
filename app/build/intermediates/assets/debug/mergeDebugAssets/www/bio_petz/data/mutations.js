@@ -95,10 +95,10 @@ class MutationEngine {
     let message;
     let statEffect = {};
 
+    const currentIndex = traitValues.indexOf(currentValue);
     switch (mutationType) {
       case 'beneficial':
         // Upgrade to better trait value
-        const currentIndex = traitValues.indexOf(currentValue);
         const upgradeIndex = Math.min(currentIndex + 1, traitValues.length - 1);
         newValue = traitValues[upgradeIndex];
         message = `Beneficial mutation! ${traitType} improved to ${newValue}`;
