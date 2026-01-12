@@ -6,7 +6,8 @@
     <title>BiO_PETZ // Virtual Bio-Pet Laboratory</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bio_petz_style.css">
+    <link rel="stylesheet" href="cyber.css">
 </head>
 <body>
     <!-- Background Effects -->
@@ -62,25 +63,128 @@
                     <!-- Pet Display Area -->
                     <div class="pet-display-section">
                         <div id="pet-display" class="pet-display">
-                            <!-- Pet visual and stats will be populated by JS -->
+                            <div class="pet-card">
+                                <div class="pet-image" id="pet-image-wrap">
+                                    <img id="pet-img" src="https://i.imgur.com/8Km9tLL.png" alt="pet">
+                                    <div class="mut-overlay ears" id="mut-ears"></div>
+                                    <div class="mut-overlay spikes" id="mut-spikes"></div>
+                                    <div class="mut-overlay eyes" id="mut-eyes"></div>
+                                </div>
+                                <div class="pet-stats">
+                                    <h3 id="pet-name-display">Biofluff</h3>
+                                    <div class="stat"><span>Hunger:</span> <span id="hunger-stat">50</span></div>
+                                    <div class="stat"><span>Happiness:</span> <span id="happiness-stat">50</span></div>
+                                    <div class="stat"><span>Hygiene:</span> <span id="hygiene-stat">50</span></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Care Actions Panel -->
+                    
+    <!-- Avatar / Profile Panel -->
+    <aside class="avatar-panel" aria-label="Avatar panel">
+        <div class="avatar-card glass">
+            <div class="avatar-visual">
+                <img id="avatar-img" src="https://i.imgur.com/6rkqGkR.png" alt="Avatar preview">
+                <div class="avatar-glow"></div>
+            </div>
+            <div class="avatar-info">
+                <h2 id="player-name">Dr. BiO</h2>
+                <div class="lvl-xp">
+                    <div class="level">Lv <span id="player-level">7</span></div>
+                    <div class="xp-bar" title="Experience">
+                        <div id="xp-fill" class="xp-fill" style="width: 58%"></div>
+                    </div>
+                </div>
+                <div class="avatar-actions">
+                    <button id="open-settings" class="btn">Pet Settings</button>
+                    <button id="customize-btn" class="btn secondary">Customize</button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Pet Settings Modal -->
+    <div id="pet-settings-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-panel glass">
+        <header class="modal-header">
+          <h3 id="modal-title">Pet Settings</h3>
+          <button id="close-modal" class="icon-btn" aria-label="Close">&times;</button>
+        </header>
+        
+<div class="modal-body">
+  <div class="console-tabs">
+    <button class="tab active" data-tab="general">GENERAL</button>
+    <button class="tab" data-tab="appearance">APPEARANCE</button>
+    <button class="tab" data-tab="dna">DNA</button>
+  </div>
+
+  <div class="tab-content active" id="tab-general">
+    <label>Pet Name
+      <input id="pet-name" type="text">
+    </label>
+    <label class="switch">
+      <input id="neon-toggle" type="checkbox" checked>
+      <span class="slider"></span>
+      <span class="label">Neon Effects</span>
+    </label>
+  </div>
+
+  <div class="tab-content" id="tab-appearance">
+    <label>Accent Color
+      <input id="pet-color" type="color" value="#00ffd1">
+    </label>
+  </div>
+
+  <div class="tab-content" id="tab-dna">
+    <label>Aggression
+      <input type="range" min="0" max="100" value="40" class="dna-slider" data-gene="aggression">
+    </label>
+    <label>Intelligence
+      <input type="range" min="0" max="100" value="55" class="dna-slider" data-gene="intelligence">
+    </label>
+    <label>Mutation Rate
+      <input type="range" min="0" max="100" value="20" class="dna-slider" data-gene="mutation">
+    </label>
+  
+    <div class="pet-catalog">
+      <div class="catalog-hint">Quick adopt: choose a unique Petz</div>
+      <div class="catalog-list">
+        <button class="catalog-item" data-id="biofluff"><img src="https://i.imgur.com/8Km9tLL.png"><div>Biofluff</div></button>
+        <button class="catalog-item" data-id="neonbyte"><img src="https://i.imgur.com/6rkqGkR.png"><div>NeonByte</div></button>
+        <button class="catalog-item" data-id="spikeling"><img src="https://i.imgur.com/4AiXzf8.png"><div>Spikeling</div></button>
+        <button class="catalog-item" data-id="eyeshift"><img src="https://i.imgur.com/3Z3L0X2.png"><div>EyeShift</div></button>
+      </div>
+    </div></div>
+
+  <div class="form-actions">
+    <button type="button" id="save-settings" class="btn">APPLY</button>
+    <button type="button" id="reset-settings" class="btn secondary">RESET</button>
+  </div>
+</div>
+</div>
+</div>
+
+    </div>
+<!-- Care Actions Panel -->
                     <div class="care-panel">
                         <h3>Care Actions</h3>
                         <div class="care-buttons">
-                            <button id="feed-btn" class="care-btn" onclick="window.game.feedPet()">
+                            <button id="feed-btn" class="care-btn" onclick="Pet.feed()">
                                 <i class="fas fa-utensils"></i>
                                 <span>Feed</span>
                             </button>
-                            <button id="clean-btn" class="care-btn" onclick="window.game.cleanPet()">
+                            <button id="clean-btn" class="care-btn" onclick="Pet.clean()">
                                 <i class="fas fa-shower"></i>
                                 <span>Clean</span>
                             </button>
-                            <button id="play-btn" class="care-btn" onclick="window.game.playWithPet()">
+                            <button id="play-btn" class="care-btn" onclick="Pet.play()">
                                 <i class="fas fa-gamepad"></i>
                                 <span>Play</span>
+                            </button>
+                            <button id="inject-btn" class="care-btn">
+                                <i class="fas fa-vial"></i>
+                                <span>Inject</span>
                             </button>
                             <button id="medicate-btn" class="care-btn">
                                 <i class="fas fa-pills"></i>
@@ -160,7 +264,18 @@
         </main>
 
         <!-- Footer -->
-        <footer class="game-footer">
+        
+    <!-- Terminal Logs Console -->
+    <aside class="terminal-console glass">
+      <div class="console-header">
+        <div class="console-title">SYSTEM LOG</div>
+        <div class="console-controls">
+          <button id="clear-logs" class="btn small">CLEAR</button>
+        </div>
+      </div>
+      <div id="console-log" class="console-log" role="log" aria-live="polite"></div>
+    </aside>
+<footer class="game-footer">
             <button class="back-btn" onclick="window.location.href='../bio_lobby3.html'">
                 <i class="fas fa-arrow-left"></i>
                 Back to Lobby
@@ -174,5 +289,68 @@
     <script src="data/items.js"></script>
     <script src="data/mutations.js"></script>
     <script src="game.js"></script>
+
+<script>
+(function(){
+  function qs(sel){return document.querySelector(sel);}
+  const modal = qs('#pet-settings-modal');
+  const openBtn = qs('#open-settings');
+  const closeBtn = qs('#close-modal');
+  const saveBtn = qs('#save-settings');
+  const resetBtn = qs('#reset-settings');
+  const petNameInput = qs('#pet-name');
+  const petColorInput = qs('#pet-color');
+  const neonToggle = qs('#neon-toggle');
+  const previewPet = qs('#preview-pet');
+
+  // load a default preview image if game exposes one
+  previewPet.src = previewPet.src || 'https://i.imgur.com/8Km9tLL.png';
+
+  function openModal(){
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+  }
+  function closeModal(){
+    modal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+  openBtn && openBtn.addEventListener('click', openModal);
+  closeBtn && closeBtn.addEventListener('click', closeModal);
+  saveBtn && saveBtn.addEventListener('click', function(){
+    const name = petNameInput.value || 'Biofluff';
+    const accent = petColorInput.value || '#00ffd1';
+    const neon = neonToggle.checked;
+
+    if(window.game && window.game.pet){
+      window.game.pet.name = name;
+    }
+
+    document.querySelector('#player-name').textContent = name;
+    document.documentElement.style.setProperty('--neon-accent', accent);
+    document.documentElement.classList.toggle('neon-enabled', neon);
+
+    localStorage.setItem('bio_petz_settings', JSON.stringify({
+      petName: name,
+      accent: accent,
+      neonEnabled: neon
+    }));
+    closeModal();
+  });
+  resetBtn && resetBtn.addEventListener('click', function(){
+    petNameInput.value = 'Biofluff';
+    petColorInput.value = '#00ffd1';
+    neonToggle.checked = true;
+  });
+
+  // close modal on overlay click or ESC
+  modal.addEventListener('click', function(e){
+    if(e.target === modal) closeModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape') closeModal();
+  });
+})();
+</script>
+
 </body>
 </html>

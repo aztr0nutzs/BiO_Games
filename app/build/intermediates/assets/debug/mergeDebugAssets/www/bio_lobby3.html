@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BiO-OS // CENTRAL COMMAND</title>
+    <title>BiO Gamez // v1.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -154,7 +154,7 @@
         }
         .spin-emblem {
             width: 140px; height: 140px;
-            background: url('s11 (2).png') center/contain no-repeat; /* Use placeholder or asset */
+            background: url('assets/bio_wheel/s11 (2).png') center/contain no-repeat;
             filter: drop-shadow(0 0 15px var(--toxic-green));
             animation: spinSlow 8s linear infinite;
         }
@@ -228,18 +228,21 @@
             <div class="nav-btn active"><i class="fas fa-gamepad"></i></div>
             <div class="nav-btn"><i class="fas fa-flask"></i></div>
             <div class="nav-btn"><i class="fas fa-dna"></i></div>
-            <div class="nav-btn" style="margin-top:auto"><i class="fas fa-power-off"></i></div>
+            <div class="nav-btn" style="margin-top:auto" onclick="BioGameJS.testBridge()"><i class="fas fa-vial"></i></div>
         </nav>
 
         <div class="profile-panel">
             <div class="glitch-banner">
-                <img src="https://placehold.co/600x400/1a1a1a/bc13fe?text=OPERATOR&font=orbitron" class="banner-img" id="bannerImg">
+                <img src="assets/lobby_top.png"
+     class="banner-img operator-avatar"
+     id="bannerImg"
+     alt="Operator Avatar">
                 <div style="position:absolute; bottom:5px; left:5px; background:var(--neon-pink); color:black; padding:2px 5px; font-size:9px; font-weight:bold;">LIVE</div>
             </div>
             
             <div style="padding: 15px;">
-                <div style="color:#666; font-size:0.7rem;">OPERATOR ID</div>
-                <div style="font-family:'Orbitron'; font-size:1.4rem; margin-bottom:15px;">SUBJECT_04</div>
+                <div style="color:#666; font-size:0.7rem;">"user"</div>
+                <div style="font-family:'Orbitron'; font-size:1.4rem; margin-bottom:15px;">BiO-Board</div>
                 
                 <div class="stat-row">
                     <span>CREDITS</span>
@@ -264,12 +267,12 @@
                 
                 <div class="hero-content">
                     <div class="badge">FEATURED GAME</div>
-                    <h1 style="font-family: 'Orbitron'; font-size: 2.5rem; margin: 5px 0; color: #fff;">BiO_SLOTZ</h1>
+                    <h1 style="font-family: 'Orbitron'; font-size: 2.5rem; margin: 5px 0; color: #fff;">BiO SLOTZ</h1>
                     <p style="color:#aaa; font-size: 0.9rem; max-width: 400px;">
                         High-voltage gambling. Spin the toxic core to match mutagen sequences. 
                         <span style="color:var(--toxic-green)">Jackpot: 5,000 Credits.</span>
                     </p>
-                    <a href="bio_slotz/BiO-Slotz_web_v1.1/index.html" class="action-btn">INITIALIZE SEQUENCE</a>
+                    <a onclick="BioGameJS.playSlotz()" class="action-btn">iNiTiALiZE</a>
                 </div>
                 
                 <div class="hero-visual">
@@ -278,30 +281,30 @@
 
             <div class="sub-grid">
                 
-                <div class="std-card" onclick="window.location.href='knxt4/knxt4_claude.html'">
+                <div class="std-card" onclick="BioGameJS.playKNXT4()">
                     <img src="https://placehold.co/100x100/111/00f3ff?text=K4&font=orbitron" class="card-thumb" style="border-color:var(--neon-cyan);">
                     <div>
-                        <div style="font-family:'Orbitron'; color:var(--neon-cyan); font-size:1.1rem;">KNXT-4</div>
+                        <div style="font-family:'Orbitron'; color:var(--neon-cyan); font-size:1.1rem;">KNXT 4</div>
                         <div style="font-size:0.75rem; color:#888;">Bio-Lab Protocol :: Connect-4</div>
                         <div style="font-size:0.7rem; color:var(--neon-cyan); margin-top:5px;">▶ CLICK TO PLAY</div>
                     </div>
                 </div>
 
-                <div class="std-card" onclick="window.location.href='bio_wheel/wheel_game.html'">
+                <div class="std-card" onclick="BioGameJS.playWheel()">
                     <img src="https://placehold.co/100x100/111/bc13fe?text=WHEEL&font=orbitron" class="card-thumb" style="border-color:var(--neon-purple);">
                     <div>
-                        <div style="font-family:'Orbitron'; color:var(--neon-purple); font-size:1.1rem;">THE BiO_WHEEL</div>
+                        <div style="font-family:'Orbitron'; color:var(--neon-purple); font-size:1.1rem;">BiO WHEEL</div>
                         <div style="font-size:0.75rem; color:#888;">Spin to Win Mutagens</div>
                         <div style="font-size:0.7rem; color:var(--neon-purple); margin-top:5px;">▶ CLICK TO PLAY</div>
                     </div>
                 </div>
 
-                <div class="std-card" onclick="window.location.href='bio_petz/index.html'">
+                <div class="std-card" onclick="BioGameJS.playBioPetz()">
                     <img src="https://placehold.co/100x100/111/39ff14?text=PETZ&font=orbitron" class="card-thumb" style="border-color:var(--toxic-green);">
                     <div>
-                        <div style="font-family:'Orbitron'; color:var(--toxic-green); font-size:1.1rem;">BiO_PETZ</div>
+                        <div style="font-family:'Orbitron'; color:var(--toxic-green); font-size:1.1rem;">BiO PETZ</div>
                         <div style="font-size:0.75rem; color:#888;">Virtual Bio-Pet Simulation</div>
-                        <div style="font-size:0.7rem; color:var(--toxic-green); margin-top:5px;">▶ LAUNCH INCUBATOR</div>
+                        <div style="font-size:0.7rem; color:var(--toxic-green); margin-top:5px;">▶ LAUNCH iNCUBATOR</div>
                     </div>
                 </div>
 
@@ -309,24 +312,24 @@
         </main>
 
         <div class="teaser-col">
-            <div class="teaser-label" style="font-size: 0.7rem; color:#444; writing-mode: vertical-rl; text-orientation: mixed;">COLLECTION</div>
+            <div class="teaser-label" style="font-size: 0.7rem; color:#444; writing-mode: vertical-rl; text-orientation: mixed;">COLLECTiON</div>
             
             <div class="containment-unit">
-                <img src="https://placehold.co/150x150/000/333?text=s29" class="teaser-img">
+                <img src="assets/s29 (2).jpeg" class="teaser-img">
                 <div style="position:absolute; bottom:0; width:100%; text-align:center; background:rgba(255,0,85,0.8); font-size:0.6rem;">LOCKED</div>
             </div>
             <div class="containment-unit">
-                <img src="https://placehold.co/150x150/000/333?text=s14" class="teaser-img">
+                <img src="assets/s14 (2).png" class="teaser-img">
                 <div style="position:absolute; bottom:0; width:100%; text-align:center; background:rgba(255,0,85,0.8); font-size:0.6rem;">LOCKED</div>
             </div>
             <div class="containment-unit">
-                <img src="https://placehold.co/150x150/000/333?text=s06" class="teaser-img">
+                <img src="assets/s06 (2).png" class="teaser-img">
                 <div style="position:absolute; bottom:0; width:100%; text-align:center; background:rgba(255,0,85,0.8); font-size:0.6rem;">LOCKED</div>
             </div>
         </div>
 
         <footer class="footer">
-            SYS.VER.4.0.2 // BIOHAZARD OS // AUTHORIZED PERSONNEL ONLY
+            SYS.VER.4.0.2 // BiOHAZARD OS // AUTHORiZED PERSONNEL ONLY
         </footer>
     </div>
 
@@ -377,7 +380,7 @@
         let cIdx = 0;
         setInterval(() => {
             cIdx = (cIdx + 1) % colors.length;
-            bannerImg.src = `https://placehold.co/600x400/1a1a1a/${colors[cIdx]}?text=OPERATOR+AVATAR&font=orbitron`;
+            bannerImg.src = `assets/lobby_top.png`;
         }, 4000);
     </script>
 
@@ -419,7 +422,7 @@ html,body{height:100%}
   <div class="multiplayer-panel">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div><strong>Multiplayer</strong><div style="font-size:12px;color:#9ff">Host or join by code (Firebase required for online play)</div></div>
-      <div><a class="link-btn" href="bio_store.html">STORE</a></div>
+      <div><a class="link-btn" onclick="BioGameJS.openStore()">STORE</a></div>
     </div>
     <div style="margin-top:8px">
       <button id="hostBtn" class="link-btn">Create Game</button>

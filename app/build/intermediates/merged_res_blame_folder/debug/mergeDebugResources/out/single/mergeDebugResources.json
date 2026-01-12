@@ -1,5 +1,9 @@
 [
     {
+        "merged": "com.bio.games.app-debug-20:/layout_activity_game.xml.flat",
+        "source": "com.bio.games.app-main-22:/layout/activity_game.xml"
+    },
+    {
         "merged": "com.bio.games.app-debug-20:/layout_activity_main.xml.flat",
         "source": "com.bio.games.app-main-22:/layout/activity_main.xml"
     }

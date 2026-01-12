@@ -17,7 +17,7 @@
 
   // Chip files from window.KNXT4_CHIPS
   const CHIP_FILES = window.KNXT4_CHIPS || [];
-  const CHIP_FOLDER = 'assets/chips/';
+  const CHIP_FOLDER = 'assets/knxt4_chips/';
 
   // ─────────────────────────────────────────────────────────────
   // State
@@ -35,8 +35,8 @@
 
   // Selected chips for each player
   let selectedChips = {
-    p1: CHIP_FILES[0] || 's03.png',
-    p2: CHIP_FILES[1] || 's04.png'
+    p1: CHIP_FILES[0] || 'chip01.png',
+    p2: CHIP_FILES[1] || 'chip02.png'
   };
 
   // Which player is selecting a chip (for modal)
@@ -347,7 +347,7 @@
   function easeOutBack(t) { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
 
   function getChipFileForPlayer(p) {
-    return (p === PLAYER1 ? selectedChips.p1 : selectedChips.p2) || (CHIP_FILES[0] || 's03.png');
+    return (p === PLAYER1 ? selectedChips.p1 : selectedChips.p2) || (CHIP_FILES[0] || 'chip01.png');
   }
 
   function getChipImage(file) {
