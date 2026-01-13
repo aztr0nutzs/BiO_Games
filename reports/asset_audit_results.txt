@@ -1,0 +1,163 @@
+=== ASSET AUDIT RESULTS ===
+Source files scanned: 36
+Referenced images: 46
+Existing images: 109
+
+MISSING IMAGES:
+  app/src/main/assets/www/../assets/knxt4_chips/chip01.png
+  app/src/main/assets/www/../assets/knxt4_chips/chip02.png
+  app/src/main/assets/www/../assets/knxt4_chips/chip03.png
+  app/src/main/assets/www/../assets/knxt4_chips/chip04.png
+  app/src/main/assets/www/../assets/knxt4_chips/chip05.png
+  app/src/main/assets/www/../assets/knxt4_chips/chip06.png
+  app/src/main/assets/www/../assets/knxt4_chips/s21.png
+  app/src/main/assets/www/assets/cabinet.png
+  app/src/main/assets/www/assets/grid_overlay.png
+  app/src/main/assets/www/assets/lobby_top.png
+  app/src/main/assets/www/assets/s06 (2).png
+  app/src/main/assets/www/assets/s14 (2).png
+  app/src/main/assets/www/assets/screen_frame.png
+  app/src/main/assets/www/assets/symbols/s00.png
+  app/src/main/assets/www/assets/symbols/s01.png
+  app/src/main/assets/www/assets/symbols/s02.png
+  app/src/main/assets/www/assets/symbols/s03.png
+  app/src/main/assets/www/assets/symbols/s04.png
+  app/src/main/assets/www/assets/symbols/s05.png
+  app/src/main/assets/www/assets/symbols/s06.png
+  app/src/main/assets/www/assets/symbols/s07.png
+  app/src/main/assets/www/assets/symbols/s08.png
+  app/src/main/assets/www/assets/symbols/s09.png
+  app/src/main/assets/www/assets/symbols/s10.png
+  app/src/main/assets/www/assets/symbols/s11.png
+  app/src/main/assets/www/assets/symbols/s12.png
+  app/src/main/assets/www/assets/symbols/s13.png
+  app/src/main/assets/www/assets/symbols/s14.png
+  app/src/main/assets/www/assets/symbols/s15.png
+  app/src/main/assets/www/assets/symbols/s16.png
+  app/src/main/assets/www/assets/symbols/s18.png
+  app/src/main/assets/www/assets/symbols/s19.png
+  app/src/main/assets/www/assets/symbols/s20.png
+  app/src/main/assets/www/assets/symbols/s21.png
+  app/src/main/assets/www/assets/symbols/s22.png
+  app/src/main/assets/www/assets/symbols/s23.png
+  app/src/main/assets/www/assets/symbols/s24.png
+  app/src/main/assets/www/assets/symbols/s25.png
+  app/src/main/assets/www/assets/symbols/s26.png
+  app/src/main/assets/www/assets/symbols/s27.png
+  app/src/main/assets/www/assets/symbols/s28.png
+  app/src/main/assets/www/chip01.png
+  app/src/main/assets/www/chip02.png
+  app/src/main/assets/www/s03 (2).png
+  app/src/main/assets/www/s11 (2).png
+
+ORPHAN IMAGES (exist but not referenced):
+  app/src/main/assets/www/assets/bio_petz_icon.png
+  app/src/main/assets/www/assets/bio_store_icon.png
+  app/src/main/assets/www/assets/chips/s03.png
+  app/src/main/assets/www/assets/chips/s04.png
+  app/src/main/assets/www/assets/chips/s06.png
+  app/src/main/assets/www/assets/chips/s09.png
+  app/src/main/assets/www/assets/chips/s11.png
+  app/src/main/assets/www/assets/chips/s14.png
+  app/src/main/assets/www/assets/chips/s21.png
+  app/src/main/assets/www/assets/knxt4_chips/chip01.png
+  app/src/main/assets/www/assets/knxt4_chips/chip02.png
+  app/src/main/assets/www/assets/knxt4_chips/chip03.png
+  app/src/main/assets/www/assets/knxt4_chips/chip04.png
+  app/src/main/assets/www/assets/knxt4_chips/chip05.png
+  app/src/main/assets/www/assets/knxt4_chips/chip06.png
+  app/src/main/assets/www/assets/knxt4_chips/s03.png
+  app/src/main/assets/www/assets/knxt4_chips/s04.png
+  app/src/main/assets/www/assets/knxt4_chips/s06.png
+  app/src/main/assets/www/assets/knxt4_chips/s09.png
+  app/src/main/assets/www/assets/knxt4_chips/s11.png
+  app/src/main/assets/www/assets/knxt4_chips/s14.png
+  app/src/main/assets/www/assets/knxt4_chips/s21.png
+  app/src/main/assets/www/assets/knxt4_icon.png
+  app/src/main/assets/www/bio_petz/assets/pets/bio_cat1.png
+  app/src/main/assets/www/bio_petz/assets/pets/bio_cat2.png
+  app/src/main/assets/www/bio_petz/assets/pets/bio_cat3.png
+  app/src/main/assets/www/bio_petz/assets/pets/bio_cat4.png
+  app/src/main/assets/www/bio_petz/assets/pets/bio_frog1.png
+  app/src/main/assets/www/bio_petz/assets/pets/bio_frog2.gif
+  app/src/main/assets/www/bio_petz/assets/pets/bio_frog2.png
+  app/src/main/assets/www/bio_petz/assets/pets/bio_frog3.gif
+  app/src/main/assets/www/bio_petz/assets/pets/bio_rat1.png
+  app/src/main/assets/www/bio_petz/bio_cat1.png
+  app/src/main/assets/www/bio_petz/bio_cat2.png
+  app/src/main/assets/www/bio_petz/bio_cat3.png
+  app/src/main/assets/www/bio_petz/bio_cat4.png
+  app/src/main/assets/www/bio_petz/bio_frog1.png
+  app/src/main/assets/www/bio_petz/bio_frog2.gif
+  app/src/main/assets/www/bio_petz/bio_frog2.png
+  app/src/main/assets/www/bio_petz/bio_frog3.gif
+  app/src/main/assets/www/bio_petz/bio_rat1.png
+  app/src/main/assets/www/bio_petz/pet_frog_idle.gif
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/cabinet.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/grid_overlay.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/screen_frame.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s00.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s01.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s02.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s03.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s04.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s05.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s06.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s07.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s08.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s09.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s10.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s11.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s12.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s13.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s14.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s15.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s16.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s18.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s19.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s20.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s21.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s22.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s23.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s24.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s25.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s26.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s27.png
+  app/src/main/assets/www/bio_slotz/BiO-Slotz_web_v1.1/assets/symbols/s28.png
+  app/src/main/assets/www/bio_store/store_bg.gif
+  app/src/main/assets/www/bio_wheel/assets/s03 (2).png
+  app/src/main/assets/www/bio_wheel/assets/s04 (2).png
+  app/src/main/assets/www/bio_wheel/assets/s06 (2).png
+  app/src/main/assets/www/bio_wheel/assets/s09 (2).png
+  app/src/main/assets/www/bio_wheel/assets/s11 (2).png
+  app/src/main/assets/www/bio_wheel/assets/s14 (2).png
+  app/src/main/assets/www/bio_wheel/assets/s21 (2).png
+  app/src/main/assets/www/bio_wheel/assets/wheel_mystery.png
+  app/src/main/assets/www/bio_wheel/assets/wheel_prize0.png
+  app/src/main/assets/www/bio_wheel/assets/wheel_prize1.png
+  app/src/main/assets/www/bio_wheel/assets/wheel_prize2.png
+  app/src/main/assets/www/bio_wheel/assets/wheel_prize3.png
+  app/src/main/assets/www/bio_wheel/assets/wheel_prize4.png
+  app/src/main/assets/www/bio_wheel/assets/wheel_prize5.png
+  app/src/main/assets/www/bio_wheel/assets/wheel_prize6.png
+  app/src/main/assets/www/bio_wheel/assets/wheel_prize7.png
+  app/src/main/assets/www/bio_wheel/assets/wheel_prize8.png
+  app/src/main/assets/www/bio_wheel/assets/wheel_prize9.png
+  app/src/main/assets/www/knxt4/assets/chips/s03.png
+  app/src/main/assets/www/knxt4/assets/chips/s04.png
+  app/src/main/assets/www/knxt4/assets/chips/s06.png
+  app/src/main/assets/www/knxt4/assets/chips/s09.png
+  app/src/main/assets/www/knxt4/assets/chips/s11.png
+  app/src/main/assets/www/knxt4/assets/chips/s14.png
+  app/src/main/assets/www/knxt4/assets/chips/s21.png
+  app/src/main/assets/www/knxt4/assets/knxt4_chips/s03.png
+  app/src/main/assets/www/knxt4/assets/knxt4_chips/s04.png
+  app/src/main/assets/www/knxt4/assets/knxt4_chips/s06.png
+  app/src/main/assets/www/knxt4/assets/knxt4_chips/s09.png
+  app/src/main/assets/www/knxt4/assets/knxt4_chips/s11.png
+  app/src/main/assets/www/knxt4/assets/knxt4_chips/s14.png
+  app/src/main/assets/www/knxt4/assets/knxt4_chips/s21.png
+  app/src/main/assets/www/lobby_bg.gif
+  app/src/main/assets/www/lobby_top.png
+
+FAIL: Missing images found.

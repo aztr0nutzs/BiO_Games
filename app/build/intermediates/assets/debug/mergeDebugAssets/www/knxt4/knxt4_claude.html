@@ -54,7 +54,7 @@ body {
 .ui-layer {
   position: absolute;
   inset: 0;
-  z-index: 100;
+  z-index: 5;
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -192,7 +192,7 @@ body {
   position: relative;
   transform-style: preserve-3d;
   /* Straightened angle, zoomed in */
-  transform: scale(1.15) rotateX(5deg) rotateY(0deg) translateZ(0px);
+  transform: rotateX(5deg) rotateY(0deg) translateZ(0px);
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -341,7 +341,7 @@ body {
   justify-content: center;
   gap: 40px;
   pointer-events: none;
-  z-index: 100;
+  z-index: 5;
 }
 .stat-card {
   background: rgba(0,0,0,0.6);

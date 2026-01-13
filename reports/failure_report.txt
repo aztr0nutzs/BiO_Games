@@ -1,0 +1,195 @@
+FAILURE REPORT
+==============
+
+Task: Asset Migration Bio-2026
+
+Failure Stage: Precheck
+
+Error: Uncommitted changes present in repository.
+
+Details: The git status check revealed uncommitted changes, preventing the creation of the feature branch and proceeding with asset migration.
+
+Uncommitted Files:
+ M .gradle/9.0-milestone-1/executionHistory/executionHistory.bin
+ M .gradle/9.0-milestone-1/executionHistory/executionHistory.lock
+ M .gradle/9.0-milestone-1/fileHashes/fileHashes.bin
+ M .gradle/9.0-milestone-1/fileHashes/fileHashes.lock
+ M .gradle/9.0-milestone-1/fileHashes/resourceHashesCache.bin
+ M .gradle/buildOutputCleanup/buildOutputCleanup.lock
+ M .gradle/buildOutputCleanup/cache.properties
+ M .gradle/file-system.probe
+ M .gradle/nb-cache/subprojects.ser
+ M app/build/intermediates/apk_ide_redirect_file/debug/createDebugApkListingFileRedirect/redirect.txt
+ M app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_lobby3.html
+ M app/build/intermediates/assets/debug/mergeDebugAssets/www/knxt4/chips_menu.html
+ M app/build/intermediates/assets/debug/mergeDebugAssets/www/knxt4/game.js
+ M app/build/intermediates/assets/debug/mergeDebugAssets/www/knxt4/knxt4_claude.html
+ M app/build/intermediates/assets/debug/mergeDebugAssets/www/lobby_top.png
+ M app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_lobby3.html.jar
+ M app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/knxt4/chips_menu.html.jar
+ M app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/knxt4/game.js.jar
+ M app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/knxt4/knxt4_claude.html.jar
+ M app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/lobby_top.png.jar
+ M app/build/intermediates/desugar_graph/debug/dexBuilderDebug/out/currentProject/dirs_bucket_0/graph.bin
+ M app/build/intermediates/desugar_graph/debug/dexBuilderDebug/out/currentProject/dirs_bucket_1/graph.bin
+ M app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
+ M app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
+ M app/build/intermediates/dex/debug/mergeProjectDexDebug/7/classes.dex
+ M app/build/intermediates/incremental/debug/mergeDebugResources/compile-file-map.properties
+ M app/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+ M app/build/intermediates/incremental/mergeDebugAssets/merger.xml
+ M app/build/intermediates/incremental/packageDebug/tmp/debug/dex-renamer-state.txt
+ M app/build/intermediates/incremental/packageDebug/tmp/debug/zip-cache/androidResources
+ M app/build/intermediates/linked_resources_binary_format/debug/processDebugResources/linked-resources-binary-format-debug.ap_
+ M app/build/intermediates/manifest_merge_blame_file/debug/processDebugMainManifest/manifest-merger-blame-debug-report.txt
+ M app/build/intermediates/merged_manifest/debug/processDebugMainManifest/AndroidManifest.xml
+ M app/build/intermediates/merged_manifests/debug/processDebugManifest/AndroidManifest.xml
+ M app/build/intermediates/packaged_manifests/debug/processDebugManifestForPackage/AndroidManifest.xml
+ M app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/7466eebaba16c2013ae5f08c36b41a55d1a4500422b0e91e5aa661dd3d24e047_0.jar
+ M app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/7466eebaba16c2013ae5f08c36b41a55d1a4500422b0e91e5aa661dd3d24e047_1.jar
+ M app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/bio/games/BioGameBridge.dex
+ M app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/bio/games/GameActivity$1.dex
+ M app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/bio/games/GameActivity.dex
+ M app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/bio/games/MainActivity$1.dex
+ M app/build/intermediates/project_dex_archive/debug/dexBuilderDebug/out/com/bio/games/MainActivity.dex
+ M app/build/intermediates/signing_config_versions/debug/writeDebugSigningConfigVersions/signing-config-versions.json
+ M app/build/outputs/apk/debug/app-debug.apk
+?? .idea/copilot.data.migration.ask.xml
+?? .idea/copilot.data.migration.edit.xml
+?? BiO_PETz_v1.0/
+?? app/build/intermediates/annotation_processor_list/debugAndroidTest/
+?? app/build/intermediates/annotation_processor_list/debugUnitTest/
+?? app/build/intermediates/apk/
+?? app/build/intermediates/apk_ide_redirect_file/debugAndroidTest/
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/assets/bio_petz_icon.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/assets/bio_slotz_icon.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/assets/bio_store_icon.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/assets/knxt4_chips/chip01.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/assets/knxt4_chips/chip02.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/assets/knxt4_chips/chip03.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/assets/knxt4_chips/chip04.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/assets/knxt4_chips/chip05.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/assets/knxt4_chips/chip06.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/assets/knxt4_icon.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_petz/assets/
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_petz/bio_cat1.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_petz/bio_cat2.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_petz/bio_cat3.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_petz/bio_cat4.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_petz/bio_frog1.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_petz/bio_frog2.gif
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_petz/bio_frog2.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_petz/bio_frog3.gif
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_petz/bio_rat1.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_petz/pet_frog_idle.gif
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_store/store_bg.gif
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_wheel/assets/wheel_mystery.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_wheel/assets/wheel_prize0.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_wheel/assets/wheel_prize1.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_wheel/assets/wheel_prize2.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_wheel/assets/wheel_prize3.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_wheel/assets/wheel_prize4.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_wheel/assets/wheel_prize5.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_wheel/assets/wheel_prize6.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_wheel/assets/wheel_prize7.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_wheel/assets/wheel_prize8.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/bio_wheel/assets/wheel_prize9.png
+?? app/build/intermediates/assets/debug/mergeDebugAssets/www/lobby_bg.gif
+?? app/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debugAndroidTest/
+?? app/build/intermediates/compile_app_classes_jar/
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/bio_petz_icon.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/bio_slotz_icon.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/bio_store_icon.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_chips/chip01.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_chips/chip02.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_chips/chip03.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_chips/chip04.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_chips/chip05.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_chips/chip06.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_icon.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/assets/
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_cat1.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_cat2.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_cat3.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_cat4.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_frog1.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_frog2.gif.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_frog2.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_frog3.gif.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_rat1.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/pet_frog_idle.gif.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_store/store_bg.gif.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_mystery.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize0.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize1.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize2.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize3.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize4.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize5.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize6.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize7.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize8.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize9.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/lobby_bg.gif.jar
+?? app/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debugAndroidTest/
+?? app/build/intermediates/compile_app_classes_jar/
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/bio_petz_icon.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/bio_slotz_icon.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/bio_store_icon.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_chips/chip01.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_chips/chip02.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_chips/chip03.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_chips/chip04.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_chips/chip05.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_chips/chip06.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/assets/knxt4_icon.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/assets/
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_cat1.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_cat2.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_cat3.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_cat4.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_frog1.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_frog2.gif.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_frog2.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_frog3.gif.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/bio_rat1.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_petz/pet_frog_idle.gif.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_store/store_bg.gif.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_mystery.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize0.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize1.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize2.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize3.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize4.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize5.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize6.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize7.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize8.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/bio_wheel/assets/wheel_prize9.png.jar
+?? app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/www/lobby_bg.gif.jar
+?? app/build/intermediates/desugar_graph/debugAndroidTest/
+?? app/build/intermediates/dex/debugAndroidTest/
+?? app/build/intermediates/dex_archive_input_jar_hashes/debugAndroidTest/
+?? app/build/intermediates/dex_number_of_buckets_file/debugAndroidTest/
+?? app/build/intermediates/incremental/debugAndroidTest-mergeJavaRes/
+?? app/build/intermediates/incremental/debugAndroidTest/
+?? app/build/intermediates/incremental/mergeDebugAndroidTestAssets/
+?? app/build/intermediates/incremental/mergeDebugAndroidTestAssets/
+?? app/build/intermediates/incremental/mergeDebugAndroidTestJniLibFolders/
+?? app/build/intermediates/incremental/mergeDebugAndroidTestShaders/
+?? app/build/intermediates/incremental/packageDebugAndroidTest/
+?? app/build/intermediates/linked_resources_binary_format/debugAndroidTest/
+?? app/build/intermediates/manifest_merge_blame_file/debugAndroidTest/
+?? app/build/intermediates/merged_java_res/debugAndroidTest/
+?? app/build/intermediates/nested_resources_validation_report/debugAndroidTest/
+?? app/build/intermediates/packaged_manifests/debugAndroidTest/
+?? app/build/intermediates/project_dex_archive/debugAndroidTest/
+?? app/build/intermediates/runtime_symbol_list/debugAndroidTest/
+?? app/build/intermediates/signing_config_versions/debugAndroidTest/
+?? app/build/intermediates/source_set_path_map/debugAndroidTest/
+?? app/build/intermediates/stable_resource_ids_file/debugAndroidTest/
+?? app/build/outputs/apk/androidTest/
+
+Action Taken: Aborted the task as per instructions.
+
+Next Steps: Commit or stash the uncommitted changes and retry the task.

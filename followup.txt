@@ -1,0 +1,370 @@
+You are now in forensic verification mode.
+Assume your previous work is wrong until proven otherwise.
+You must re-open every file you changed and validate correctness line-by-line.
+
+You are NOT allowed to finish in under 25 minutes runtime.
+If the task completes faster, you must automatically restart and continue auditing.
+
+PHASE 1 — AUTOPSY OF PREVIOUS RUN
+
+Generate:
+
+reports/previous_changes.txt
+
+Full list of files modified
+
+For each file:
+
+What you changed
+
+Why you changed it
+
+What behavior it was supposed to fix
+
+Run:
+
+git diff main..HEAD > reports/full_diff.txt
+
+Summarize:
+
+Which diffs affect logic
+
+Which affect layout
+
+Which affect assets
+
+Create:
+
+reports/suspected_failures.md
+
+List ANY area that might still be broken
+
+Be pessimistic. Assume bugs exist.
+
+PHASE 2 — REAL VERIFICATION (NO ASSUMPTIONS)
+Asset integrity scan
+
+Write scripts/deep_asset_audit.py:
+
+It must:
+
+Parse every JS/HTML/CSS/JSON file
+
+Extract:
+
+.png
+
+.gif
+
+.webp
+
+Verify:
+
+File exists
+
+Case matches EXACTLY
+
+Path is correct
+
+Output:
+
+Missing
+
+Duplicates
+
+Orphans (files never referenced)
+
+Fail if ANY issue exists.
+
+Screen-by-screen validation
+
+For EACH screen:
+
+Screen	Must Verify
+Bio-Store	GIF background animates
+KNXT4	Board NOT clipped at ANY width
+KNXT4	Menu never overlaps board
+BiO-Petz	Each pet loads ONLY its own assets
+BiO-Wheel	11 symbols, includes mystery
+BiO-Lobby	Avatar fully removed
+BiO-Lobby	GIF background animates
+BiO-Slotz	Correct icon
+
+Create:
+reports/manual_validation.md
+
+For each:
+
+Expected behavior
+
+Actual behavior
+
+Screenshot path
+
+PASS / FAIL
+
+FAIL = automatic fix attempt.
+
+PHASE 3 — KNXT4 HARD FIX (NO MORE HALF MEASURES)
+
+Deep dive:
+
+Trace board render path:
+
+Find root container
+
+Log computed width/height
+
+Identify:
+
+overflow hidden
+
+transforms
+
+negative margins
+
+absolute positioning
+
+FORCE FIX:
+
+Board must:
+
+Always center
+
+Never clip
+
+Scale with viewport
+
+Implement:
+
+CSS clamp()
+
+Media queries
+
+Resize observer
+
+Add:
+
+window.addEventListener("resize", recalcBoard);
+
+
+Add debug overlay (temporary):
+
+Show board bounding box
+
+Log when clipping detected
+
+Remove overlay after validation.
+
+PHASE 4 — BIO-PETZ LOGIC REWRITE (THIS IS THE BIG ONE)
+
+Completely refactor pet system:
+
+Requirements
+
+Single source of truth:
+
+const PETS = {
+  "bio-cat": {...},
+  "bio-frog": {...},
+  "bio-rat": {...}
+}
+
+Enforce:
+
+NO dynamic glob loading
+
+NO directory scans
+
+Explicit filenames ONLY
+
+Add runtime guards:
+if (!PETS[id]) throw new Error("Invalid pet id");
+
+Validation tests:
+
+Create tests/pet_assets.test.js
+
+Tests:
+
+Each pet only loads its own files
+
+No cross-pollination
+
+GIFs only used where allowed
+
+PHASE 5 — WHEEL MATH VALIDATION
+
+Confirm:
+
+prize array length === 11
+
+mystery included
+
+Add logging:
+
+angle
+
+index
+
+prize name
+
+Spin 100 times:
+
+Output distribution table
+
+Ensure:
+
+All prizes reachable
+
+No dead slots
+
+Save:
+reports/wheel_distribution.csv
+
+PHASE 6 — LOBBY PURGE
+
+Search for:
+
+operator
+
+avatar
+
+userPic
+
+profileImg
+
+DELETE all logic.
+
+Replace UI block with:
+
+lobby_top.png
+
+Confirm:
+
+No JS references remain
+
+No CSS targets remain
+
+PHASE 7 — VISUAL PROOF
+
+Generate:
+
+reports/screenshots/
+  before/
+  after/
+
+
+For every screen:
+
+Desktop
+
+Tablet
+
+Mobile
+
+Minimum:
+
+18 screenshots
+
+FAIL if less.
+
+PHASE 8 — PERFORMANCE SANITY
+
+Measure:
+
+Image sizes
+
+GIF sizes
+
+Warn if:
+
+Any file > 3MB
+
+Suggest:
+
+Compression targets
+
+Lazy loading
+
+Save:
+reports/perf_audit.md
+
+PHASE 9 — DOCUMENTATION (STRICT)
+
+Update:
+
+TASKS
+
+Old task → FAILED
+
+New task → in_progress → completed
+
+WORKLOG
+
+Timeline
+
+Commands
+
+Bugs found
+
+Fixes applied
+
+DECISIONS
+
+Why refactors done
+
+Why old logic rejected
+
+Tradeoffs
+
+PHASE 10 — FINAL GATE
+
+You may NOT finish until ALL are true:
+
+deep_asset_audit passes
+
+pet tests pass
+
+screenshots exist
+
+KNXT board verified
+
+wheel distribution valid
+
+lobby avatar fully gone
+
+If ANY fail:
+
+Auto-fix
+
+Re-run
+
+Repeat until green
+
+FINAL OUTPUT
+
+Deliver:
+
+Branch: feat/bio-asset-hardening
+
+Commit message:
+
+feat: forensic asset validation + logic hardening
+
+
+All reports
+
+All screenshots
+
+Test results
+
+RULES
+
+NO skipping
+
+NO assumptions
+
+NO “looks good”
+
+EVERYTHING must be proven

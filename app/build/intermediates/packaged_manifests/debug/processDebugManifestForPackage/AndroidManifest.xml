@@ -23,6 +23,7 @@
         android:extractNativeLibs="true"
         android:hardwareAccelerated="true"
         android:label="BiO Games"
+        android:testOnly="true"
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.bio.games.MainActivity"
