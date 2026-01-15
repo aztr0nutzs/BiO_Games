@@ -58,6 +58,46 @@ public class GameServer {
         return true;
     }
 
+    // Control flow flattening example
+    public boolean validateGameActionWithFlattening(String playerId, String sessionToken, String action, int amount) {
+        boolean isValid = false;
+        int step = 0;
+        Integer credits = null;
+
+        while (true) {
+            switch (step) {
+                case 0:
+                    if (!validateSessionToken(playerId, sessionToken)) {
+                        Log.e(TAG, "Invalid session token for player: " + playerId);
+                        step = 4;
+                        break;
+                    }
+                    step = 1;
+                    break;
+                case 1:
+                    credits = playerCredits.get(playerId);
+                    if (credits == null || credits < amount) {
+                        Log.e(TAG, "Insufficient credits for player: " + playerId);
+                        step = 4;
+                        break;
+                    }
+                    step = 2;
+                    break;
+                case 2:
+                    playerCredits.put(playerId, credits - amount);
+                    step = 3;
+                    break;
+                case 3:
+                    Log.d(TAG, "Game action validated for player: " + playerId + ", action: " + action + ", amount: " + amount);
+                    isValid = true;
+                    step = 4;
+                    break;
+                case 4:
+                    return isValid;
+            }
+        }
+    }
+
     // Generate a device hash for security
     public String generateDeviceHash() {
         try {
