@@ -1,0 +1,499 @@
+[
+    {
+        "name": "chip04.png",
+        "x": 0,
+        "y": 0,
+        "width": 1506,
+        "height": 1806
+    },
+    {
+        "name": "chip01.png",
+        "x": 1506,
+        "y": 0,
+        "width": 1649,
+        "height": 1649
+    },
+    {
+        "name": "chip02.png",
+        "x": 3155,
+        "y": 0,
+        "width": 1649,
+        "height": 1649
+    },
+    {
+        "name": "chip03.png",
+        "x": 4804,
+        "y": 0,
+        "width": 1428,
+        "height": 1904
+    },
+    {
+        "name": "s30.jpeg",
+        "x": 6232,
+        "y": 0,
+        "width": 736,
+        "height": 1041
+    },
+    {
+        "name": "s29.jpeg",
+        "x": 6968,
+        "y": 0,
+        "width": 736,
+        "height": 1041
+    },
+    {
+        "name": "s32.jpeg",
+        "x": 7704,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s30.jpeg",
+        "x": 8440,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s36.jpeg",
+        "x": 9176,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s33.jpeg",
+        "x": 9912,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s29.jpeg",
+        "x": 10648,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s28.jpeg",
+        "x": 11384,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s31.jpeg",
+        "x": 12120,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s32.jpeg",
+        "x": 12856,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s30.jpeg",
+        "x": 13592,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s36.jpeg",
+        "x": 14328,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s33.jpeg",
+        "x": 15064,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "chip06.png",
+        "x": 15800,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s29.jpeg",
+        "x": 16536,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s28.jpeg",
+        "x": 17272,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s31.jpeg",
+        "x": 18008,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s28.jpeg",
+        "x": 18744,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s32.jpeg",
+        "x": 19480,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s30.jpeg",
+        "x": 20216,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s36.jpeg",
+        "x": 20952,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s33.jpeg",
+        "x": 21688,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s29.jpeg",
+        "x": 22424,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s28.jpeg",
+        "x": 23160,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s31.jpeg",
+        "x": 23896,
+        "y": 0,
+        "width": 736,
+        "height": 736
+    },
+    {
+        "name": "s34.jpeg",
+        "x": 24632,
+        "y": 0,
+        "width": 720,
+        "height": 720
+    },
+    {
+        "name": "s34.jpeg",
+        "x": 25352,
+        "y": 0,
+        "width": 720,
+        "height": 720
+    },
+    {
+        "name": "s34.jpeg",
+        "x": 26072,
+        "y": 0,
+        "width": 720,
+        "height": 720
+    },
+    {
+        "name": "s22.jpeg",
+        "x": 26792,
+        "y": 0,
+        "width": 620,
+        "height": 620
+    },
+    {
+        "name": "s21.jpeg",
+        "x": 27412,
+        "y": 0,
+        "width": 552,
+        "height": 552
+    },
+    {
+        "name": "s21.jpeg",
+        "x": 27964,
+        "y": 0,
+        "width": 552,
+        "height": 552
+    },
+    {
+        "name": "s21.jpeg",
+        "x": 28516,
+        "y": 0,
+        "width": 552,
+        "height": 552
+    },
+    {
+        "name": "s37.jpeg",
+        "x": 29068,
+        "y": 0,
+        "width": 500,
+        "height": 500
+    },
+    {
+        "name": "s37.jpeg",
+        "x": 29568,
+        "y": 0,
+        "width": 500,
+        "height": 500
+    },
+    {
+        "name": "s37.jpeg",
+        "x": 30068,
+        "y": 0,
+        "width": 500,
+        "height": 500
+    },
+    {
+        "name": "s35.jpeg",
+        "x": 30568,
+        "y": 0,
+        "width": 480,
+        "height": 480
+    },
+    {
+        "name": "chip05.png",
+        "x": 31048,
+        "y": 0,
+        "width": 480,
+        "height": 480
+    },
+    {
+        "name": "s35.jpeg",
+        "x": 31528,
+        "y": 0,
+        "width": 480,
+        "height": 480
+    },
+    {
+        "name": "s35.jpeg",
+        "x": 32008,
+        "y": 0,
+        "width": 480,
+        "height": 480
+    },
+    {
+        "name": "s06.png",
+        "x": 32488,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s14.png",
+        "x": 32744,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s09.png",
+        "x": 33000,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s11.png",
+        "x": 33256,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s04.png",
+        "x": 33512,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s21.png",
+        "x": 33768,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s03.png",
+        "x": 34024,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s06.png",
+        "x": 34280,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s14.png",
+        "x": 34536,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s09.png",
+        "x": 34792,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s11.png",
+        "x": 35048,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s04.png",
+        "x": 35304,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s21.png",
+        "x": 35560,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s03.png",
+        "x": 35816,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s06.png",
+        "x": 36072,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s14.png",
+        "x": 36328,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s09.png",
+        "x": 36584,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s11.png",
+        "x": 36840,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s04.png",
+        "x": 37096,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s21.png",
+        "x": 37352,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s03.png",
+        "x": 37608,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s06.png",
+        "x": 37864,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s14.png",
+        "x": 38120,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s09.png",
+        "x": 38376,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s11.png",
+        "x": 38632,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s04.png",
+        "x": 38888,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s21.png",
+        "x": 39144,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    },
+    {
+        "name": "s03.png",
+        "x": 39400,
+        "y": 0,
+        "width": 256,
+        "height": 256
+    }
+]

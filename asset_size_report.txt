@@ -1,0 +1,5 @@
+=== ASSET SIZE COMPARISON REPORT ===
+
+Total size before: 73.73 MB
+Total size after: 73.73 MB
+Size reduction: 0.00%
