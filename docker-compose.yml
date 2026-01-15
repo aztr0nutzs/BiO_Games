@@ -73,5 +73,18 @@ services:
     depends_on:
       - postgres
 
+  admin:
+    build: ./admin
+    ports:
+      - "3006:3006"
+    environment:
+      - PG_HOST=postgres
+      - PG_USER=postgres
+      - PG_PASSWORD=password
+      - PG_DATABASE=bio_games
+      - JWT_SECRET=admin_jwt_secret
+    depends_on:
+      - postgres
+
 volumes:
   postgres_data:

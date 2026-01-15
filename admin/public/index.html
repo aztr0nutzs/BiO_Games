@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bio Games Admin Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .header { background: #2c3e50; color: white; padding: 20px; margin: -20px -20px 20px -20px; }
+        .nav { background: #34495e; padding: 10px; margin-bottom: 20px; }
+        .nav button { background: #3498db; color: white; border: none; padding: 10px 15px; margin: 0 5px; cursor: pointer; }
+        .nav button:hover { background: #2980b9; }
+        .section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .metrics { display: flex; justify-content: space-around; }
+        .metric { text-align: center; }
+        .metric h3 { margin: 0; color: #2c3e50; }
+        .metric p { font-size: 24px; margin: 5px 0; color: #3498db; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        .btn { background: #27ae60; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
+        .btn.danger { background: #e74c3c; }
+        .login-form { max-width: 300px; margin: 50px auto; }
+        .login-form input { width: 100%; padding: 10px; margin: 10px 0; }
+        .login-form button { width: 100%; padding: 10px; background: #3498db; color: white; border: none; }
+    </style>
+</head>
+<body>
+    <div id="login-section" class="login-form">
+        <h2>Admin Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div id="admin-panel" style="display: none;">
+        <div class="header">
+            <h1>Bio Games Admin Panel</h1>
+            <p id="admin-info"></p>
+        </div>
+
+        <div class="nav">
+            <button onclick="showSection('dashboard')">Dashboard</button>
+            <button onclick="showSection('players')">Players</button>
+            <button onclick="showSection('cheats')">Cheats</button>
+            <button onclick="showSection('logs')">Audit Logs</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <div id="dashboard-section" class="section">
+            <h2>Dashboard</h2>
+            <div class="metrics" id="metrics">
+                <!-- Metrics will be loaded here -->
+            </div>
+        </div>
+
+        <div id="players-section" class="section" style="display: none;">
+            <h2>Player Management</h2>
+            <table id="players-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="players-tbody">
+                    <!-- Players will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="cheats-section" class="section" style="display: none;">
+            <h2>Cheat Reports</h2>
+            <table id="cheats-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Player</th>
+                        <th>Risk Score</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="cheats-tbody">
+                    <!-- Cheat reports will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="logs-section" class="section" style="display: none;">
+            <h2>Audit Logs</h2>
+            <table id="logs-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Admin</th>
+                        <th>Action</th>
+                        <th>Resource</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-tbody">
+                    <!-- Logs will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('admin_token');
+
+        if (token) {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+            loadDashboard();
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/admin/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+                if (data.token) {
+                    token = data.token;
+                    localStorage.setItem('admin_token', token);
+                    document.getElementById('login-section').style.display = 'none';
+                    document.getElementById('admin-panel').style.display = 'block';
+                    document.getElementById('admin-info').textContent = `Logged in as ${username}`;
+                    loadDashboard();
+                } else {
+                    alert('Login failed: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_token');
+            token = null;
+            document.getElementById('admin-panel').style.display = 'none';
+            document.getElementById('login-section').style.display = 'block';
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.getElementById(section + '-section').style.display = 'block';
+
+            if (section === 'dashboard') loadDashboard();
+            if (section === 'players') loadPlayers();
+            if (section === 'cheats') loadCheats();
+            if (section === 'logs') loadLogs();
+        }
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/admin/dashboard/metrics', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                document.getElementById('metrics').innerHTML = `
+                    <div class="metric">
+                        <h3>Revenue Today</h3>
+                        <p>$${data.revenue_today || 0}</p>
+                    </div>
+                    <div class="metric">
+                        <h3>Active Users</h3>
+                        <p>${data.active_users || 0}</p>
+                    </div>
+                    <div class="metric">
+                        <h3>Cheat Flags</h3>
+                        <p>${data.cheat_flags || 0}</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Load dashboard error:', error);
+            }
+        }
+
+        async function loadPlayers() {
+            try {
+                const response = await fetch('/api/admin/players', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                const tbody = document.getElementById('players-tbody');
+                tbody.innerHTML = data.players.map(player => `
+                    <tr>
+                        <td>${player.id}</td>
+                        <td>${player.username}</td>
+                        <td>${player.email}</td>
+                        <td>
+                            <button class="btn" onclick="viewPlayer(${player.id})">View</button>
+                            <button class="btn danger" onclick="banPlayer(${player.id})">Ban</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Load players error:', error);
+            }
+        }
+
+        async function loadCheats() {
+            try {
+                const response = await fetch('/api/admin/cheats', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                const tbody = document.getElementById('cheats-tbody');
+                tbody.innerHTML = data.reports.map(report => `
+                    <tr>
+                        <td>${report.id}</td>
+                        <td>${report.user_id}</td>
+                        <td>${report.risk_score}</td>
+                        <td>${report.status}</td>
+                        <td>
+                            <button class="btn" onclick="reviewCheat(${report.id})">Review</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Load cheats error:', error);
+            }
+        }
+
+        async function loadLogs() {
+            try {
+                const response = await fetch('/api/admin/audit-logs', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                const tbody = document.getElementById('logs-tbody');
+                tbody.innerHTML = data.logs.map(log => `
+                    <tr>
+                        <td>${new Date(log.timestamp).toLocaleString()}</td>
+                        <td>${log.admin_user_id}</td>
+                        <td>${log.action}</td>
+                        <td>${log.resource}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Load logs error:', error);
+            }
+        }
+
+        async function banPlayer(userId) {
+            if (confirm('Are you sure you want to ban this player?')) {
+                try {
+                    await fetch(`/api/admin/players/${userId}/ban`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ duration: 'permanent', reason: 'Admin ban' })
+                    });
+                    alert('Player banned successfully');
+                    loadPlayers();
+                } catch (error) {
+                    console.error('Ban player error:', error);
+                    alert('Failed to ban player');
+                }
+            }
+        }
+
+        async function reviewCheat(reportId) {
+            try {
+                await fetch(`/api/admin/cheats/${reportId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'reviewed' })
+                });
+                alert('Cheat report reviewed');
+                loadCheats();
+            } catch (error) {
+                console.error('Review cheat error:', error);
+                alert('Failed to review cheat report');
+            }
+        }
+
+        function viewPlayer(userId) {
+            // For now, just alert
+            alert(`View details for player ${userId}`);
+        }
+    </script>
+</body>
+</html>
