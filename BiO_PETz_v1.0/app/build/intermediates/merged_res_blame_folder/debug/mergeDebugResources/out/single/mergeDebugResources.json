@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.biopet.app-debug-49:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.biopet.app-main-51:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.biopet.app-debug-49:/drawable_ic_launcher.xml.flat",
+        "source": "com.biopet.app-main-51:/drawable/ic_launcher.xml"
+    }
+]

@@ -1,0 +1,5 @@
+com.biopet.test.app-androidTest-0 /home/aztr0nutzs/StudioProjects/BiO_PETz_v1.0/app/build/generated/res/resValues/androidTest/debug
+com.biopet.test.app-updated_navigation_xml-1 /home/aztr0nutzs/StudioProjects/BiO_PETz_v1.0/app/build/generated/updated_navigation_xml/debugAndroidTest
+com.biopet.test.app-mergeDebugAndroidTestResources-2 /home/aztr0nutzs/StudioProjects/BiO_PETz_v1.0/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
+com.biopet.test.app-mergeDebugAndroidTestResources-3 /home/aztr0nutzs/StudioProjects/BiO_PETz_v1.0/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
+com.biopet.test.app-debugAndroidTest-4 /home/aztr0nutzs/StudioProjects/BiO_PETz_v1.0/app/build/intermediates/merged_res/debugAndroidTest/mergeDebugAndroidTestResources
