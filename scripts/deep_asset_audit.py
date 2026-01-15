@@ -1,129 +1,107 @@
-#!/usr/bin/env python3
 import os
 import re
 import sys
-from pathlib import Path
+from collections import defaultdict
 
-def find_files_with_extensions(root_dir, extensions):
-    """Find all files with given extensions recursively."""
+assets_dir = "app/src/main/assets/www"
+extensions_to_parse = ['.js', '.html', '.css', '.json']
+image_extensions = ['.png', '.gif', '.webp']
+
+def find_files(dir_path, extensions):
     files = []
-    for ext in extensions:
-        files.extend(Path(root_dir).rglob(f"*.{ext}"))
+    for root, dirs, filenames in os.walk(dir_path):
+        for filename in filenames:
+            if any(filename.endswith(ext) for ext in extensions):
+                files.append(os.path.join(root, filename))
     return files
 
-def extract_image_references(file_path):
-    """Extract image file references from a file."""
-    references = set()
-    try:
-        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-            content = f.read()
-            # Find URLs or paths ending with .png, .gif, .webp
-            # Match things like 'image.png', '/path/image.gif', 'url(image.webp)'
-            patterns = [
-                r'["\']([^"\']*\.(png|gif|webp))["\']',  # quoted
-                r'url\(([^)]*\.(png|gif|webp))\)',  # css url()
-                r'src=["\']([^"\']*\.(png|gif|webp))["\']',  # src attribute
-            ]
-            for pattern in patterns:
-                matches = re.findall(pattern, content, re.IGNORECASE)
-                for match in matches:
-                    if isinstance(match, tuple):
-                        ref = match[0]
-                    else:
-                        ref = match
-                    # Normalize: remove leading ./ or ../ etc? But keep as is for now
-                    references.add(ref)
-    except Exception as e:
-        print(f"Error reading {file_path}: {e}")
-    return references
+def extract_references(content):
+    # Simple regex to find image paths in quotes
+    pattern = r'["\']([^"\']*\.(?:png|gif|webp))["\']'
+    matches = re.findall(pattern, content, re.IGNORECASE)
+    return matches
 
-def normalize_path(path, base_dir):
-    """Normalize a path relative to base_dir."""
-    # If absolute or starts with http, skip
-    if path.startswith(('http', 'https', '//')):
-        return None
-    # Remove query params
-    path = path.split('?')[0].split('#')[0]
-    # If starts with /, it's absolute in assets
-    if path.startswith('/'):
-        return os.path.join(base_dir, path[1:])
-    # Relative path
-    return os.path.join(base_dir, path)
+def resolve_path(base_dir, ref, assets_dir):
+    if ref.startswith('/'):
+        # Treat as absolute from assets root
+        return os.path.join(assets_dir, ref.lstrip('/'))
+    else:
+        # Relative to base_dir
+        return os.path.join(base_dir, ref)
 
 def main():
-    assets_dir = "app/src/main/assets/www"
     if not os.path.exists(assets_dir):
-        print(f"Assets directory {assets_dir} not found.")
+        print(f"Assets directory {assets_dir} not found")
         sys.exit(1)
-    
-    # Find all source files
-    source_files = find_files_with_extensions(assets_dir, ['js', 'html', 'css', 'json'])
-    
-    # Collect all referenced images
-    referenced_images = set()
-    for src_file in source_files:
-        refs = extract_image_references(str(src_file))
+
+    parsed_files = find_files(assets_dir, extensions_to_parse)
+    referenced = set()
+    for file_path in parsed_files:
+        try:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+        except Exception as e:
+            print(f"Error reading {file_path}: {e}")
+            continue
+        refs = extract_references(content)
+        base_dir = os.path.dirname(file_path)
         for ref in refs:
-            normalized = normalize_path(ref, assets_dir)
-            if normalized:
-                referenced_images.add(normalized)
-    
-    # Find all existing image files
-    existing_images = set()
-    image_files = find_files_with_extensions(assets_dir, ['png', 'gif', 'webp'])
-    for img_file in image_files:
-        existing_images.add(str(img_file))
-    
-    # Check for missing
-    missing = referenced_images - existing_images
-    
-    # Check for duplicates (same basename in different dirs? or exact same path multiple refs)
-    # For duplicates, perhaps count references
-    ref_counts = {}
-    for ref in referenced_images:
-        ref_counts[ref] = ref_counts.get(ref, 0) + 1
-    duplicates = {k: v for k, v in ref_counts.items() if v > 1}
-    
-    # Orphans: existing but not referenced
-    orphans = existing_images - referenced_images
-    
-    # Output
-    print("=== ASSET AUDIT RESULTS ===")
-    print(f"Source files scanned: {len(source_files)}")
-    print(f"Referenced images: {len(referenced_images)}")
-    print(f"Existing images: {len(existing_images)}")
-    print()
-    
+            resolved = resolve_path(base_dir, ref, assets_dir)
+            resolved = os.path.normpath(resolved)
+            referenced.add(resolved)
+
+    # Find all actual assets
+    actual_assets = set()
+    duplicates = defaultdict(list)
+    for root, dirs, filenames in os.walk(assets_dir):
+        for filename in filenames:
+            if any(filename.lower().endswith(ext) for ext in image_extensions):
+                full_path = os.path.join(root, filename)
+                actual_assets.add(full_path)
+                basename = os.path.basename(filename)
+                duplicates[basename].append(full_path)
+
+    # Duplicates: same basename in different locations
+    duplicate_files = {name: paths for name, paths in duplicates.items() if len(paths) > 1}
+
+    # Missing: referenced not in actual
+    missing = referenced - actual_assets
+
+    # Orphaned: actual not in referenced
+    orphaned = actual_assets - referenced
+
+    # Report
+    print("Asset Integrity Report")
+    print("======================")
     if missing:
-        print("MISSING IMAGES:")
-        for img in sorted(missing):
-            print(f"  {img}")
-        print()
-    
-    if duplicates:
-        print("DUPLICATE REFERENCES:")
-        for img, count in sorted(duplicates.items()):
-            print(f"  {img} (referenced {count} times)")
-        print()
-    
-    if orphans:
-        print("ORPHAN IMAGES (exist but not referenced):")
-        for img in sorted(orphans):
-            print(f"  {img}")
-        print()
-    
-    # Fail if any missing
-    if missing:
-        print("FAIL: Missing images found.")
+        print("Missing Assets:")
+        for m in sorted(missing):
+            print(f"  {m}")
+    else:
+        print("No missing assets.")
+
+    if duplicate_files:
+        print("Duplicate Files (same name):")
+        for name, paths in sorted(duplicate_files.items()):
+            print(f"  {name}:")
+            for p in paths:
+                print(f"    {p}")
+    else:
+        print("No duplicate files.")
+
+    if orphaned:
+        print("Orphaned Files:")
+        for o in sorted(orphaned):
+            print(f"  {o}")
+    else:
+        print("No orphaned files.")
+
+    # Fail if missing or duplicates
+    if missing or duplicate_files:
+        print("Issues found. Exiting with error.")
         sys.exit(1)
     else:
-        print("PASS: No missing images.")
-    
-    if duplicates:
-        print("WARNING: Duplicate references found.")
-    
-    if orphans:
-        print("INFO: Orphan images found.")
+        print("All checks passed.")
 
 if __name__ == "__main__":
     main()

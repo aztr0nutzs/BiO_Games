@@ -1,6 +1,8 @@
 package com.bio.games;
 
 import android.content.Context;
+import android.os.Looper;
+import android.util.Log;
 import android.content.Intent;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -12,6 +14,12 @@ public class BioGameBridge {
 
     public BioGameBridge(Context context, WebView webView) {
         this.context = context;
+n    private void assertMainThread() {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            throw new RuntimeException("Bridge not on UI thread");
+        }
+    }
+
         this.webView = webView;
     }
 
@@ -24,31 +32,38 @@ public class BioGameBridge {
 
     @JavascriptInterface
     public void playSlotz() {
+    assertMainThread();
         launchGame("file:///android_asset/www/bio_slotz/BiO-Slotz_web_v1.1/index.html");
     }
 
     @JavascriptInterface
     public void playKNXT4() {
-        launchGame("file:///android_asset/www/knxt4/knxt4_claude.html");
+        assertMainThread();
+    Log.d("BioGameDebug", "playKNXT4 called");
+    webView.loadUrl("file:///android_asset/www/knxt4_claude.html");
     }
 
     @JavascriptInterface
     public void playWheel() {
+    assertMainThread();
         launchGame("file:///android_asset/www/bio_wheel/wheel_game.html");
     }
 
     @JavascriptInterface
     public void playBioPetz() {
+    assertMainThread();
         launchGame("file:///android_asset/www/bio_petz/index.html");
     }
 
     @JavascriptInterface
     public void openStore() {
+    assertMainThread();
         launchGame("file:///android_asset/www/bio_store.html");
     }
 
     @JavascriptInterface
     public void testBridge() {
+    assertMainThread();
         Toast.makeText(context, "Bridge is working!", Toast.LENGTH_SHORT).show();
     }
 }

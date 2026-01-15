@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KNXT 4 - Connect Four</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #00ff00;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #00f3ff;
+        }
+        #board {
+            display: grid;
+            grid-template-columns: repeat(7, 50px);
+            grid-template-rows: repeat(6, 50px);
+            gap: 5px;
+            margin: 20px auto;
+            background-color: #001122;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .cell {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .cell.red {
+            background-color: #ff0000;
+        }
+        .cell.yellow {
+            background-color: #ffff00;
+        }
+        .cell:hover {
+            background-color: #ccc;
+        }
+        #status {
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+        button {
+            background-color: #00f3ff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #00aaff;
+        }
+    </style>
+</head>
+<body>
+    <h1>KNXT 4 - Connect Four</h1>
+    <div id="board"></div>
+    <div id="status">Player 1's turn (Red)</div>
+    <button onclick="BioGameJS.openLobby()">Back to Lobby</button>
+    <button onclick="resetGame()">Reset Game</button>
+
+    <script>
+        const ROWS = 6;
+        const COLS = 7;
+        let board = Array(ROWS).fill().map(() => Array(COLS).fill(0));
+        let currentPlayer = 1; // 1 for red, 2 for yellow
+        let gameOver = false;
+
+        const boardElement = document.getElementById('board');
+        const statusElement = document.getElementById('status');
+
+        function createBoard() {
+            boardElement.innerHTML = '';
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.addEventListener('click', () => dropPiece(col));
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+
+        function dropPiece(col) {
+            if (gameOver) return;
+            for (let row = ROWS - 1; row >= 0; row--) {
+                if (board[row][col] === 0) {
+                    board[row][col] = currentPlayer;
+                    updateBoard();
+                    if (checkWin(row, col)) {
+                        statusElement.textContent = `Player ${currentPlayer} wins!`;
+                        gameOver = true;
+                    } else if (board.flat().every(cell => cell !== 0)) {
+                        statusElement.textContent = "It's a draw!";
+                        gameOver = true;
+                    } else {
+                        currentPlayer = currentPlayer === 1 ? 2 : 1;
+                        statusElement.textContent = `Player ${currentPlayer}'s turn (${currentPlayer === 1 ? 'Red' : 'Yellow'})`;
+                    }
+                    break;
+                }
+            }
+        }
+
+        function updateBoard() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                const row = parseInt(cell.dataset.row);
+                const col = parseInt(cell.dataset.col);
+                cell.className = 'cell';
+                if (board[row][col] === 1) {
+                    cell.classList.add('red');
+                } else if (board[row][col] === 2) {
+                    cell.classList.add('yellow');
+                }
+            });
+        }
+
+        function checkWin(row, col) {
+            const directions = [
+                [0, 1], [1, 0], [1, 1], [1, -1]
+            ];
+            for (let [dr, dc] of directions) {
+                let count = 1;
+                for (let i = 1; i < 4; i++) {
+                    const r = row + dr * i;
+                    const c = col + dc * i;
+                    if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === currentPlayer) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+                for (let i = 1; i < 4; i++) {
+                    const r = row - dr * i;
+                    const c = col - dc * i;
+                    if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === currentPlayer) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+                if (count >= 4) return true;
+            }
+            return false;
+        }
+
+        function resetGame() {
+            board = Array(ROWS).fill().map(() => Array(COLS).fill(0));
+            currentPlayer = 1;
+            gameOver = false;
+            statusElement.textContent = "Player 1's turn (Red)";
+            updateBoard();
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>

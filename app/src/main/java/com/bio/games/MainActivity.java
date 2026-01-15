@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         ws.setDomStorageEnabled(true);
         ws.setAllowFileAccess(true);
         ws.setAllowFileAccessFromFileURLs(true);
+ws.setAllowContentAccess(true);
         ws.setAllowUniversalAccessFromFileURLs(true);
 
         webView.setWebViewClient(new WebViewClient());
@@ -38,6 +39,18 @@ public class MainActivity extends AppCompatActivity {
         });
         BioGameBridge bridge = new BioGameBridge(this, webView);
         webView.addJavascriptInterface(bridge, "BioGameJS");
+n    @Override
+    protected void onPause() {
+        super.onPause();
+        if (webView != null) webView.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (webView != null) webView.onResume();
+    }
+
         webView.loadUrl("file:///android_asset/www/bio_lobby3.html");
     }
 
