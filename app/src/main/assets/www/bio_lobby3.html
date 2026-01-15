@@ -118,10 +118,10 @@
             display: flex; flex-direction: column; backdrop-filter: blur(5px);
         }
         .glitch-banner {
-            height: 160px; position: relative; overflow: hidden;
+            height: 200px; position: relative; overflow: hidden;
             border-bottom: 2px solid var(--neon-pink); background: #000;
         }
-        .banner-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+        .banner-img { width: 100%; height: 100%; object-fit: contain; opacity: 0.8; }
 
         .viewport { 
             grid-area: main; overflow-y: auto; padding-right: 5px;
@@ -334,6 +334,16 @@
     </div>
 
     <script>
+        // Ensure BioGameJS is available
+        function waitForBridge(callback) {
+            if (typeof BioGameJS !== 'undefined') {
+                callback();
+            } else {
+                console.log('Waiting for BioGameJS bridge...');
+                setTimeout(() => waitForBridge(callback), 100);
+            }
+        }
+
         // Update credits and toxins from bridge
         function updateBalance() {
             try {
@@ -354,17 +364,45 @@
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-            // Update balance on load
-            updateBalance();
+            console.log('DOM loaded, waiting for bridge...');
             
-            // Update balance every 2 seconds
-            setInterval(updateBalance, 2000);
-            
-            document.getElementById("testBridgeBtn").addEventListener("click", () => BioGameJS.testBridge());
-            document.getElementById("playBioSlotzBtn").addEventListener("click", () => BioGameJS.playSlotz());
-            document.getElementById("playKNXT4Btn").addEventListener("click", () => BioGameJS.playKNXT4());
-            document.getElementById("playBioWheelBtn").addEventListener("click", () => BioGameJS.playWheel());
-            document.getElementById("playBioPetzBtn").addEventListener("click", () => BioGameJS.playBioPetz());
+            waitForBridge(() => {
+                console.log('BioGameJS bridge is ready!');
+                
+                // Update balance on load
+                updateBalance();
+                
+                // Update balance every 2 seconds
+                setInterval(updateBalance, 2000);
+                
+                // Set up button handlers
+                document.getElementById("testBridgeBtn").addEventListener("click", () => {
+                    console.log('Test bridge clicked');
+                    BioGameJS.testBridge();
+                });
+                
+                document.getElementById("playBioSlotzBtn").addEventListener("click", () => {
+                    console.log('BiO-SLoTz clicked');
+                    BioGameJS.playSlotz();
+                });
+                
+                document.getElementById("playKNXT4Btn").addEventListener("click", () => {
+                    console.log('KNXT4 clicked');
+                    BioGameJS.playKNXT4();
+                });
+                
+                document.getElementById("playBioWheelBtn").addEventListener("click", () => {
+                    console.log('BiO-Wheel clicked');
+                    BioGameJS.playWheel();
+                });
+                
+                document.getElementById("playBioPetzBtn").addEventListener("click", () => {
+                    console.log('BiO-Petz clicked');
+                    BioGameJS.playBioPetz();
+                });
+                
+                console.log('All button handlers registered');
+            });
         });
 
         // --- MATRIX RAIN ANIMATION (Canvas) ---

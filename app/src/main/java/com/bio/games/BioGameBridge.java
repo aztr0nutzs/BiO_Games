@@ -95,7 +95,7 @@ public class BioGameBridge {
         mainHandler.post(() -> {
             if (gameServer.validateGameAction(playerId, sessionToken, "playKNXT4", 50)) {
                 Log.d("BioGameBridge", "playKNXT4: Validation successful, loading game");
-                webView.loadUrl("file:///android_asset/www/knxt4_claude.html");
+                launchGame("file:///android_asset/www/knxt4/knxt4_claude.html");
             } else {
                 Log.w("BioGameBridge", "playKNXT4: Insufficient credits");
                 Toast.makeText(context, "Insufficient credits to play KNXT4!", Toast.LENGTH_SHORT).show();
@@ -109,7 +109,7 @@ public class BioGameBridge {
         mainHandler.post(() -> {
             if (gameServer.validateGameAction(playerId, sessionToken, "playWheel", 200)) {
                 Log.d("BioGameBridge", "playWheel: Validation successful, launching game");
-                launchGame("file:///android_asset/www/bio_wheel/wheel_game.html");
+                launchGame("file:///android_asset/www/bio_wheel/wheel_index.html");
             } else {
                 Log.w("BioGameBridge", "playWheel: Insufficient credits");
                 Toast.makeText(context, "Insufficient credits to play Wheel!", Toast.LENGTH_SHORT).show();
