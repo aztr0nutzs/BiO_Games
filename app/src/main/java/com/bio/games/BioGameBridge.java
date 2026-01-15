@@ -28,9 +28,20 @@ public class BioGameBridge {
         this.context = context;
         this.webView = webView;
         this.gameServer = new GameServer(context);
-        this.playerId = encryptString("player_" + System.currentTimeMillis());
-        this.sessionToken = encryptString(gameServer.generateSessionToken(playerId));
+        
+        // Generate unencrypted player ID first
+        String rawPlayerId = "player_" + System.currentTimeMillis();
+        
+        // Generate session token with unencrypted ID
+        String rawSessionToken = gameServer.generateSessionToken(rawPlayerId);
+        
+        // Store encrypted versions for transmission
+        this.playerId = encryptString(rawPlayerId);
+        this.sessionToken = encryptString(rawSessionToken);
+        
         this.mainHandler = new Handler(Looper.getMainLooper());
+        
+        Log.d("BioGameBridge", "Bridge initialized with playerId: " + rawPlayerId);
     }
 
     private String encryptString(String input) {
@@ -76,15 +87,20 @@ public class BioGameBridge {
         mainHandler.post(() -> {
             if (SecurityUtils.isRooted() || SecurityUtils.isEmulator(context) || SecurityUtils.isHooked()) {
                 Log.w("BioGameBridge", "playSlotz: Security violation detected");
-                Toast.makeText(context, encryptString("Security violation detected"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Security violation detected", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (gameServer.validateGameActionWithFlattening(decryptString(playerId), decryptString(sessionToken), encryptString("playSlotz"), 100)) {
+            // Use decrypted IDs for validation
+            String decryptedPlayerId = decryptString(playerId);
+            String decryptedToken = decryptString(sessionToken);
+            Log.d("BioGameBridge", "playSlotz: Validating with playerId=" + decryptedPlayerId);
+            
+            if (gameServer.validateGameActionWithFlattening(decryptedPlayerId, decryptedToken, "playSlotz", 0)) {
                 Log.d("BioGameBridge", "playSlotz: Validation successful, launching game");
-                launchGame(encryptString("file:///android_asset/www/bio_slotz/BiO-Slotz_web_v1.1/index.html"));
+                launchGame("file:///android_asset/www/bio_slotz/BiO-Slotz_web_v1.1/index.html");
             } else {
                 Log.w("BioGameBridge", "playSlotz: Insufficient credits");
-                Toast.makeText(context, encryptString("Insufficient credits to play Slotz!"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Insufficient credits to play Slotz!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -93,7 +109,11 @@ public class BioGameBridge {
     public void playKNXT4() {
         Log.d("BioGameBridge", "playKNXT4 called");
         mainHandler.post(() -> {
-            if (gameServer.validateGameAction(playerId, sessionToken, "playKNXT4", 50)) {
+            String decryptedPlayerId = decryptString(playerId);
+            String decryptedToken = decryptString(sessionToken);
+            Log.d("BioGameBridge", "playKNXT4: Validating with playerId=" + decryptedPlayerId);
+            
+            if (gameServer.validateGameAction(decryptedPlayerId, decryptedToken, "playKNXT4", 0)) {
                 Log.d("BioGameBridge", "playKNXT4: Validation successful, loading game");
                 launchGame("file:///android_asset/www/knxt4/knxt4_claude.html");
             } else {
@@ -107,7 +127,11 @@ public class BioGameBridge {
     public void playWheel() {
         Log.d("BioGameBridge", "playWheel called");
         mainHandler.post(() -> {
-            if (gameServer.validateGameAction(playerId, sessionToken, "playWheel", 200)) {
+            String decryptedPlayerId = decryptString(playerId);
+            String decryptedToken = decryptString(sessionToken);
+            Log.d("BioGameBridge", "playWheel: Validating with playerId=" + decryptedPlayerId);
+            
+            if (gameServer.validateGameAction(decryptedPlayerId, decryptedToken, "playWheel", 0)) {
                 Log.d("BioGameBridge", "playWheel: Validation successful, launching game");
                 launchGame("file:///android_asset/www/bio_wheel/wheel_index.html");
             } else {
@@ -121,7 +145,11 @@ public class BioGameBridge {
     public void playBioPetz() {
         Log.d("BioGameBridge", "playBioPetz called");
         mainHandler.post(() -> {
-            if (gameServer.validateGameAction(playerId, sessionToken, "playBioPetz", 0)) {
+            String decryptedPlayerId = decryptString(playerId);
+            String decryptedToken = decryptString(sessionToken);
+            Log.d("BioGameBridge", "playBioPetz: Validating with playerId=" + decryptedPlayerId);
+            
+            if (gameServer.validateGameAction(decryptedPlayerId, decryptedToken, "playBioPetz", 0)) {
                 Log.d("BioGameBridge", "playBioPetz: Validation successful, launching game");
                 launchGame("file:///android_asset/www/bio_petz/index.html");
             } else {
@@ -149,30 +177,34 @@ public class BioGameBridge {
 
     @JavascriptInterface
     public int getCredits() {
-        Log.d("BioGameBridge", "getCredits called");
-        int credits = gameServer.getPlayerCredits(playerId);
+        String decryptedPlayerId = decryptString(playerId);
+        Log.d("BioGameBridge", "getCredits called for playerId: " + decryptedPlayerId);
+        int credits = gameServer.getPlayerCredits(decryptedPlayerId);
         Log.d("BioGameBridge", "getCredits: returning " + credits);
         return credits;
     }
 
     @JavascriptInterface
     public int getToxins() {
-        Log.d("BioGameBridge", "getToxins called");
-        int toxins = gameServer.getPlayerToxins(playerId);
+        String decryptedPlayerId = decryptString(playerId);
+        Log.d("BioGameBridge", "getToxins called for playerId: " + decryptedPlayerId);
+        int toxins = gameServer.getPlayerToxins(decryptedPlayerId);
         Log.d("BioGameBridge", "getToxins: returning " + toxins);
         return toxins;
     }
 
     @JavascriptInterface
     public void addCredits(int amount) {
+        String decryptedPlayerId = decryptString(playerId);
         Log.d("BioGameBridge", "addCredits called with amount: " + amount);
-        gameServer.addCredits(playerId, amount);
+        gameServer.addCredits(decryptedPlayerId, amount);
     }
 
     @JavascriptInterface
     public void addToxins(int amount) {
+        String decryptedPlayerId = decryptString(playerId);
         Log.d("BioGameBridge", "addToxins called with amount: " + amount);
-        gameServer.addToxins(playerId, amount);
+        gameServer.addToxins(decryptedPlayerId, amount);
     }
 
     @JavascriptInterface

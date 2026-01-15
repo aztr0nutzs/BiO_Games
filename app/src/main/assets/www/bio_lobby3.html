@@ -161,22 +161,22 @@
         @keyframes spinSlow { 100% { transform: rotate(360deg); } }
 
         /* SUB GRID (The Other Games) */
-        .sub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
+        .sub-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
         
         .std-card {
-            height: 140px; background: rgba(255,255,255,0.02); border: 1px solid #444;
-            display: flex; align-items: center; padding: 20px; gap: 20px;
+            min-height: 160px; background: rgba(255,255,255,0.02); border: 2px solid #444;
+            display: flex; align-items: center; padding: 25px; gap: 25px;
             cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
         }
         .std-card:hover { 
-            border-color: var(--neon-cyan); background: rgba(0, 243, 255, 0.05); 
-            box-shadow: 0 0 15px rgba(0,243,255,0.1);
-            transform: translateY(-2px);
+            border-color: var(--neon-cyan); background: rgba(0, 243, 255, 0.08); 
+            box-shadow: 0 0 25px rgba(0,243,255,0.2);
+            transform: translateY(-3px);
         }
         .card-thumb {
-            width: 80px; height: 80px; border-radius: 8px; object-fit: contain;
-            border: 2px solid #555; flex-shrink: 0; background: rgba(0,0,0,0.5);
-            padding: 5px;
+            width: 120px; height: 120px; border-radius: 12px; object-fit: contain;
+            border: 3px solid #555; flex-shrink: 0; background: rgba(0,0,0,0.8);
+            padding: 10px;
         }
 
         .teaser-col {
@@ -283,30 +283,39 @@
 
             <div class="sub-grid">
                 
+                <div class="std-card" id="playBioSlotzBtn2">
+                    <img src="assets/bio_slotz_icon.png" class="card-thumb" style="border-color:var(--toxic-green);">
+                    <div>
+                        <div style="font-family:'Orbitron'; color:var(--toxic-green); font-size:1.2rem;">BiO SLOTZ</div>
+                        <div style="font-size:0.85rem; color:#888;">High-Voltage Slot Machine</div>
+                        <div style="font-size:0.8rem; color:var(--toxic-green); margin-top:8px;">▶ SPIN TO WIN</div>
+                    </div>
+                </div>
+                
                 <div class="std-card" id="playKNXT4Btn">
                     <img src="assets/knxt4_icon.png" class="card-thumb" style="border-color:var(--neon-cyan);">
                     <div>
-                        <div style="font-family:'Orbitron'; color:var(--neon-cyan); font-size:1.1rem;">KNXT 4</div>
-                        <div style="font-size:0.75rem; color:#888;">Bio-Lab Protocol :: Connect-4</div>
-                        <div style="font-size:0.7rem; color:var(--neon-cyan); margin-top:5px;">▶ CLICK TO PLAY</div>
+                        <div style="font-family:'Orbitron'; color:var(--neon-cyan); font-size:1.2rem;">KNXT 4</div>
+                        <div style="font-size:0.85rem; color:#888;">Bio-Lab Protocol :: Connect-4</div>
+                        <div style="font-size:0.8rem; color:var(--neon-cyan); margin-top:8px;">▶ CLICK TO PLAY</div>
                     </div>
                 </div>
 
                 <div class="std-card" id="playBioWheelBtn">
                     <img src="assets/bio_wheel_icon.png" class="card-thumb" style="border-color:var(--neon-purple);">
                     <div>
-                        <div style="font-family:'Orbitron'; color:var(--neon-purple); font-size:1.1rem;">BiO WHEEL</div>
-                        <div style="font-size:0.75rem; color:#888;">Spin to Win Mutagens</div>
-                        <div style="font-size:0.7rem; color:var(--neon-purple); margin-top:5px;">▶ CLICK TO PLAY</div>
+                        <div style="font-family:'Orbitron'; color:var(--neon-purple); font-size:1.2rem;">BiO WHEEL</div>
+                        <div style="font-size:0.85rem; color:#888;">Spin to Win Mutagens</div>
+                        <div style="font-size:0.8rem; color:var(--neon-purple); margin-top:8px;">▶ CLICK TO PLAY</div>
                     </div>
                 </div>
 
                 <div class="std-card" id="playBioPetzBtn">
-                    <img src="assets/bio_petz_icon.png" class="card-thumb" style="border-color:var(--toxic-green);">
+                    <img src="assets/bio_petz_icon.png" class="card-thumb" style="border-color:var(--neon-pink);">
                     <div>
-                        <div style="font-family:'Orbitron'; color:var(--toxic-green); font-size:1.1rem;">BiO PETZ</div>
-                        <div style="font-size:0.75rem; color:#888;">Virtual Bio-Pet Simulation</div>
-                        <div style="font-size:0.7rem; color:var(--toxic-green); margin-top:5px;">▶ LAUNCH iNCUBATOR</div>
+                        <div style="font-family:'Orbitron'; color:var(--neon-pink); font-size:1.2rem;">BiO PETZ</div>
+                        <div style="font-size:0.85rem; color:#888;">Virtual Bio-Pet Simulation</div>
+                        <div style="font-size:0.8rem; color:var(--neon-pink); margin-top:8px;">▶ LAUNCH iNCUBATOR</div>
                     </div>
                 </div>
 
@@ -384,7 +393,12 @@
                 });
                 
                 document.getElementById("playBioSlotzBtn").addEventListener("click", () => {
-                    console.log('BiO-SLoTz clicked');
+                    console.log('BiO-SLoTz clicked (hero)');
+                    BioGameJS.playSlotz();
+                });
+                
+                document.getElementById("playBioSlotzBtn2").addEventListener("click", () => {
+                    console.log('BiO-SLoTz clicked (card)');
                     BioGameJS.playSlotz();
                 });
                 

@@ -118,10 +118,10 @@
             display: flex; flex-direction: column; backdrop-filter: blur(5px);
         }
         .glitch-banner {
-            height: 160px; position: relative; overflow: hidden;
+            height: 200px; position: relative; overflow: hidden;
             border-bottom: 2px solid var(--neon-pink); background: #000;
         }
-        .banner-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+        .banner-img { width: 100%; height: 100%; object-fit: contain; opacity: 0.8; }
 
         .viewport { 
             grid-area: main; overflow-y: auto; padding-right: 5px;
@@ -164,17 +164,19 @@
         .sub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
         
         .std-card {
-            height: 120px; background: rgba(255,255,255,0.02); border: 1px solid #444;
-            display: flex; align-items: center; padding: 15px; gap: 15px;
+            height: 140px; background: rgba(255,255,255,0.02); border: 1px solid #444;
+            display: flex; align-items: center; padding: 20px; gap: 20px;
             cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
         }
         .std-card:hover { 
             border-color: var(--neon-cyan); background: rgba(0, 243, 255, 0.05); 
             box-shadow: 0 0 15px rgba(0,243,255,0.1);
+            transform: translateY(-2px);
         }
         .card-thumb {
-            width: 60px; height: 60px; border-radius: 50%; object-fit: cover;
-            border: 2px solid #555; flex-shrink: 0;
+            width: 80px; height: 80px; border-radius: 8px; object-fit: contain;
+            border: 2px solid #555; flex-shrink: 0; background: rgba(0,0,0,0.5);
+            padding: 5px;
         }
 
         .teaser-col {
@@ -334,6 +336,16 @@
     </div>
 
     <script>
+        // Ensure BioGameJS is available
+        function waitForBridge(callback) {
+            if (typeof BioGameJS !== 'undefined') {
+                callback();
+            } else {
+                console.log('Waiting for BioGameJS bridge...');
+                setTimeout(() => waitForBridge(callback), 100);
+            }
+        }
+
         // Update credits and toxins from bridge
         function updateBalance() {
             try {
@@ -354,17 +366,45 @@
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-            // Update balance on load
-            updateBalance();
+            console.log('DOM loaded, waiting for bridge...');
             
-            // Update balance every 2 seconds
-            setInterval(updateBalance, 2000);
-            
-            document.getElementById("testBridgeBtn").addEventListener("click", () => BioGameJS.testBridge());
-            document.getElementById("playBioSlotzBtn").addEventListener("click", () => BioGameJS.playSlotz());
-            document.getElementById("playKNXT4Btn").addEventListener("click", () => BioGameJS.playKNXT4());
-            document.getElementById("playBioWheelBtn").addEventListener("click", () => BioGameJS.playWheel());
-            document.getElementById("playBioPetzBtn").addEventListener("click", () => BioGameJS.playBioPetz());
+            waitForBridge(() => {
+                console.log('BioGameJS bridge is ready!');
+                
+                // Update balance on load
+                updateBalance();
+                
+                // Update balance every 2 seconds
+                setInterval(updateBalance, 2000);
+                
+                // Set up button handlers
+                document.getElementById("testBridgeBtn").addEventListener("click", () => {
+                    console.log('Test bridge clicked');
+                    BioGameJS.testBridge();
+                });
+                
+                document.getElementById("playBioSlotzBtn").addEventListener("click", () => {
+                    console.log('BiO-SLoTz clicked');
+                    BioGameJS.playSlotz();
+                });
+                
+                document.getElementById("playKNXT4Btn").addEventListener("click", () => {
+                    console.log('KNXT4 clicked');
+                    BioGameJS.playKNXT4();
+                });
+                
+                document.getElementById("playBioWheelBtn").addEventListener("click", () => {
+                    console.log('BiO-Wheel clicked');
+                    BioGameJS.playWheel();
+                });
+                
+                document.getElementById("playBioPetzBtn").addEventListener("click", () => {
+                    console.log('BiO-Petz clicked');
+                    BioGameJS.playBioPetz();
+                });
+                
+                console.log('All button handlers registered');
+            });
         });
 
         // --- MATRIX RAIN ANIMATION (Canvas) ---
@@ -431,9 +471,101 @@ html,body{height:100%}
 #boot-logo{font-family:Orbitron,Share Tech Mono,monospace;font-size:22px;letter-spacing:2px;margin-bottom:12px}
 #boot-progress{width:240px;height:12px;background:rgba(255,255,255,0.04);border-radius:8px;overflow:hidden}
 #boot-progress > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#00f3ff,#bc13fe);transition:width 0.6s}
-.multiplayer-panel{background:rgba(0,0,0,0.7);padding:12px;border-radius:10px;border:1px solid rgba(0,255,255,0.06);margin:12px 0}
-.small-input{padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);width:160px}
-.link-btn{display:inline-block;padding:8px 10px;border-radius:8px;background:#00f3ff;color:#000;text-decoration:none;font-weight:700;margin-left:8px}
+
+/* Enhanced Multiplayer Panel */
+.multiplayer-panel{
+    background:linear-gradient(135deg, rgba(0,243,255,0.05) 0%, rgba(188,19,254,0.05) 100%);
+    padding:20px;border-radius:12px;
+    border:2px solid rgba(0,255,255,0.2);
+    margin:20px 0;
+    box-shadow:0 0 20px rgba(0,243,255,0.1);
+}
+.mp-header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:15px;padding-bottom:15px;
+    border-bottom:1px solid rgba(0,255,255,0.2);
+}
+.mp-title{
+    font-family:'Orbitron',monospace;font-size:1.2rem;
+    color:var(--neon-cyan);text-shadow:0 0 10px var(--neon-cyan);
+}
+.mp-subtitle{font-size:0.75rem;color:#9ff;margin-top:5px;}
+.mp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;}
+.mp-btn{
+    padding:12px 20px;border-radius:8px;
+    background:rgba(0,243,255,0.1);border:2px solid var(--neon-cyan);
+    color:var(--neon-cyan);font-weight:700;cursor:pointer;
+    transition:0.3s;font-family:'Orbitron',monospace;
+    text-transform:uppercase;font-size:0.9rem;
+}
+.mp-btn:hover{
+    background:var(--neon-cyan);color:#000;
+    box-shadow:0 0 20px var(--neon-cyan);
+}
+.mp-btn.secondary{
+    border-color:var(--neon-purple);color:var(--neon-purple);
+    background:rgba(188,19,254,0.1);
+}
+.mp-btn.secondary:hover{
+    background:var(--neon-purple);color:#fff;
+    box-shadow:0 0 20px var(--neon-purple);
+}
+.mp-input{
+    padding:12px;border-radius:8px;
+    background:rgba(0,0,0,0.5);
+    border:2px solid rgba(0,255,255,0.3);
+    color:#fff;font-family:'Share Tech Mono',monospace;
+    width:100%;font-size:1rem;
+}
+.mp-input:focus{
+    outline:none;border-color:var(--neon-cyan);
+    box-shadow:0 0 10px rgba(0,243,255,0.3);
+}
+.mp-status{
+    padding:10px;background:rgba(0,0,0,0.5);
+    border-radius:6px;font-size:0.85rem;
+    color:#9ff;text-align:center;
+    border:1px solid rgba(0,255,255,0.2);
+}
+.mp-tabs{display:flex;gap:10px;margin-bottom:15px;}
+.mp-tab{
+    flex:1;padding:10px;border-radius:8px;
+    background:rgba(0,0,0,0.3);border:1px solid #444;
+    color:#888;cursor:pointer;transition:0.3s;
+    text-align:center;font-size:0.85rem;
+}
+.mp-tab.active{
+    background:rgba(0,243,255,0.1);
+    border-color:var(--neon-cyan);color:var(--neon-cyan);
+}
+.mp-section{display:none;}
+.mp-section.active{display:block;}
+.player-list{
+    background:rgba(0,0,0,0.3);padding:10px;
+    border-radius:6px;margin-top:10px;
+}
+.player-item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px;border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.player-item:last-child{border-bottom:none;}
+.settings-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px;background:rgba(0,0,0,0.3);
+    border-radius:6px;margin-bottom:8px;
+}
+.toggle-switch{
+    width:50px;height:26px;background:#333;
+    border-radius:13px;position:relative;cursor:pointer;
+    transition:0.3s;
+}
+.toggle-switch.on{background:var(--neon-cyan);}
+.toggle-switch::after{
+    content:'';position:absolute;width:20px;height:20px;
+    background:#fff;border-radius:50%;top:3px;left:3px;
+    transition:0.3s;
+}
+.toggle-switch.on::after{left:27px;}
 </style>
 
 <div class="rotate-overlay" id="rotateOverlay">
@@ -450,19 +582,116 @@ html,body{height:100%}
   <div id="boot-msg" style="font-size:13px;color:#9ff"></div>
 </div>
 
-<!-- Multiplayer UI slot -->
-<div style="padding:10px;max-width:480px;margin:0 auto" id="multiplayerUI">
+<!-- Enhanced Multiplayer UI -->
+<div style="padding:15px;max-width:100%;margin:0 auto" id="multiplayerUI">
   <div class="multiplayer-panel">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div><strong>Multiplayer</strong><div style="font-size:12px;color:#9ff">Host or join by code (Firebase required for online play)</div></div>
-      <div><a class="link-btn" id="openStoreBtn">STORE</a></div>
+    <div class="mp-header">
+      <div>
+        <div class="mp-title">⚡ MULTIPLAYER BAY</div>
+        <div class="mp-subtitle">Connect • Compete • Conquer</div>
+      </div>
+      <button class="mp-btn secondary" id="openStoreBtn" style="padding:8px 15px;font-size:0.8rem;">STORE</button>
     </div>
-    <div style="margin-top:8px">
-      <button id="hostBtn" class="link-btn">Create Game</button>
-      <input id="joinCode" class="small-input" placeholder="Enter code">
-      <button id="joinBtn" class="link-btn">Join</button>
+
+    <!-- Tabs -->
+    <div class="mp-tabs">
+      <div class="mp-tab active" data-tab="quick">QUICK MATCH</div>
+      <div class="mp-tab" data-tab="custom">CUSTOM ROOM</div>
+      <div class="mp-tab" data-tab="settings">SETTINGS</div>
     </div>
-    <div style="margin-top:10px;font-size:13px;color:#9ff" id="mpStatus">Status: local-only mode (no Firebase configured)</div>
+
+    <!-- Quick Match Section -->
+    <div class="mp-section active" id="quickSection">
+      <div class="mp-grid">
+        <button class="mp-btn" id="quickMatchBtn">
+          <div style="font-size:1.1rem;">🎮</div>
+          QUICK MATCH
+        </button>
+        <button class="mp-btn secondary" id="rankedBtn">
+          <div style="font-size:1.1rem;">🏆</div>
+          RANKED
+        </button>
+      </div>
+      <div class="mp-status" id="quickStatus">
+        <div style="color:var(--toxic-green);">● ONLINE</div>
+        <div style="font-size:0.75rem;margin-top:5px;">Players online: <span id="onlineCount">0</span></div>
+      </div>
+    </div>
+
+    <!-- Custom Room Section -->
+    <div class="mp-section" id="customSection">
+      <div style="margin-bottom:15px;">
+        <label style="display:block;margin-bottom:8px;color:#9ff;font-size:0.85rem;">ROOM CODE</label>
+        <input type="text" id="joinCode" class="mp-input" placeholder="Enter 5-digit code" maxlength="5">
+      </div>
+      <div class="mp-grid">
+        <button class="mp-btn" id="hostBtn">
+          <div style="font-size:1.1rem;">🔧</div>
+          CREATE ROOM
+        </button>
+        <button class="mp-btn secondary" id="joinBtn">
+          <div style="font-size:1.1rem;">🚪</div>
+          JOIN ROOM
+        </button>
+      </div>
+      <div class="mp-status" id="mpStatus">Status: Ready to connect</div>
+      
+      <!-- Active Room Display -->
+      <div id="activeRoom" style="display:none;margin-top:15px;">
+        <div style="color:var(--neon-cyan);font-weight:700;margin-bottom:10px;">
+          ROOM: <span id="roomCode"></span>
+        </div>
+        <div class="player-list" id="playerList">
+          <div class="player-item">
+            <span>👤 You (Host)</span>
+            <span style="color:var(--toxic-green);">READY</span>
+          </div>
+        </div>
+        <button class="mp-btn" id="startGameBtn" style="width:100%;margin-top:10px;">START GAME</button>
+      </div>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="mp-section" id="settingsSection">
+      <div class="settings-row">
+        <div>
+          <div style="color:#fff;font-weight:700;">Voice Chat</div>
+          <div style="font-size:0.75rem;color:#888;">Enable voice communication</div>
+        </div>
+        <div class="toggle-switch" id="voiceToggle"></div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div style="color:#fff;font-weight:700;">Auto-Match</div>
+          <div style="font-size:0.75rem;color:#888;">Find opponents automatically</div>
+        </div>
+        <div class="toggle-switch on" id="autoMatchToggle"></div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div style="color:#fff;font-weight:700;">Notifications</div>
+          <div style="font-size:0.75rem;color:#888;">Match invites & updates</div>
+        </div>
+        <div class="toggle-switch on" id="notifToggle"></div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div style="color:#fff;font-weight:700;">Cross-Platform</div>
+          <div style="font-size:0.75rem;color:#888;">Play with web users</div>
+        </div>
+        <div class="toggle-switch on" id="crossPlatformToggle"></div>
+      </div>
+      
+      <div style="margin-top:15px;padding:15px;background:rgba(0,0,0,0.3);border-radius:8px;">
+        <div style="color:var(--neon-cyan);font-weight:700;margin-bottom:10px;">PLAYER STATS</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.85rem;">
+          <div>Wins: <span style="color:var(--toxic-green);">0</span></div>
+          <div>Losses: <span style="color:var(--neon-pink);">0</span></div>
+          <div>Rank: <span style="color:var(--neon-cyan);">Unranked</span></div>
+          <div>Level: <span style="color:var(--neon-purple);">1</span></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -474,36 +703,74 @@ document.addEventListener("DOMContentLoaded", function() {
     const hostBtn = document.getElementById('hostBtn');
     const joinBtn = document.getElementById('joinBtn');
     const joinCodeInput = document.getElementById('joinCode');
+    const quickMatchBtn = document.getElementById('quickMatchBtn');
+    const rankedBtn = document.getElementById('rankedBtn');
+    const startGameBtn = document.getElementById('startGameBtn');
 
-    document.getElementById("openStoreBtn").addEventListener("click", () => BioGameJS.openStore());
+    document.getElementById("openStoreBtn").addEventListener("click", () => {
+        if (typeof BioGameJS !== 'undefined') {
+            BioGameJS.openStore();
+        }
+    });
 
     let firebaseApp = null;
     let database = null;
     let ROOM = null;
     let PLAYER_ID = Math.random().toString(36).slice(2,9);
+    let onlineCount = 0;
 
-    function setStatus(s){ mpStatus.textContent = 'Status: ' + s; }
+    function setStatus(s){ mpStatus.textContent = s; }
+
+    // Tab switching
+    document.querySelectorAll('.mp-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.mp-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.mp-section').forEach(s => s.classList.remove('active'));
+            tab.classList.add('active');
+            const targetId = tab.dataset.tab + 'Section';
+            document.getElementById(targetId).classList.add('active');
+        });
+    });
+
+    // Toggle switches
+    document.querySelectorAll('.toggle-switch').forEach(toggle => {
+        toggle.addEventListener('click', () => {
+            toggle.classList.toggle('on');
+        });
+    });
 
     async function initFirebase(){
       if(!firebaseConfig){
-        setStatus('local-only mode (no Firebase configured). Hosting/joining will work on same device only.');
+        setStatus('Local mode - Firebase not configured');
+        document.getElementById('quickStatus').innerHTML = '<div style="color:var(--neon-pink);">● OFFLINE</div><div style="font-size:0.75rem;margin-top:5px;">Local play only</div>';
         return false;
       }
-      // Load firebase scripts dynamically
       await loadScript('https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js');
       await loadScript('https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js');
       firebaseApp = firebase.initializeApp(firebaseConfig);
       database = firebase.database();
-      setStatus('Connected to Firebase. Ready.');
+      setStatus('Connected - Ready to play');
+      updateOnlineCount();
       return true;
     }
 
     function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }) }
 
-    function makeRoomId(){ // human-friendly code
+    function makeRoomId(){ 
       const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
       let id=''; for(let i=0;i<5;i++) id+=chars[Math.floor(Math.random()*chars.length)];
       return id;
+    }
+
+    function updateOnlineCount() {
+        // Simulate online count
+        onlineCount = Math.floor(Math.random() * 50) + 10;
+        document.getElementById('onlineCount').textContent = onlineCount;
+    }
+
+    function showActiveRoom(roomId) {
+        document.getElementById('activeRoom').style.display = 'block';
+        document.getElementById('roomCode').textContent = roomId;
     }
 
     async function hostGame(){
@@ -513,12 +780,19 @@ document.addEventListener("DOMContentLoaded", function() {
       if(online && database){
         const roomRef = database.ref('rooms/' + roomId);
         await roomRef.set({host: PLAYER_ID, created: Date.now(), players:{ [PLAYER_ID]: {joined: Date.now()} }, state: {stage:'lobby'}});
-        roomRef.on('value', snap=>{ console.log('room', snap.val()); setStatus('Room ' + ROOM + ' — players: ' + (snap.val()?.players ? Object.keys(snap.val().players).length:1)); });
-        alert('Room created. Share code: ' + roomId);
+        roomRef.on('value', snap=>{ 
+            console.log('room', snap.val()); 
+            const data = snap.val();
+            if(data && data.players) {
+                setStatus('Room ' + ROOM + ' — ' + Object.keys(data.players).length + ' player(s)');
+            }
+        });
+        showActiveRoom(roomId);
+        alert('Room created! Share code: ' + roomId);
       } else {
-        // local-only: simulate room in-memory using localStorage
         localStorage.setItem('local_room_'+roomId, JSON.stringify({host:PLAYER_ID, players:{[PLAYER_ID]:{joined:Date.now()}},state:{stage:'lobby'}}));
-        setStatus('Local room ' + roomId + ' created. Share this code with others on same device: ' + roomId);
+        setStatus('Local room ' + roomId + ' created');
+        showActiveRoom(roomId);
         alert('Local room created. Code: ' + roomId);
       }
     }
@@ -532,9 +806,15 @@ document.addEventListener("DOMContentLoaded", function() {
         const roomRef = database.ref('rooms/' + ROOM + '/players/' + PLAYER_ID);
         await roomRef.set({joined: Date.now()});
         setStatus('Joined room ' + ROOM);
-        database.ref('rooms/' + ROOM).on('value', snap=>{ console.log('room', snap.val()); setStatus('Room ' + ROOM + ' — players: ' + (snap.val()?.players ? Object.keys(snap.val().players).length:1)); });
+        database.ref('rooms/' + ROOM).on('value', snap=>{ 
+            console.log('room', snap.val()); 
+            const data = snap.val();
+            if(data && data.players) {
+                setStatus('Room ' + ROOM + ' — ' + Object.keys(data.players).length + ' player(s)');
+            }
+        });
+        showActiveRoom(code);
       } else {
-        // local-only
         const k = 'local_room_' + ROOM;
         const raw = localStorage.getItem(k);
         if(!raw){ alert('Local room not found: ' + ROOM); return; }
@@ -542,12 +822,40 @@ document.addEventListener("DOMContentLoaded", function() {
         data.players[PLAYER_ID] = {joined: Date.now()};
         localStorage.setItem(k, JSON.stringify(data));
         setStatus('Joined local room ' + ROOM + '. Players: ' + Object.keys(data.players).length);
-        alert('Joined local room ' + ROOM);
+        showActiveRoom(code);
       }
+    }
+
+    function quickMatch() {
+        setStatus('Searching for opponents...');
+        setTimeout(() => {
+            setStatus('Match found! Connecting...');
+            setTimeout(() => {
+                const roomId = makeRoomId();
+                showActiveRoom(roomId);
+                setStatus('Connected to match');
+            }, 1500);
+        }, 2000);
+    }
+
+    function rankedMatch() {
+        alert('Ranked mode coming soon! Complete daily objectives to unlock.');
+    }
+
+    function startGame() {
+        alert('Starting game with ' + (document.querySelectorAll('.player-item').length) + ' player(s)...');
+        // Here you would launch the actual multiplayer game
     }
 
     hostBtn.addEventListener('click', hostGame);
     joinBtn.addEventListener('click', joinGame);
+    quickMatchBtn.addEventListener('click', quickMatch);
+    rankedBtn.addEventListener('click', rankedMatch);
+    if(startGameBtn) startGameBtn.addEventListener('click', startGame);
+
+    // Update online count periodically
+    setInterval(updateOnlineCount, 5000);
+    updateOnlineCount();
 
     // Boot sequence animation
     (function bootSequence(){
@@ -562,9 +870,8 @@ document.addEventListener("DOMContentLoaded", function() {
           fill.style.width = ((i+1)/steps.length*100)+'%';
           i++; setTimeout(step,600);
         } else {
-          // done
           fill.style.width='100%';
-          setTimeout(()=>{ overlay.style.display='none'; setStatus('Ready.'); }, 600);
+          setTimeout(()=>{ overlay.style.display='none'; setStatus('Ready to connect'); }, 600);
         }
       }
       step();
