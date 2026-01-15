@@ -1,19 +1,599 @@
 <!DOCTYPE html>
 <html lang="en">
-
-  <head>
+<head>
     <meta charset="UTF-8">
-    <title>Wheel of Fortune</title>
-    <link rel="stylesheet" href="https://public.codepenassets.com/css/normalize-5.0.0.min.css">
-<link rel="stylesheet" href="./wheel_style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BiO-WHEEL // Toxic Fortune</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-purple: #bc13fe;
+            --neon-pink: #ff0055;
+            --toxic-green: #39ff14;
+            --bg-dark: #050505;
+        }
 
-  </head>
-    
-  <body>
-  <body id="root" class="text-sm min-h-screen text-white"></body>
-    <script src='https://cdn.tailwindcss.com'></script>
-<script src='https://unpkg.com/gsap@3/dist/gsap.min.js'></script><script type="module" src="./wheel_script.js"></script>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0a0a0a 100%);
+            min-height: 100vh;
+            font-family: 'Orbitron', sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+        }
 
-  </body>
-  
+        .back-button {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+            background: rgba(0,243,255,0.15);
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 12px 24px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .back-button:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+
+        .game-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 80px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 2rem;
+            color: var(--neon-purple);
+            text-shadow: 0 0 20px var(--neon-purple);
+            margin-bottom: 5px;
+        }
+        .header .subtitle {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .stat-box {
+            background: rgba(0,0,0,0.5);
+            border: 2px solid var(--neon-cyan);
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            color: var(--toxic-green);
+            text-shadow: 0 0 10px var(--toxic-green);
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 30px;
+        }
+
+        .wheel-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+        }
+
+        #wheel-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 50px rgba(188, 19, 254, 0.5),
+                0 0 100px rgba(0, 243, 255, 0.3),
+                inset 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-top: 50px solid var(--neon-pink);
+            filter: drop-shadow(0 0 15px var(--neon-pink));
+            z-index: 10;
+        }
+
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #fff 0%, var(--neon-purple) 50%, #000 100%);
+            border-radius: 50%;
+            border: 4px solid #fff;
+            box-shadow: 0 0 30px var(--neon-purple);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .bet-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0,0,0,0.5);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+        .bet-label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .bet-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(0,243,255,0.2);
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .bet-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+        }
+        .bet-amount {
+            font-size: 1.5rem;
+            color: var(--toxic-green);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .spin-btn {
+            width: 100%;
+            max-width: 300px;
+            padding: 20px 40px;
+            font-size: 1.3rem;
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.3s;
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.5);
+        }
+        .spin-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(188, 19, 254, 0.8);
+        }
+        .spin-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .result-popup.show {
+            display: flex;
+        }
+        .result-content {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(188,19,254,0.2) 0%, rgba(0,243,255,0.2) 100%);
+            border: 3px solid var(--neon-purple);
+            border-radius: 20px;
+            box-shadow: 0 0 50px var(--neon-purple);
+            animation: popIn 0.5s ease;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .result-title {
+            font-size: 2rem;
+            color: var(--toxic-green);
+            text-shadow: 0 0 20px var(--toxic-green);
+            margin-bottom: 10px;
+        }
+        .result-prize {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .result-amount {
+            font-size: 3rem;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 30px var(--neon-cyan);
+            margin-bottom: 20px;
+        }
+        .result-btn {
+            padding: 15px 40px;
+            font-size: 1rem;
+            font-family: 'Orbitron', sans-serif;
+            background: var(--neon-cyan);
+            border: none;
+            color: #000;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .result-btn:hover {
+            box-shadow: 0 0 30px var(--neon-cyan);
+        }
+
+        .prizes-list {
+            margin-top: 30px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .prizes-title {
+            text-align: center;
+            color: var(--neon-purple);
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+        .prizes-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        .prize-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+        .prize-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-bottom: 5px;
+        }
+        .prize-item .multiplier {
+            font-size: 0.8rem;
+            color: var(--toxic-green);
+        }
+    </style>
+</head>
+<body>
+    <a href="../bio_lobby3.html" class="back-button">← BACK</a>
+
+    <div class="game-container">
+        <div class="header">
+            <h1>BiO-WHEEL</h1>
+            <div class="subtitle">// Spin the Toxic Fortune</div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-box">
+                <div class="stat-label">CREDITS</div>
+                <div class="stat-value" id="credits">1000</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">LAST WIN</div>
+                <div class="stat-value" id="lastWin">0</div>
+            </div>
+        </div>
+
+        <div class="wheel-container">
+            <div class="wheel-wrapper">
+                <canvas id="wheel-canvas" width="400" height="400"></canvas>
+                <div class="wheel-pointer"></div>
+                <div class="wheel-center">🎰</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="bet-controls">
+                <span class="bet-label">BET:</span>
+                <button class="bet-btn" id="bet-down">-</button>
+                <span class="bet-amount" id="bet-amount">10</span>
+                <button class="bet-btn" id="bet-up">+</button>
+            </div>
+            <button class="spin-btn" id="spin-btn">SPIN</button>
+        </div>
+
+        <div class="prizes-list">
+            <div class="prizes-title">PRIZE MULTIPLIERS</div>
+            <div class="prizes-grid" id="prizes-grid"></div>
+        </div>
+    </div>
+
+    <div class="result-popup" id="result-popup">
+        <div class="result-content">
+            <div class="result-title">YOU WON!</div>
+            <div class="result-prize" id="result-prize">Prize Name</div>
+            <div class="result-amount" id="result-amount">+0</div>
+            <button class="result-btn" id="result-btn">CONTINUE</button>
+        </div>
+    </div>
+
+    <script>
+        // Game Configuration
+        const PRIZES = [
+            { name: "JACKPOT", color: "#ff0055", multiplier: 50, image: "assets/wheel_prize0.png" },
+            { name: "MEGA WIN", color: "#bc13fe", multiplier: 25, image: "assets/wheel_prize1.png" },
+            { name: "BIG WIN", color: "#00f3ff", multiplier: 10, image: "assets/wheel_prize2.png" },
+            { name: "NICE WIN", color: "#39ff14", multiplier: 5, image: "assets/wheel_prize3.png" },
+            { name: "SMALL WIN", color: "#ffaa00", multiplier: 3, image: "assets/wheel_prize4.png" },
+            { name: "MINI WIN", color: "#ff6600", multiplier: 2, image: "assets/wheel_prize5.png" },
+            { name: "TRY AGAIN", color: "#666666", multiplier: 0, image: "assets/wheel_prize6.png" },
+            { name: "BONUS", color: "#00ff88", multiplier: 8, image: "assets/wheel_prize7.png" },
+            { name: "LUCKY", color: "#ff00ff", multiplier: 4, image: "assets/wheel_prize8.png" },
+            { name: "DOUBLE", color: "#00ffff", multiplier: 2, image: "assets/wheel_prize9.png" }
+        ];
+
+        // Game State
+        let credits = 1000;
+        let bet = 10;
+        let isSpinning = false;
+        let currentRotation = 0;
+
+        // DOM Elements
+        const canvas = document.getElementById('wheel-canvas');
+        const ctx = canvas.getContext('2d');
+        const creditsDisplay = document.getElementById('credits');
+        const lastWinDisplay = document.getElementById('lastWin');
+        const betDisplay = document.getElementById('bet-amount');
+        const spinBtn = document.getElementById('spin-btn');
+        const betUpBtn = document.getElementById('bet-up');
+        const betDownBtn = document.getElementById('bet-down');
+        const resultPopup = document.getElementById('result-popup');
+        const resultPrize = document.getElementById('result-prize');
+        const resultAmount = document.getElementById('result-amount');
+        const resultBtn = document.getElementById('result-btn');
+        const prizesGrid = document.getElementById('prizes-grid');
+
+        // Load prize images
+        const prizeImages = [];
+        let imagesLoaded = 0;
+
+        PRIZES.forEach((prize, i) => {
+            const img = new Image();
+            img.onload = () => {
+                imagesLoaded++;
+                if (imagesLoaded === PRIZES.length) {
+                    drawWheel();
+                }
+            };
+            img.onerror = () => {
+                imagesLoaded++;
+                if (imagesLoaded === PRIZES.length) {
+                    drawWheel();
+                }
+            };
+            img.src = prize.image;
+            prizeImages[i] = img;
+        });
+
+        // Draw the wheel
+        function drawWheel() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 10;
+            const segmentAngle = (2 * Math.PI) / PRIZES.length;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(currentRotation);
+
+            // Draw segments
+            PRIZES.forEach((prize, i) => {
+                const startAngle = i * segmentAngle;
+                const endAngle = startAngle + segmentAngle;
+
+                // Draw segment
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, startAngle, endAngle);
+                ctx.closePath();
+
+                // Gradient fill
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
+                gradient.addColorStop(0, '#000');
+                gradient.addColorStop(0.3, prize.color);
+                gradient.addColorStop(1, '#000');
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                // Border
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Draw image
+                ctx.save();
+                ctx.rotate(startAngle + segmentAngle / 2);
+                ctx.translate(radius * 0.65, 0);
+                ctx.rotate(Math.PI / 2);
+                
+                if (prizeImages[i] && prizeImages[i].complete && prizeImages[i].naturalWidth > 0) {
+                    ctx.drawImage(prizeImages[i], -30, -30, 60, 60);
+                } else {
+                    // Fallback text
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 12px Orbitron';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(prize.multiplier + 'x', 0, 5);
+                }
+                ctx.restore();
+            });
+
+            // Center circle
+            ctx.beginPath();
+            ctx.arc(0, 0, 30, 0, 2 * Math.PI);
+            ctx.fillStyle = '#000';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // Spin the wheel
+        function spin() {
+            if (isSpinning || credits < bet) return;
+
+            isSpinning = true;
+            credits -= bet;
+            updateDisplay();
+            spinBtn.disabled = true;
+
+            // Random result
+            const winningIndex = Math.floor(Math.random() * PRIZES.length);
+            const segmentAngle = (2 * Math.PI) / PRIZES.length;
+            
+            // Calculate target rotation (multiple full spins + landing position)
+            const spins = 5 + Math.random() * 3; // 5-8 full spins
+            const targetAngle = spins * 2 * Math.PI + (PRIZES.length - winningIndex - 0.5) * segmentAngle;
+            
+            const startRotation = currentRotation;
+            const startTime = Date.now();
+            const duration = 4000 + Math.random() * 1000; // 4-5 seconds
+
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function (ease out cubic)
+                const eased = 1 - Math.pow(1 - progress, 3);
+                
+                currentRotation = startRotation + targetAngle * eased;
+                drawWheel();
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Spin complete
+                    isSpinning = false;
+                    spinBtn.disabled = false;
+                    showResult(PRIZES[winningIndex]);
+                }
+            }
+
+            animate();
+        }
+
+        // Show result popup
+        function showResult(prize) {
+            const winAmount = bet * prize.multiplier;
+            credits += winAmount;
+            updateDisplay();
+            lastWinDisplay.textContent = winAmount;
+
+            resultPrize.textContent = prize.name;
+            resultAmount.textContent = '+' + winAmount;
+            resultPopup.classList.add('show');
+        }
+
+        // Update display
+        function updateDisplay() {
+            creditsDisplay.textContent = credits;
+            betDisplay.textContent = bet;
+        }
+
+        // Populate prizes grid
+        function populatePrizesGrid() {
+            prizesGrid.innerHTML = '';
+            PRIZES.forEach(prize => {
+                const item = document.createElement('div');
+                item.className = 'prize-item';
+                item.innerHTML = `
+                    <img src="${prize.image}" alt="${prize.name}" onerror="this.style.display='none'">
+                    <div class="multiplier">${prize.multiplier}x</div>
+                `;
+                prizesGrid.appendChild(item);
+            });
+        }
+
+        // Event Listeners
+        spinBtn.addEventListener('click', spin);
+
+        betUpBtn.addEventListener('click', () => {
+            if (bet < 100) {
+                bet += 10;
+                updateDisplay();
+            }
+        });
+
+        betDownBtn.addEventListener('click', () => {
+            if (bet > 10) {
+                bet -= 10;
+                updateDisplay();
+            }
+        });
+
+        resultBtn.addEventListener('click', () => {
+            resultPopup.classList.remove('show');
+        });
+
+        // Initialize
+        populatePrizesGrid();
+        drawWheel();
+        updateDisplay();
+
+        console.log('BiO-Wheel initialized successfully!');
+    </script>
+</body>
 </html>
