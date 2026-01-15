@@ -5,8 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>BiO-Slotz</title>
   <link rel="stylesheet" href="style.css?v=3">
+  <style>
+    .back-button {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 10000;
+      background: rgba(0,243,255,0.2);
+      border: 2px solid #00f3ff;
+      color: #00f3ff;
+      padding: 10px 20px;
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 5px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .back-button:hover {
+      background: #00f3ff;
+      color: #000;
+    }
+    .debug-overlay {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.8);
+      color: #0f0;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 12px;
+      z-index: 9999;
+      max-width: 300px;
+      border: 1px solid #0f0;
+    }
+  </style>
 </head>
 <body>
+  <a href="../bio_lobby3.html" class="back-button">← BACK TO LOBBY</a>
+  <div id="debug" class="debug-overlay"></div>
+  
   <div id="stage">
     <div id="cabinetWrap">
       <img id="cabinet" src="assets/cabinet.png" alt="BiO-Slotz Cabinet" draggable="false" />
@@ -14,8 +52,8 @@
         <canvas id="reels"></canvas>
 <img id="headerBanner" src="assets/header2.jpg" alt="" draggable="false" />
         <div id="hud" aria-hidden="true">
-          <div class="hudItem"><div class="lbl">CREDITS</div><div id="hudCredits" class="val">0</div></div>
-          <div class="hudItem"><div class="lbl">BET</div><div id="hudBet" class="val">0</div></div>
+          <div class="hudItem"><div class="lbl">CREDITS</div><div id="hudCredits" class="val">1000</div></div>
+          <div class="hudItem"><div class="lbl">BET</div><div id="hudBet" class="val">10</div></div>
           <div class="hudItem"><div class="lbl">LINES</div><div id="hudLines" class="val">3</div></div>
           <div class="hudItem"><div class="lbl">WIN</div><div id="hudWin" class="val">0</div></div>
           <div class="hudItem"><div class="lbl">FREE</div><div id="hudFS" class="val">0</div></div>
@@ -35,5 +73,31 @@
   </div>
 
   <script src="game.js?v=3"></script>
+  <script>
+    // Debug logging
+    const debug = document.getElementById('debug');
+    function log(msg) {
+      console.log(msg);
+      debug.innerHTML += msg + '<br>';
+      debug.scrollTop = debug.scrollHeight;
+    }
+    
+    window.addEventListener('load', () => {
+      log('✓ Page loaded');
+      log('✓ Canvas: ' + (document.getElementById('reels') ? 'Found' : 'Missing'));
+      log('✓ Game.js: ' + (typeof game !== 'undefined' ? 'Loaded' : 'Missing'));
+      log('✓ Credits: ' + document.getElementById('hudCredits').textContent);
+      
+      setTimeout(() => {
+        if (document.getElementById('debug')) {
+          document.getElementById('debug').style.display = 'none';
+        }
+      }, 5000);
+    });
+    
+    window.addEventListener('error', (e) => {
+      log('✗ Error: ' + e.message);
+    });
+  </script>
 </body>
 </html>

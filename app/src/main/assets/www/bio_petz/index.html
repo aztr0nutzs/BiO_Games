@@ -291,6 +291,140 @@
     <script src="game.js"></script>
 
 <script>
+// Navigation system
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('BiO-Petz initializing...');
+    
+    // Navigation tabs
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const screens = document.querySelectorAll('.screen');
+    
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetScreen = btn.dataset.screen;
+            console.log('Switching to screen:', targetScreen);
+            
+            // Remove active from all
+            navBtns.forEach(b => b.classList.remove('active'));
+            screens.forEach(s => s.classList.remove('active'));
+            
+            // Add active to clicked
+            btn.classList.add('active');
+            document.getElementById(targetScreen + '-screen').classList.add('active');
+        });
+    });
+    
+    // Modal tabs
+    const modalTabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    modalTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.dataset.tab;
+            
+            modalTabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            tab.classList.add('active');
+            document.getElementById('tab-' + targetTab).classList.add('active');
+        });
+    });
+    
+    // Catalog items
+    const catalogItems = document.querySelectorAll('.catalog-item');
+    catalogItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const petId = item.dataset.id;
+            const petImg = item.querySelector('img').src;
+            console.log('Selected pet:', petId);
+            
+            // Update pet display
+            document.getElementById('pet-img').src = petImg;
+            document.getElementById('pet-name-display').textContent = petId;
+            
+            // Close modal
+            document.getElementById('pet-settings-modal').classList.add('hidden');
+        });
+    });
+    
+    // Initialize pet stats display
+    if (typeof Pet !== 'undefined') {
+        Pet.draw();
+        console.log('Pet initialized:', Pet.name);
+    }
+    
+    // Populate inventory
+    const inventoryGrid = document.getElementById('inventory-grid');
+    if (inventoryGrid) {
+        inventoryGrid.innerHTML = `
+            <div class="inventory-item">
+                <div class="item-icon">🍖</div>
+                <div class="item-name">Bio-Food</div>
+                <div class="item-count">x5</div>
+            </div>
+            <div class="inventory-item">
+                <div class="item-icon">💊</div>
+                <div class="item-name">Medicine</div>
+                <div class="item-count">x3</div>
+            </div>
+            <div class="inventory-item">
+                <div class="item-icon">🧪</div>
+                <div class="item-name">Mutagen</div>
+                <div class="item-count">x1</div>
+            </div>
+        `;
+    }
+    
+    // Populate shop
+    const shopGrid = document.getElementById('shop-grid');
+    if (shopGrid) {
+        shopGrid.innerHTML = `
+            <div class="shop-item">
+                <div class="item-icon">🍖</div>
+                <div class="item-name">Bio-Food</div>
+                <div class="item-price">10 Credits</div>
+                <button class="btn small">Buy</button>
+            </div>
+            <div class="shop-item">
+                <div class="item-icon">💊</div>
+                <div class="item-name">Medicine</div>
+                <div class="item-price">25 Credits</div>
+                <button class="btn small">Buy</button>
+            </div>
+            <div class="shop-item">
+                <div class="item-icon">🧪</div>
+                <div class="item-name">Mutagen</div>
+                <div class="item-price">50 Credits</div>
+                <button class="btn small">Buy</button>
+            </div>
+        `;
+    }
+    
+    // Experiment buttons
+    const experimentBtns = document.querySelectorAll('.experiment-btn');
+    const resultsDisplay = document.getElementById('experiment-results');
+    
+    experimentBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const experiment = btn.dataset.experiment;
+            console.log('Running experiment:', experiment);
+            
+            resultsDisplay.innerHTML = `
+                <div class="experiment-running">
+                    <h4>Running ${experiment} experiment...</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                    <p>Mutation chance: ${Math.floor(Math.random() * 50 + 10)}%</p>
+                    <p>Expected completion: ${Math.floor(Math.random() * 60 + 30)} seconds</p>
+                </div>
+            `;
+        });
+    });
+    
+    console.log('BiO-Petz fully initialized!');
+});
+
 (function(){
   function qs(sel){return document.querySelector(sel);}
   const modal = qs('#pet-settings-modal');
@@ -301,10 +435,6 @@
   const petNameInput = qs('#pet-name');
   const petColorInput = qs('#pet-color');
   const neonToggle = qs('#neon-toggle');
-  const previewPet = qs('#preview-pet');
-
-  // load a default preview image if game exposes one
-  previewPet.src = previewPet.src || 'https://i.imgur.com/8Km9tLL.png';
 
   function openModal(){
     modal.classList.remove('hidden');
@@ -321,11 +451,11 @@
     const accent = petColorInput.value || '#00ffd1';
     const neon = neonToggle.checked;
 
-    if(window.game && window.game.pet){
-      window.game.pet.name = name;
+    if(window.Pet){
+      window.Pet.name = name;
     }
 
-    document.querySelector('#player-name').textContent = name;
+    document.querySelector('#pet-name-display').textContent = name;
     document.documentElement.style.setProperty('--neon-accent', accent);
     document.documentElement.classList.toggle('neon-enabled', neon);
 
