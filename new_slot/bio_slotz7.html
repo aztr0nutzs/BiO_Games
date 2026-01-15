@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Nexus Bio-Systems | Firelink</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&display=swap');
+
+body {
+    margin: 0;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* ===== CABINET ===== */
+#game-wrapper {
+    position: relative;
+    width: 100vw;
+    max-width: 500px;
+    aspect-ratio: 954 / 1062;
+    background: url('1000021203.png') center/contain no-repeat;
+}
+
+/* ===== SCREEN CUTOUT (UNCHANGED) ===== */
+#screen-area {
+    position: absolute;
+    top: 34.5%;
+    left: 17.6%;
+    width: 65%;
+    height: 37.4%;
+    background: #000;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    overflow: hidden;
+}
+
+/* ===== REELS ===== */
+.reel {
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid rgba(0,243,255,.15);
+}
+
+.strip {
+    position: absolute;
+    width: 100%;
+    will-change: transform;
+}
+
+.strip.blur {
+    filter: blur(4px);
+}
+
+.symbol {
+    height: 25%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.symbol img {
+    width: 85%;
+    filter: drop-shadow(0 0 6px rgba(0,255,255,.35));
+}
+
+.locked img {
+    filter: drop-shadow(0 0 14px orange);
+}
+
+.win img {
+    filter: drop-shadow(0 0 18px gold);
+    animation: pulse .8s infinite;
+}
+
+@keyframes pulse {
+    50% { transform: scale(1.12); }
+}
+
+/* ===== HUD ===== */
+.hud {
+    position: absolute;
+    font-size: .8rem;
+    font-weight: 900;
+    color: #00f3ff;
+    text-shadow: 0 0 6px #00f3ff;
+    pointer-events: none;
+}
+
+#credits { bottom: 12.8%; left: 19%; }
+#bet     { bottom: 12.8%; left: 32.5%; }
+#win     { bottom: 12.8%; left: 69.5%; color:#00ff41; }
+
+/* ===== BONUS OVERLAY ===== */
+#bonus {
+    position:absolute;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.75);
+    color:#ff9f00;
+    font-size:1.6rem;
+    z-index:10;
+    text-shadow:0 0 15px orange;
+}
+
+/* ===== BUTTON HIT ZONES ===== */
+.btn { position:absolute; z-index:5; }
+#spin  { bottom: 7.5%; left: 43.5%; width: 13%; height: 12%; }
+#plus  { bottom: 9.5%; left: 60.5%; width: 8%; height: 6%; }
+#minus { bottom: 9.5%; left: 32.5%; width: 8%; height: 6%; }
+</style>
+</head>
+
+<body>
+
+<div id="game-wrapper">
+    <div id="screen-area"></div>
+    <div id="bonus">🔥 FIRE LINK 🔥</div>
+
+    <div id="credits" class="hud">1000</div>
+    <div id="bet" class="hud">10</div>
+    <div id="win" class="hud">0</div>
+
+    <div id="spin" class="btn" onclick="spin()"></div>
+    <div id="plus" class="btn" onclick="changeBet(5)"></div>
+    <div id="minus" class="btn" onclick="changeBet(-5)"></div>
+</div>
+
+<script>
+/* ================= AUDIO ================= */
+const snd = {
+    spin:new Audio('spin.wav'),
+    stop:new Audio('stop.wav'),
+    win:new Audio('win.wav'),
+    bonus:new Audio('bonus.wav'),
+    collect:new Audio('collect.wav')
+};
+const buzz = () => navigator.vibrate?.(30);
+
+/* ================= SYMBOL WEIGHTS (RTP) ================= */
+const SYMBOLS = [
+    {id:'s01', img:'s01.png', fire:true, weight:1},
+    {id:'s03', img:'s03.png', weight:6},
+    {id:'s04', img:'s04.png', weight:7},
+    {id:'s05', img:'s05.png', weight:8},
+    {id:'s06', img:'s06.png', weight:10}
+];
+
+/* ================= PAYTABLE ================= */
+const PAY = {
+    s01:[0,0,10,50,200],
+    s03:[0,0,5,20,100],
+    s04:[0,0,4,15,75],
+    s05:[0,0,3,10,50],
+    s06:[0,0,2,5,20]
+};
+
+const LINES = [
+    [1,1,1,1,1],[2,2,2,2,2],[0,0,0,0,0],[3,3,3,3,3],
+    [0,1,2,1,0],[3,2,1,2,3],[1,2,3,2,1],[2,1,0,1,2]
+];
+
+let credits=1000, bet=10, spinning=false;
+let bonus=false, respins=0, locked={};
+const reels=[];
+
+/* ================= INIT ================= */
+const screen=document.getElementById('screen-area');
+for(let c=0;c<5;c++){
+    const r=document.createElement('div'); r.className='reel';
+    const s=document.createElement('div'); s.className='strip';
+    for(let i=0;i<24;i++) s.appendChild(sym());
+    r.appendChild(s); screen.appendChild(r); reels.push(s);
+}
+
+/* ================= SYMBOL PICK ================= */
+function sym(){
+    const t=SYMBOLS.reduce((a,b)=>a+b.weight,0);
+    let r=Math.random()*t;
+    for(const s of SYMBOLS){ if((r-=s.weight)<=0){
+        const d=document.createElement('div');
+        d.className='symbol'; d.dataset.sym=s.id;
+        d.innerHTML=`<img src="${s.img}">`;
+        if(s.fire) d.dataset.val=(Math.floor(Math.random()*10)+1)*bet;
+        return d;
+    }}
+}
+
+/* ================= SPIN ================= */
+function spin(){
+    if(spinning || credits<bet) return;
+    spinning=true; credits-=bet;
+    clearWins(); updateHUD();
+    snd.spin.play(); buzz();
+
+    let fireSeen=0;
+    reels.forEach((strip,i)=>{
+        strip.classList.add('blur');
+        const extra = fireSeen>=2 && i===4 ? 600:0;
+        strip.style.transition=`transform ${0.9+i*.25+extra/1000}s cubic-bezier(.2,.7,.3,1)`;
+        strip.style.transform='translateY(-1200px)';
+        setTimeout(()=>{
+            strip.classList.remove('blur');
+            strip.style.transition='none';
+            strip.style.transform='translateY(0)';
+            strip.innerHTML='';
+            for(let j=0;j<24;j++){
+                const s=sym(); strip.appendChild(s);
+                if(j<4 && s.dataset.sym==='s01') fireSeen++;
+            }
+            snd.stop.play();
+            if(i===4) finish();
+        },1000+i*250+extra);
+    });
+}
+
+/* ================= FINISH ================= */
+function finish(){
+    spinning=false;
+    evaluate();
+}
+
+/* ================= BASE + BONUS ================= */
+function evaluate(){
+    let fires=[];
+    reels.forEach((r,c)=>[0,1,2,3].forEach(row=>{
+        const s=r.children[row];
+        if(s.dataset.sym==='s01') fires.push({c,row,el:s});
+    }));
+
+    if(!bonus && fires.length>=6){
+        startBonus(fires); return;
+    }
+
+    let win=0;
+    const grid=reels.map(r=>[0,1,2,3].map(i=>r.children[i].dataset.sym));
+    LINES.forEach(l=>{
+        let b=grid[0][l[0]], cnt=1;
+        for(let r=1;r<5;r++){
+            if(grid[r][l[r]]===b) cnt++; else break;
+        }
+        if(cnt>=3){
+            win+=PAY[b][cnt]*bet;
+            for(let r=0;r<cnt;r++) reels[r].children[l[r]].classList.add('win');
+        }
+    });
+
+    credits+=win;
+    document.getElementById('win').innerText=win;
+    if(win) snd.win.play();
+    updateHUD();
+}
+
+/* ================= FIRE LINK ================= */
+function startBonus(fires){
+    bonus=true; respins=3; locked={};
+    document.getElementById('bonus').style.display='flex';
+    snd.bonus.play();
+
+    fires.forEach(f=>{
+        f.el.classList.add('locked');
+        locked[`${f.c}-${f.row}`]=f.el;
+    });
+
+    bonusSpin();
+}
+
+function bonusSpin(){
+    if(respins<=0){ endBonus(); return; }
+    respins--;
+
+    reels.forEach((strip,c)=>{
+        strip.innerHTML='';
+        for(let r=0;r<4;r++){
+            const k=`${c}-${r}`;
+            if(locked[k]) strip.appendChild(locked[k]);
+            else strip.appendChild(sym());
+        }
+    });
+
+    let added=false;
+    Object.values(reels).forEach((r,c)=>[0,1,2,3].forEach(row=>{
+        const s=r.children[row];
+        if(s.dataset.sym==='s01'){
+            const k=`${c}-${row}`;
+            if(!locked[k]){
+                locked[k]=s;
+                s.classList.add('locked');
+                respins=3; added=true;
+            }
+        }
+    }));
+
+    setTimeout(bonusSpin,700);
+}
+
+function endBonus(){
+    let total=0;
+    Object.values(locked).forEach(s=>total+=+s.dataset.val);
+    credits+=total;
+    document.getElementById('win').innerText=total;
+    snd.collect.play();
+    bonus=false;
+    locked={};
+    document.getElementById('bonus').style.display='none';
+    updateHUD();
+}
+
+/* ================= UI ================= */
+function clearWins(){
+    document.querySelectorAll('.win,.locked').forEach(e=>e.classList.remove('win','locked'));
+    document.getElementById('win').innerText=0;
+}
+function changeBet(v){ bet=Math.max(5,bet+v); updateHUD(); }
+function updateHUD(){
+    document.getElementById('credits').innerText=credits|0;
+    document.getElementById('bet').innerText=bet;
+}
+</script>
+</body>
+</html>

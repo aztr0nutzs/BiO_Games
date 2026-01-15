@@ -1,0 +1,35 @@
+Source → Destination Mappings:
+
+./bio_assets/bio_lobby_assets/lobby_bg.gif → bio_assets/lobby_bg.gif
+./bio_assets/bio_lobby_assets/lobby_top.png → bio_assets/lobby_top.png
+./bio_assets/bio_store_assets/store_bg.gif → bio_assets/store_bg.gif
+./bio_assets/bio_store_assets/bio_store_icon.png → bio_assets/bio_store_icon.png
+./bio_assets/knxt4_assets/knxt4_icon.png → bio_assets/knxt4_icon.png
+./bio_assets/knxt4_assets/knxt4_chips/chip01.png → bio_assets/chips/chip01.png
+./bio_assets/knxt4_assets/knxt4_chips/chip02.png → bio_assets/chips/chip02.png
+./bio_assets/knxt4_assets/knxt4_chips/chip03.png → bio_assets/chips/chip03.png
+./bio_assets/knxt4_assets/knxt4_chips/chip04.png → bio_assets/chips/chip04.png
+./bio_assets/knxt4_assets/knxt4_chips/chip05.png → bio_assets/chips/chip05.png
+./bio_assets/knxt4_assets/knxt4_chips/chip06.png → bio_assets/chips/chip06.png
+./bio_assets/bio_petz_assets/bio_petz_icon.png → bio_assets/bio_petz_icon.png
+./bio_assets/bio_petz_assets/pet_cat1.png → bio_assets/bio_cat_1.png
+./bio_assets/bio_petz_assets/pet_cat2.png → bio_assets/bio_cat_2.png
+./bio_assets/bio_petz_assets/pet_cat3.png → bio_assets/bio_cat_3.png
+./bio_assets/bio_petz_assets/pet_cat4.png → bio_assets/bio_cat_4.png
+./bio_assets/bio_petz_assets/pet_frog1.png → bio_assets/bio_frog_1.png
+./bio_assets/bio_petz_assets/pet_frog2.gif → bio_assets/bio_frog_1.gif
+./bio_assets/bio_petz_assets/pet_frog2.png → bio_assets/bio_frog_2.png
+./bio_assets/bio_petz_assets/pet_frog3.gif → bio_assets/bio_frog_2.gif
+./bio_assets/bio_petz_assets/pet_rat1.png → bio_assets/bio_rat_1.png
+./bio_assets/bio_wheel_assets/wheel_mystery.png → bio_assets/wheel_mystery.png
+./bio_assets/bio_wheel_assets/wheel_prize0.png → bio_assets/wheel_prize0.png
+./bio_assets/bio_wheel_assets/wheel_prize1.png → bio_assets/wheel_prize1.png
+./bio_assets/bio_wheel_assets/wheel_prize2.png → bio_assets/wheel_prize2.png
+./bio_assets/bio_wheel_assets/wheel_prize3.png → bio_assets/wheel_prize3.png
+./bio_assets/bio_wheel_assets/wheel_prize4.png → bio_assets/wheel_prize4.png
+./bio_assets/bio_wheel_assets/wheel_prize5.png → bio_assets/wheel_prize5.png
+./bio_assets/bio_wheel_assets/wheel_prize6.png → bio_assets/wheel_prize6.png
+./bio_assets/bio_wheel_assets/wheel_prize7.png → bio_assets/wheel_prize7.png
+./bio_assets/bio_wheel_assets/wheel_prize8.png → bio_assets/wheel_prize8.png
+./bio_assets/bio_wheel_assets/wheel_prize9.png → bio_assets/wheel_prize9.png
+./bio_assets/bio_slotz_assets/bio_slotz_icon.png → bio_assets/bio_slotz_icon.png

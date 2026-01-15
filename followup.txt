@@ -1,370 +1,255 @@
-You are now in forensic verification mode.
-Assume your previous work is wrong until proven otherwise.
-You must re-open every file you changed and validate correctness line-by-line.
+You are in repair + verification mode.
+Assume EVERYTHING is broken until proven otherwise.
 
-You are NOT allowed to finish in under 25 minutes runtime.
-If the task completes faster, you must automatically restart and continue auditing.
+RULES
 
-PHASE 1 — AUTOPSY OF PREVIOUS RUN
+DO NOT finish early.
 
-Generate:
+DO NOT skip steps.
 
-reports/previous_changes.txt
+DO NOT claim success without proof.
 
-Full list of files modified
+NO bulk file dumps.
 
-For each file:
+All fixes must be real code changes.
 
-What you changed
-
-Why you changed it
-
-What behavior it was supposed to fix
+PHASE 0 – GIT SANITY (BLOCKER)
 
 Run:
 
-git diff main..HEAD > reports/full_diff.txt
+git status
 
-Summarize:
 
-Which diffs affect logic
+If uncommitted changes exist:
 
-Which affect layout
+Create commit:
 
-Which affect assets
+chore: checkpoint before asset remediation
 
-Create:
 
-reports/suspected_failures.md
+Then continue.
 
-List ANY area that might still be broken
+If you skip this phase, the task FAILS.
 
-Be pessimistic. Assume bugs exist.
+PHASE 1 – ASSET FAILURE REPAIR
+Problems to fix
 
-PHASE 2 — REAL VERIFICATION (NO ASSUMPTIONS)
-Asset integrity scan
+Missing chip images (KNXT4)
 
-Write scripts/deep_asset_audit.py:
+Missing symbol files (BiO-Wheel)
 
-It must:
+Missing assets in BiO-Slotz
 
-Parse every JS/HTML/CSS/JSON file
+Orphaned files not referenced anywhere
 
-Extract:
+Actions
 
-.png
+Re-run asset audit script
 
-.gif
+For EVERY missing asset:
 
-.webp
+Identify:
+
+Which screen uses it
+
+Expected filename
+
+Fix by ONE of:
+
+Move existing file
+
+Rename file
+
+Update code reference
+
+Log each fix in:
+
+reports/asset_fixes.md
+
+
+For orphaned assets:
+
+Either:
+
+Remove file
+
+Or wire it into code
+
+Explain decision.
+
+FAIL if ANY missing asset remains.
+
+PHASE 2 – SCREEN FAILURES (MANDATORY)
+
+You MUST fix these failed screens:
+
+Screen	Required Fix
+KNXT4	Missing chips + layout
+BiO-Wheel	Missing symbols
+BiO-Lobby	Missing background
+BiO-Slotz	Missing icons/assets
+For EACH screen:
+
+Open its HTML
+
+List:
+
+All assets it loads
 
 Verify:
 
 File exists
 
-Case matches EXACTLY
+Correct path
 
-Path is correct
+Correct case
 
-Output:
+Fix:
 
-Missing
+Broken src paths
 
-Duplicates
+Wrong filenames
 
-Orphans (files never referenced)
+Directory mistakes
 
-Fail if ANY issue exists.
+Log results in:
 
-Screen-by-screen validation
+reports/screen_fixes.md
 
-For EACH screen:
 
-Screen	Must Verify
-Bio-Store	GIF background animates
-KNXT4	Board NOT clipped at ANY width
-KNXT4	Menu never overlaps board
-BiO-Petz	Each pet loads ONLY its own assets
-BiO-Wheel	11 symbols, includes mystery
-BiO-Lobby	Avatar fully removed
-BiO-Lobby	GIF background animates
-BiO-Slotz	Correct icon
+Each screen must end with:
+PASS or FAIL.
+
+PHASE 3 – BRIDGE LAYER HARDENING
+
+Based on suspected failures:
+
+Audit BioGameBridge.java
+
+Confirm:
+
+All methods annotated
+
+No dead methods
+
+No mismatches
+
+Add runtime logging:
+
+Log.d("Bridge", "Method called: playBioWheel");
+
+
+In HTML:
+
+Wrap calls in try/catch
+
+try { BioGameJS.playBioWheel(); }
+catch(e){ console.error(e); }
+
 
 Create:
-reports/manual_validation.md
 
-For each:
+reports/bridge_audit.md
 
-Expected behavior
+PHASE 4 – WEBVIEW RELIABILITY
 
-Actual behavior
+Confirm in MainActivity:
 
-Screenshot path
+JS enabled
 
-PASS / FAIL
+DOM storage enabled
 
-FAIL = automatic fix attempt.
+File access allowed
 
-PHASE 3 — KNXT4 HARD FIX (NO MORE HALF MEASURES)
-
-Deep dive:
-
-Trace board render path:
-
-Find root container
-
-Log computed width/height
-
-Identify:
-
-overflow hidden
-
-transforms
-
-negative margins
-
-absolute positioning
-
-FORCE FIX:
-
-Board must:
-
-Always center
-
-Never clip
-
-Scale with viewport
-
-Implement:
-
-CSS clamp()
-
-Media queries
-
-Resize observer
+WebChromeClient set
 
 Add:
 
-window.addEventListener("resize", recalcBoard);
+webView.setWebContentsDebuggingEnabled(true);
 
 
-Add debug overlay (temporary):
+Log any change.
 
-Show board bounding box
+PHASE 5 – FULL REVALIDATION
 
-Log when clipping detected
+Re-test ALL screens:
 
-Remove overlay after validation.
+Bio-Store
 
-PHASE 4 — BIO-PETZ LOGIC REWRITE (THIS IS THE BIG ONE)
+BiO-Petz
 
-Completely refactor pet system:
+KNXT4
 
-Requirements
+BiO-Wheel
 
-Single source of truth:
+BiO-Lobby
 
-const PETS = {
-  "bio-cat": {...},
-  "bio-frog": {...},
-  "bio-rat": {...}
-}
+BiO-Slotz
 
-Enforce:
+Create:
 
-NO dynamic glob loading
+reports/final_validation.md
 
-NO directory scans
 
-Explicit filenames ONLY
+For each:
 
-Add runtime guards:
-if (!PETS[id]) throw new Error("Invalid pet id");
+Asset status
 
-Validation tests:
+Navigation
 
-Create tests/pet_assets.test.js
+PASS/FAIL
 
-Tests:
+FAIL = auto-fix + retest.
 
-Each pet only loads its own files
-
-No cross-pollination
-
-GIFs only used where allowed
-
-PHASE 5 — WHEEL MATH VALIDATION
-
-Confirm:
-
-prize array length === 11
-
-mystery included
-
-Add logging:
-
-angle
-
-index
-
-prize name
-
-Spin 100 times:
-
-Output distribution table
-
-Ensure:
-
-All prizes reachable
-
-No dead slots
-
-Save:
-reports/wheel_distribution.csv
-
-PHASE 6 — LOBBY PURGE
-
-Search for:
-
-operator
-
-avatar
-
-userPic
-
-profileImg
-
-DELETE all logic.
-
-Replace UI block with:
-
-lobby_top.png
-
-Confirm:
-
-No JS references remain
-
-No CSS targets remain
-
-PHASE 7 — VISUAL PROOF
-
-Generate:
-
-reports/screenshots/
-  before/
-  after/
-
-
-For every screen:
-
-Desktop
-
-Tablet
-
-Mobile
-
-Minimum:
-
-18 screenshots
-
-FAIL if less.
-
-PHASE 8 — PERFORMANCE SANITY
-
-Measure:
-
-Image sizes
-
-GIF sizes
-
-Warn if:
-
-Any file > 3MB
-
-Suggest:
-
-Compression targets
-
-Lazy loading
-
-Save:
-reports/perf_audit.md
-
-PHASE 9 — DOCUMENTATION (STRICT)
+PHASE 6 – DOCUMENTATION (NO EXCUSES)
 
 Update:
 
-TASKS
+docs/TASKS.md
 
-Old task → FAILED
+Mark failed task
 
-New task → in_progress → completed
+Mark new task completed
 
-WORKLOG
+docs/WORKLOG.md
 
 Timeline
-
-Commands
 
 Bugs found
 
 Fixes applied
 
-DECISIONS
+docs/DECISIONS.md
 
-Why refactors done
+Why assets were missing
 
-Why old logic rejected
+How structure was corrected
 
-Tradeoffs
+FINAL COMMIT
 
-PHASE 10 — FINAL GATE
+ONLY when all pass:
 
-You may NOT finish until ALL are true:
+feat: fix asset failures + screen validation
 
-deep_asset_audit passes
+ACCEPTANCE CONDITIONS
 
-pet tests pass
+You may NOT finish unless:
 
-screenshots exist
+Zero missing assets
 
-KNXT board verified
+All 6 screens PASS
 
-wheel distribution valid
+Bridge calls verified
 
-lobby avatar fully gone
+WebView stable
 
-If ANY fail:
+Git clean
 
-Auto-fix
+Translation
 
-Re-run
-
-Repeat until green
-
-FINAL OUTPUT
-
-Deliver:
-
-Branch: feat/bio-asset-hardening
-
-Commit message:
-
-feat: forensic asset validation + logic hardening
-
-
-All reports
-
-All screenshots
-
-Test results
-
-RULES
-
-NO skipping
-
-NO assumptions
-
-NO “looks good”
-
-EVERYTHING must be proven
+This forces Kilo to:
+• Clean git
+• Fix real files
+• Stop lying
+• Re-test everything
+• Document like a grown adult

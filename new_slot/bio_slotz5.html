@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nexus Bio-Systems | Firelink</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+        /* --- LAYOUT ENGINE --- */
+        body {
+            background-color: #000;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            color: #fff;
+        }
+
+        /* Responsive Cabinet Wrapper */
+        #game-wrapper {
+            position: relative;
+            width: 100vw;
+            max-width: 500px; /* Limits size on tablets/desktops */
+            aspect-ratio: 954 / 1062; /* Matches 1000021203.png exactly */
+            background-image: url('1000021203.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* --- THE REEL SCREEN --- */
+        #screen-area {
+            position: absolute;
+            top: 34.5%;  /* Precise alignment to the black screen in image */
+            left: 17.6%;
+            width: 65%;
+            height: 37.4%;
+            background: #000;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            overflow: hidden;
+            border-radius: 4px;
+            box-shadow: inset 0 0 25px rgba(0,0,0,1);
+        }
+
+        .reel-column {
+            position: relative;
+            height: 100%;
+            border-right: 1px solid rgba(0, 243, 255, 0.1);
+        }
+
+        .strip {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            will-change: transform;
+        }
+
+        .symbol {
+            height: 80px; /* Calculated based on container height / 4 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        /* Symbol Styles */
+        .sym-fire { color: #ff4500; font-size: 2.2rem; animation: pulse 1s infinite; }
+        .sym-bot { color: #ff00ff; }
+        .sym-dna { color: #00ff41; }
+        .sym-low { color: #00f3ff; font-weight: bold; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 2px red); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 10px orange); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 2px red); }
+        }
+
+        /* --- HUD & DISPLAYS --- */
+        .hud-display {
+            position: absolute;
+            color: #00f3ff;
+            font-size: 0.8rem;
+            font-weight: 900;
+            text-align: center;
+            width: 13%;
+            text-shadow: 0 0 5px #00f3ff;
+            pointer-events: none;
+        }
+
+        #display-credits { bottom: 12.8%; left: 19%; }
+        #display-bet { bottom: 12.8%; left: 32.5%; }
+        #display-win { bottom: 12.8%; left: 69.5%; color: #00ff41; text-shadow: 0 0 5px #00ff41; }
+
+        /* --- NEON OVERLAYS --- */
+        .neon-header-glow {
+            position: absolute;
+            top: 20%; left: 28%; width: 44%; height: 8%;
+            background: rgba(255, 0, 255, 0.05);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+            animation: flicker 4s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+            20%, 24%, 55% { opacity: 0.3; }
+        }
+
+        /* --- CONTROLS --- */
+        .btn-zone {
+            position: absolute;
+            cursor: pointer;
+            z-index: 10;
+            -webkit-tap-highlight-color: transparent;
+            /* background: rgba(255,0,0,0.2); /* Debugging */
+        }
+
+        #btn-spin { bottom: 7.5%; left: 43.5%; width: 13%; height: 12%; border-radius: 50%; }
+        #btn-plus { bottom: 9.5%; left: 60.5%; width: 8%; height: 6%; }
+        #btn-minus { bottom: 9.5%; left: 32.5%; width: 8%; height: 6%; }
+
+        /* --- BONUS UI --- */
+        #bonus-msg {
+            position: absolute;
+            top: 45%; left: 0; width: 100%;
+            text-align: center;
+            font-size: 1.5rem;
+            color: #fff;
+            background: rgba(0,0,0,0.8);
+            padding: 10px 0;
+            border-top: 2px solid #ff4500;
+            border-bottom: 2px solid #ff4500;
+            display: none;
+            z-index: 100;
+        }
+
+        .locked { border: 2px solid #ff4500; background: rgba(255, 69, 0, 0.2); }
+    </style>
+</head>
+<body>
+
+<div id="game-wrapper">
+    <div class="neon-header-glow"></div>
+    
+    <div id="screen-area">
+        </div>
+
+    <div id="display-credits" class="hud-display">1000.00</div>
+    <div id="display-bet" class="hud-display">2.50</div>
+    <div id="display-win" class="hud-display">0.00</div>
+
+    <div id="bonus-msg">FIRE LINK!</div>
+
+    <div id="btn-spin" class="btn-zone" onclick="Slot.spin()"></div>
+    <div id="btn-plus" class="btn-zone" onclick="Slot.changeBet(0.5)"></div>
+    <div id="btn-minus" class="btn-zone" onclick="Slot.changeBet(-0.5)"></div>
+</div>
+
+<script>
+const SYMBOLS = [
+    { char: '🤖', type: 'sym-bot', weight: 2 },
+    { char: '🧬', type: 'sym-dna', weight: 3 },
+    { char: '🔥', type: 'sym-fire', weight: 1.5 },
+    { char: 'A', type: 'sym-low', weight: 5 },
+    { char: 'K', type: 'sym-low', weight: 5 },
+    { char: 'Q', type: 'sym-low', weight: 5 }
+];
+
+const Slot = {
+    credits: 1000.00,
+    bet: 2.50,
+    isSpinning: false,
+    isBonus: false,
+    bonusSpins: 0,
+    locked: [], // {c, r}
+
+    init() {
+        const screen = document.getElementById('screen-area');
+        screen.innerHTML = '';
+        for (let c = 0; c < 5; c++) {
+            const col = document.createElement('div');
+            col.className = 'reel-column';
+            const strip = document.createElement('div');
+            strip.className = 'strip';
+            strip.id = `strip-${c}`;
+            
+            // Fill with 20 symbols for initial look/spin buffer
+            for (let i = 0; i < 20; i++) {
+                strip.appendChild(this.createSymbol());
+            }
+            col.appendChild(strip);
+            screen.appendChild(col);
+        }
+        this.updateUI();
+    },
+
+    createSymbol(forceFire = false) {
+        const div = document.createElement('div');
+        div.className = 'symbol';
+        const s = forceFire ? SYMBOLS[2] : this.getRandomSym();
+        div.innerText = s.char;
+        div.classList.add(s.type);
+        if(s.char === '🔥') div.dataset.val = (this.bet * (Math.floor(Math.random() * 5) + 1)).toFixed(2);
+        return div;
+    },
+
+    getRandomSym() {
+        const totalWeight = SYMBOLS.reduce((a, b) => a + b.weight, 0);
+        let r = Math.random() * totalWeight;
+        for (let s of SYMBOLS) {
+            if (r < s.weight) return s;
+            r -= s.weight;
+        }
+        return SYMBOLS[0];
+    },
+
+    changeBet(amt) {
+        if (this.isSpinning) return;
+        this.bet = Math.max(0.5, this.bet + amt);
+        this.updateUI();
+    },
+
+    updateUI() {
+        document.getElementById('display-credits').innerText = this.credits.toFixed(2);
+        document.getElementById('display-bet').innerText = this.bet.toFixed(2);
+    },
+
+    spin() {
+        if (this.isSpinning) return;
+        
+        if (!this.isBonus) {
+            if (this.credits < this.bet) return alert("Low Balance");
+            this.credits -= this.bet;
+            document.getElementById('display-win').innerText = "0.00";
+        }
+
+        this.isSpinning = true;
+        this.updateUI();
+
+        const duration = 1500;
+        const symbolHeight = 80; // Matches CSS
+
+        for (let c = 0; c < 5; c++) {
+            const strip = document.getElementById(`strip-${c}`);
+            strip.style.transition = `transform ${0.5 + c * 0.2}s cubic-bezier(0.45, 0.05, 0.55, 0.95)`;
+            strip.style.transform = `translateY(-${symbolHeight * 12}px)`;
+
+            setTimeout(() => {
+                strip.style.transition = 'none';
+                strip.style.transform = 'translateY(0)';
+                // Replace bottom 4 symbols with "results"
+                const children = strip.children;
+                for (let r = 0; r < 4; r++) {
+                    const newSym = this.createSymbol();
+                    strip.replaceChild(newSym, children[r]);
+                }
+                
+                if (c === 4) {
+                    this.isSpinning = false;
+                    this.checkResults();
+                }
+            }, duration);
+        }
+    },
+
+    checkResults() {
+        let fires = [];
+        for (let c = 0; c < 5; c++) {
+            const strip = document.getElementById(`strip-${c}`);
+            for (let r = 0; r < 4; r++) {
+                if (strip.children[r].innerText === '🔥') {
+                    fires.push({c, r, el: strip.children[r]});
+                }
+            }
+        }
+
+        if (fires.length >= 4 && !this.isBonus) {
+            this.triggerBonus(fires);
+        }
+    },
+
+    triggerBonus(fires) {
+        this.isBonus = true;
+        this.bonusSpins = 3;
+        const msg = document.getElementById('bonus-msg');
+        msg.style.display = 'block';
+        msg.innerText = "FIRE LINK: 3 SPINS";
+        
+        fires.forEach(f => f.el.classList.add('locked'));
+        this.locked = fires.map(f => ({c: f.c, r: f.r}));
+    }
+};
+
+window.onload = () => Slot.init();
+</script>
+</body>
+</html>

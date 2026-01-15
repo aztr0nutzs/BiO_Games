@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nexus Bio-Slot Firelink</title>
+    <style>
+        /* --- CORE SETUP --- */
+        body {
+            background-color: #000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* The Game Container - Maintains Aspect Ratio of your image */
+        #game-container {
+            position: relative;
+            /* Adjust this width to fit your phone/screen needs */
+            width: 100%; 
+            max-width: 600px; 
+            aspect-ratio: 954 / 1062; /* Precise aspect ratio of your image */
+            background-image: url('cabinet.png'); /* YOUR IMAGE NAME HERE */
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.2);
+        }
+
+        /* Fallback if image doesn't load */
+        #game-container.no-img {
+            background-color: #1a1a1a;
+            border: 2px solid cyan;
+        }
+
+        /* --- THE REEL GRID (Overlays the black screen area) --- */
+        #reel-stage {
+            position: absolute;
+            top: 34.2%;    /* Aligned to your image screen top */
+            left: 17.5%;   /* Aligned to your image screen left */
+            width: 65%;    /* Width of the screen area */
+            height: 37.5%; /* Height of the screen area */
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2%;
+            overflow: hidden; /* Hides symbols when they spin out */
+            border-radius: 4px;
+            /* Debug border: uncomment to see grid alignment */
+            /* border: 1px solid red; */ 
+        }
+
+        .reel-col {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* The strip of symbols that moves */
+        .reel-strip {
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.0s; /* Controlled by JS */
+        }
+
+        .symbol {
+            width: 100%;
+            /* Each symbol is 1/4th of the visible height (4 rows) */
+            height: 25%; 
+            aspect-ratio: 1/1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 5px cyan;
+            position: relative;
+        }
+
+        /* Symbol Styling */
+        .sym-FIRE { font-size: 30px; filter: drop-shadow(0 0 8px orange); animation: pulse 1s infinite; }
+        .sym-BIO  { color: #0f0; filter: drop-shadow(0 0 5px lime); }
+        .sym-LOW  { color: #00f3ff; }
+        
+        /* Fireball Cash Value */
+        .cash-val {
+            position: absolute;
+            bottom: 5px;
+            font-size: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 1px 3px;
+            border-radius: 3px;
+            color: #fff;
+        }
+
+        /* --- NEON GLOW FX --- */
+        /* This overlays the top tubes to make them flicker */
+        .neon-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 10%, rgba(0, 255, 65, 0.1), transparent 40%);
+            animation: neonFlicker 4s infinite;
+        }
+        
+        .screen-glow {
+            position: absolute;
+            top: 34%; left: 17%; width: 66%; height: 38%;
+            box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.2);
+            pointer-events: none;
+            border-radius: 10px;
+            z-index: 10;
+        }
+
+        @keyframes neonFlicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+            20%, 24%, 55% { opacity: 0.5; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- CONTROLS (Invisible Click Zones) --- */
+        .click-zone {
+            position: absolute;
+            cursor: pointer;
+            z-index: 100;
+            /* background: rgba(255,0,0,0.3); */ /* Uncomment to see buttons for debugging */
+        }
+        
+        /* Mapping specific buttons from your image */
+        #btn-spin {
+            top: 77%; left: 43.5%; width: 13%; height: 11%;
+            border-radius: 50%;
+        }
+        #btn-minus { top: 79%; left: 33%; width: 7%; height: 6%; }
+        #btn-plus { top: 79%; left: 60%; width: 7%; height: 6%; }
+        #btn-max { top: 77%; left: 61%; width: 9%; height: 4%; }
+
+        /* --- DISPLAYS (Text Overlay) --- */
+        .hud-text {
+            position: absolute;
+            color: #00f3ff;
+            font-family: 'Courier New', sans-serif;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-align: center;
+            width: 12%;
+            text-shadow: 0 0 5px #00f3ff;
+        }
+
+        #disp-credits { top: 86%; left: 20%; }
+        #disp-bet { top: 86%; left: 32%; }
+        #disp-win { top: 86%; left: 71%; color: #0f0; text-shadow: 0 0 5px #0f0; }
+
+        /* --- MESSAGES & FIRE LINK UI --- */
+        #message-area {
+            position: absolute;
+            top: 45%; left: 20%; width: 60%;
+            text-align: center;
+            font-size: 2em;
+            color: gold;
+            text-shadow: 0 0 10px red;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 20;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border: 2px solid gold;
+        }
+
+        .locked {
+            border: 2px solid red;
+            box-sizing: border-box;
+            background-color: rgba(50, 0, 0, 0.5);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div class="neon-overlay"></div>
+        <div class="screen-glow"></div>
+
+        <div id="reel-stage">
+            </div>
+
+        <div id="disp-credits" class="hud-text">1000</div>
+        <div id="disp-bet" class="hud-text">25</div>
+        <div id="disp-win" class="hud-text">0</div>
+
+        <div id="message-area">FIRELINK!</div>
+
+        <div id="btn-spin" class="click-zone" onclick="handleSpin()"></div>
+        <div id="btn-minus" class="click-zone" onclick="adjustBet(-5)"></div>
+        <div id="btn-plus" class="click-zone" onclick="adjustBet(5)"></div>
+        <div id="btn-max" class="click-zone" onclick="adjustBet(100)"></div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const ROWS = 4;
+        const COLS = 5;
+        const SYMBOLS = ['10', 'J', 'Q', 'K', 'A', '🧬', '🤖', '🔥'];
+        // 🔥 is the Firelink trigger
+        
+        let state = {
+            credits: 1000,
+            bet: 25,
+            spinning: false,
+            grid: [], // Current symbols on screen
+            bonusActive: false,
+            spinsLeft: 0,
+            lockedPos: [] // positions {c, r, val} that are locked
+        };
+
+        const reelStage = document.getElementById('reel-stage');
+        const msgArea = document.getElementById('message-area');
+
+        // --- INITIALIZATION ---
+        function init() {
+            // Create 5 columns
+            for (let i = 0; i < COLS; i++) {
+                let col = document.createElement('div');
+                col.className = 'reel-col';
+                col.id = `col-${i}`;
+                
+                // Create the moving strip inside the column
+                let strip = document.createElement('div');
+                strip.className = 'reel-strip';
+                strip.id = `strip-${i}`;
+                
+                // Fill with initial random symbols
+                for(let j=0; j < ROWS; j++) {
+                    let sym = randomSymbol();
+                    strip.appendChild(createSymbolDiv(sym));
+                }
+                
+                col.appendChild(strip);
+                reelStage.appendChild(col);
+            }
+            updateHUD();
+        }
+
+        // --- CORE GAMEPLAY ---
+
+        function handleSpin() {
+            if (state.spinning) return;
+
+            if (state.bonusActive) {
+                playBonusSpin();
+                return;
+            }
+
+            if (state.credits < state.bet) {
+                showMessage("NO CREDITS");
+                return;
+            }
+
+            // Deduct Bet
+            state.credits -= state.bet;
+            document.getElementById('disp-win').innerText = "0";
+            updateHUD();
+
+            startSpinAnimation(false);
+        }
+
+        function startSpinAnimation(isBonus) {
+            state.spinning = true;
+            showMessage(""); // Clear messages
+
+            // Animate each column with a delay
+            for (let i = 0; i < COLS; i++) {
+                let strip = document.getElementById(`strip-${i}`);
+                
+                // CSS Transform for "Blur" effect
+                strip.style.transition = `transform 0.2s ease-in`;
+                strip.style.transform = `translateY(-50px)`; // Pull up slightly
+
+                setTimeout(() => {
+                    // Snap back and simulate spin
+                    strip.style.transition = 'none';
+                    strip.style.transform = `translateY(-100%)`; // Move symbols up out of view
+                    
+                    // Logic: Generate NEW symbols
+                    strip.innerHTML = ''; // clear old
+                    let newColData = [];
+                    
+                    for(let r=0; r<ROWS; r++) {
+                        // If holding fireballs, check lock
+                        if(isBonus && isLocked(i, r)) {
+                            let lockedData = getLockedData(i, r);
+                            strip.appendChild(createSymbolDiv('🔥', lockedData.val, true));
+                            newColData.push('🔥');
+                        } else {
+                            // Normal gen
+                            let s = isBonus ? randomBonusSymbol() : randomSymbol();
+                            strip.appendChild(createSymbolDiv(s));
+                            newColData.push(s);
+                        }
+                    }
+
+                    // Slide in
+                    setTimeout(() => {
+                        strip.style.transition = 'transform 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
+                        strip.style.transform = `translateY(0)`;
+                    }, 50);
+
+                }, 100 + (i * 100)); // Staggered timing per reel
+            }
+
+            // End Spin Timer
+            setTimeout(() => {
+                state.spinning = false;
+                if(isBonus) checkBonusOutcome();
+                else checkWin();
+            }, 1000);
+        }
+
+        // --- LOGIC HELPER ---
+        function randomSymbol() {
+            // Weighted random
+            const rand = Math.random();
+            if (rand < 0.1) return '🔥'; // 10% chance fireball
+            if (rand < 0.2) return '🤖';
+            if (rand < 0.3) return '🧬';
+            return SYMBOLS[Math.floor(Math.random() * 5)]; // A-10
+        }
+
+        function randomBonusSymbol() {
+            // In bonus, mainly blanks or fire
+            return Math.random() < 0.15 ? '🔥' : ''; 
+        }
+
+        function createSymbolDiv(char, val=null, locked=false) {
+            let div = document.createElement('div');
+            div.className = 'symbol';
+            
+            if (char === '🔥') {
+                div.classList.add('sym-FIRE');
+                div.innerHTML = `🔥<div class="cash-val">$${val || (state.bet * (Math.floor(Math.random()*5)+1))}</div>`;
+                if(locked) div.classList.add('locked');
+                // Store value in dataset for logic
+                div.dataset.val = val || div.querySelector('.cash-val').innerText.replace('$','');
+            } else if (char === '🤖' || char === '🧬') {
+                div.classList.add('sym-BIO');
+                div.innerText = char;
+            } else {
+                div.classList.add('sym-LOW');
+                div.innerText = char;
+            }
+            
+            return div;
+        }
+
+        // --- FIRELINK FEATURE LOGIC ---
+
+        function checkWin() {
+            // Scan for fireballs
+            let fireballs = [];
+            for(let c=0; c<COLS; c++) {
+                let strip = document.getElementById(`strip-${c}`);
+                Array.from(strip.children).forEach((el, r) => {
+                    if(el.classList.contains('sym-FIRE')) {
+                        fireballs.push({c:c, r:r, val: parseInt(el.dataset.val)});
+                    }
+                });
+            }
+
+            if(fireballs.length >= 4) {
+                triggerBonus(fireballs);
+            } else {
+                // Simple Line Win Simulation (Center Row match)
+                // Real slot logic checks 25 lines, simplifying for single file demo
+                let row2 = [];
+                for(let c=0; c<COLS; c++) {
+                    let txt = document.getElementById(`strip-${c}`).children[1].innerText;
+                    row2.push(txt);
+                }
+                if(row2[0] === row2[1] && row2[1] === row2[2]) {
+                    let win = state.bet * 5;
+                    state.credits += win;
+                    document.getElementById('disp-win').innerText = win;
+                    showMessage(`WIN: ${win}`);
+                }
+                updateHUD();
+            }
+        }
+
+        function triggerBonus(initialFireballs) {
+            state.bonusActive = true;
+            state.spinsLeft = 3;
+            state.lockedPos = initialFireballs;
+            
+            showMessage("FIRE LINK STARTED!");
+            document.body.style.boxShadow = "inset 0 0 50px red"; // visual cue
+
+            setTimeout(() => {
+                showMessage(`SPINS: ${state.spinsLeft}`);
+                playBonusSpin(); // Auto start
+            }, 2000);
+        }
+
+        function isLocked(c, r) {
+            return state.lockedPos.some(p => p.c === c && p.r === r);
+        }
+
+        function getLockedData(c, r) {
+            return state.lockedPos.find(p => p.c === c && p.r === r);
+        }
+
+        function playBonusSpin() {
+            if(state.spinsLeft <= 0) {
+                endBonus();
+                return;
+            }
+            state.spinsLeft--;
+            showMessage(`SPINS: ${state.spinsLeft}`);
+            startSpinAnimation(true);
+        }
+
+        function checkBonusOutcome() {
+            // Scan for NEW fireballs
+            let newFinds = false;
+            for(let c=0; c<COLS; c++) {
+                let strip = document.getElementById(`strip-${c}`);
+                Array.from(strip.children).forEach((el, r) => {
+                    if(el.classList.contains('sym-FIRE') && !isLocked(c, r)) {
+                        // Found a new one!
+                        state.lockedPos.push({c:c, r:r, val: parseInt(el.dataset.val)});
+                        newFinds = true;
+                    }
+                });
+            }
+
+            if(newFinds) {
+                state.spinsLeft = 3; // Reset
+                showMessage("RESET TO 3!");
+            }
+
+            if(state.spinsLeft > 0) {
+                setTimeout(playBonusSpin, 1000);
+            } else {
+                endBonus();
+            }
+        }
+
+        function endBonus() {
+            let total = state.lockedPos.reduce((acc, cur) => acc + cur.val, 0);
+            state.credits += total;
+            state.bonusActive = false;
+            state.lockedPos = [];
+            
+            showMessage(`TOTAL BONUS: ${total}`);
+            document.getElementById('disp-win').innerText = total;
+            document.body.style.boxShadow = "none";
+            updateHUD();
+        }
+
+        // --- UTILS ---
+        function adjustBet(amt) {
+            if(state.spinning || state.bonusActive) return;
+            if(state.bet + amt >= 5) state.bet += amt;
+            updateHUD();
+        }
+
+        function updateHUD() {
+            document.getElementById('disp-credits').innerText = state.credits;
+            document.getElementById('disp-bet').innerText = state.bet;
+        }
+
+        function showMessage(msg) {
+            msgArea.innerText = msg;
+            msgArea.style.opacity = msg ? 1 : 0;
+        }
+
+        // Start
+        init();
+
+    </script>
+</body>
+</html>

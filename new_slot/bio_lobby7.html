@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Nexus Bio-Systems | Firelink</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&display=swap');
+
+body {
+    margin: 0;
+    background: radial-gradient(circle at center, #050505, #000);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* ===== CABINET (CLOSER) ===== */
+#game-wrapper {
+    position: relative;
+    width: 120vw;              /* ← closer */
+    max-width: 560px;          /* ← fills screen more */
+    aspect-ratio: 954 / 1062;
+    background: url('1000021203.png') center/contain no-repeat;
+}
+
+/* ===== SCREEN CUTOUT (UNCHANGED) ===== */
+#screen-area {
+    position: absolute;
+    top: 34.5%;
+    left: 17.6%;
+    width: 65%;
+    height: 37.4%;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    overflow: hidden;
+    background: #000;
+}
+
+/* ===== REELS ===== */
+.reel {
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid rgba(0,243,255,.15);
+}
+
+.strip {
+    position: absolute;
+    width: 100%;
+}
+
+.strip.blur {
+    filter: blur(5px);
+}
+
+.symbol {
+    height: 25%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.symbol img {
+    width: 86%;
+    filter: drop-shadow(0 0 6px rgba(0,255,255,.3));
+}
+
+.win img {
+    filter: drop-shadow(0 0 20px gold);
+    animation: winPulse .8s infinite;
+}
+
+@keyframes winPulse {
+    50% { transform: scale(1.12); }
+}
+
+/* ===== HUD ===== */
+.hud {
+    position: absolute;
+    font-size: .8rem;
+    font-weight: 900;
+    color: #00f3ff;
+    text-shadow: 0 0 6px #00f3ff;
+    pointer-events: none;
+}
+#credits { bottom: 12.8%; left: 19%; }
+#bet     { bottom: 12.8%; left: 32.5%; }
+#win     { bottom: 12.8%; left: 69.5%; color:#00ff41; }
+
+/* ===== BUTTON HIT ZONES ===== */
+.btn { position:absolute; z-index:5; }
+#spin  { bottom: 7.5%; left: 43.5%; width: 13%; height: 12%; }
+#plus  { bottom: 9.5%; left: 60.5%; width: 8%; height: 6%; }
+#minus { bottom: 9.5%; left: 32.5%; width: 8%; height: 6%; }
+</style>
+</head>
+
+<body>
+
+<div id="game-wrapper">
+    <div id="screen-area"></div>
+
+    <div id="credits" class="hud">1000</div>
+    <div id="bet" class="hud">10</div>
+    <div id="win" class="hud">0</div>
+
+    <div id="spin" class="btn" onclick="spin()"></div>
+    <div id="plus" class="btn" onclick="changeBet(5)"></div>
+    <div id="minus" class="btn" onclick="changeBet(-5)"></div>
+</div>
+
+<script>
+/* ================= SYMBOL IDS ================= */
+const SYM = {
+    FIRE:'s01', SCAT:'s02',
+    A:'s03', B:'s04', C:'s05', D:'s06'
+};
+
+/* ================= REAL REEL STRIPS ================= */
+const REEL_STRIPS = [
+    [SYM.A,SYM.B,SYM.C,SYM.D,SYM.A,SYM.B,SYM.FIRE,SYM.C,SYM.A,SYM.B,SYM.C,SYM.D],
+    [SYM.B,SYM.C,SYM.D,SYM.A,SYM.B,SYM.C,SYM.D,SYM.FIRE,SYM.A,SYM.B,SYM.C,SYM.D],
+    [SYM.C,SYM.D,SYM.A,SYM.B,SYM.C,SYM.D,SYM.A,SYM.FIRE,SYM.B,SYM.C,SYM.D,SYM.A],
+    [SYM.B,SYM.A,SYM.C,SYM.D,SYM.B,SYM.C,SYM.A,SYM.D,SYM.FIRE,SYM.C,SYM.A,SYM.B],
+    [SYM.A,SYM.C,SYM.B,SYM.D,SYM.A,SYM.B,SYM.C,SYM.D,SYM.A,SYM.FIRE,SYM.B,SYM.C]
+];
+
+/* ================= PAYTABLE ================= */
+const PAY = {
+    s01:[0,0,20,100,500],
+    s03:[0,0,5,20,100],
+    s04:[0,0,4,15,75],
+    s05:[0,0,3,10,50],
+    s06:[0,0,2,5,20]
+};
+
+/* ================= PAYLINES (5x4) ================= */
+const LINES = [
+    [1,1,1,1,1],[2,2,2,2,2],[0,0,0,0,0],[3,3,3,3,3],
+    [0,1,2,1,0],[3,2,1,2,3],[1,2,3,2,1],[2,1,0,1,2]
+];
+
+let credits=1000, bet=10, spinning=false;
+const reels=[], stops=[];
+
+/* ================= INIT ================= */
+const screen=document.getElementById('screen-area');
+for(let c=0;c<5;c++){
+    const r=document.createElement('div'); r.className='reel';
+    const s=document.createElement('div'); s.className='strip';
+    r.appendChild(s); screen.appendChild(r);
+    reels.push(s);
+}
+
+/* ================= BUILD VISIBLE WINDOW ================= */
+function buildReel(col, stop){
+    const strip=reels[col];
+    strip.innerHTML='';
+    const reel=REEL_STRIPS[col];
+    for(let i=-2;i<6;i++){
+        const sym=reel[(stop+i+reel.length)%reel.length];
+        const d=document.createElement('div');
+        d.className='symbol';
+        d.dataset.sym=sym;
+        d.innerHTML=`<img src="${sym}.png">`;
+        strip.appendChild(d);
+    }
+}
+
+/* ================= SPIN ================= */
+function spin(){
+    if(spinning || credits<bet) return;
+    spinning=true;
+    credits-=bet;
+    clearWins();
+    updateHUD();
+
+    // pre-calc stops
+    for(let i=0;i<5;i++){
+        stops[i]=Math.floor(Math.random()*REEL_STRIPS[i].length);
+        buildReel(i,stops[i]);
+    }
+
+    reels.forEach((strip,i)=>{
+        strip.classList.add('blur');
+        strip.style.transition=`transform ${1+i*.25}s cubic-bezier(.2,.7,.3,1)`;
+        strip.style.transform='translateY(-400%)';
+        setTimeout(()=>{
+            strip.classList.remove('blur');
+            strip.style.transition='none';
+            strip.style.transform='translateY(0)';
+            if(i===4) finish();
+        },1000+i*250);
+    });
+}
+
+/* ================= FINISH ================= */
+function finish(){
+    spinning=false;
+    evaluate();
+}
+
+/* ================= REAL WIN EVAL ================= */
+function evaluate(){
+    let total=0;
+
+    const grid=reels.map(r=>[2,3,4,5].map(i=>r.children[i].dataset.sym));
+
+    LINES.forEach(line=>{
+        let base=null, count=0;
+        for(let c=0;c<5;c++){
+            const s=grid[c][line[c]];
+            if(c===0){ base=s; count=1; continue; }
+            if(s===base || s===SYM.FIRE){
+                count++;
+            } else break;
+        }
+        if(count>=3 && PAY[base]){
+            total+=PAY[base][count]*bet;
+            for(let c=0;c<count;c++){
+                reels[c].children[line[c]+2].classList.add('win');
+            }
+        }
+    });
+
+    credits+=total;
+    document.getElementById('win').innerText=total;
+    updateHUD();
+}
+
+/* ================= UI ================= */
+function clearWins(){
+    document.querySelectorAll('.win').forEach(e=>e.classList.remove('win'));
+    document.getElementById('win').innerText=0;
+}
+function changeBet(v){ bet=Math.max(5,bet+v); updateHUD(); }
+function updateHUD(){
+    document.getElementById('credits').innerText=credits|0;
+    document.getElementById('bet').innerText=bet;
+}
+</script>
+</body>
+</html>

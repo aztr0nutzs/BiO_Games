@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Bio-Systems Slot</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff41;
+            --glass-black: rgba(0, 0, 0, 0.85);
+        }
+
+        body {
+            background-color: #050505;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            overflow: hidden;
+            color: white;
+        }
+
+        /* --- Main Container --- */
+        .cabinet-wrapper {
+            position: relative;
+            width: 100vh; /* Scale based on height to fit screen */
+            max-width: 100%;
+            aspect-ratio: 954 / 1062; /* Based on image dimensions */
+            background-image: url('1000021203.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* --- Neon Glow Effects --- */
+        /* These overlays sit on top of the image to create the glow/flicker */
+        .glow-overlay {
+            position: absolute;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            opacity: 0.6;
+            animation: flicker 3s infinite alternate;
+        }
+
+        .glow-header {
+            top: 20%;
+            left: 28%;
+            width: 44%;
+            height: 8%;
+            box-shadow: 0 0 20px var(--neon-pink), inset 0 0 10px var(--neon-blue);
+            border-radius: 10px;
+        }
+
+        .glow-tubes {
+            top: 2%;
+            left: 10%;
+            width: 80%;
+            height: 15%;
+            box-shadow: 0 0 15px var(--neon-green);
+            opacity: 0.3;
+        }
+
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 0.5; }
+            20%, 24%, 55% { opacity: 0.1; }
+        }
+
+        /* --- The Screen / Reel Area --- */
+        .screen-container {
+            position: absolute;
+            top: 34.5%;
+            left: 17.5%;
+            width: 65%;
+            height: 37%;
+            background: black;
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px black;
+        }
+
+        .reel {
+            display: flex;
+            flex-direction: column;
+            /* We simulate spinning by translating this inner content */
+            transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1); 
+        }
+
+        .symbol {
+            height: 25%; /* 4 rows = 25% each */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5em; /* Adjust based on screen size */
+            text-shadow: 0 0 5px currentColor;
+            position: relative;
+        }
+
+        /* Symbol Specific Styles */
+        .sym-high { color: var(--neon-pink); filter: drop-shadow(0 0 5px var(--neon-pink)); }
+        .sym-mid { color: var(--neon-blue); }
+        .sym-low { color: var(--neon-green); font-size: 2em; }
+        .sym-bonus { 
+            font-size: 3em; 
+            filter: drop-shadow(0 0 10px red);
+            animation: pulse 1s infinite;
+        }
+        
+        .bonus-value {
+            position: absolute;
+            font-size: 0.3em;
+            color: white;
+            bottom: 15%;
+            font-weight: bold;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- UI Controls (Invisible Click Zones) --- */
+        .controls-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Helper to see buttons during dev (remove 'background' in prod) */
+        .btn-zone {
+            position: absolute;
+            cursor: pointer;
+            border-radius: 50%;
+            /* background: rgba(255, 0, 0, 0.3); */ 
+        }
+
+        .btn-zone:active {
+            transform: scale(0.95);
+        }
+
+        #btn-spin {
+            top: 77%;
+            left: 44%;
+            width: 12%;
+            height: 11%;
+            border-radius: 50%;
+        }
+
+        #btn-minus {
+            top: 79%;
+            left: 33.5%;
+            width: 6%;
+            height: 5%;
+            border-radius: 5px;
+        }
+
+        #btn-plus {
+            top: 79%;
+            left: 60.5%;
+            width: 6%;
+            height: 5%;
+            border-radius: 5px;
+        }
+
+        /* --- Digital Displays (Text overlay on the image screens) --- */
+        .display-text {
+            position: absolute;
+            font-family: 'Orbitron', monospace;
+            color: var(--neon-blue);
+            font-size: 1.2em;
+            text-align: center;
+            width: 10%;
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        #display-credits {
+            top: 85.5%;
+            left: 20%;
+            width: 12%;
+            color: var(--neon-blue);
+        }
+        
+        #display-bet {
+            top: 85.5%;
+            left: 33%;
+            width: 10%;
+            color: var(--neon-blue);
+        }
+
+        #display-win {
+            top: 85.5%;
+            left: 71%;
+            width: 12%;
+            color: var(--neon-green);
+        }
+        
+        #display-msg {
+            top: 35%;
+            left: 20%;
+            width: 60%;
+            text-align: center;
+            font-size: 2em;
+            color: #fff;
+            text-shadow: 0 0 10px #ff00ff;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 10;
+        }
+
+        /* Bonus Overlay State */
+        .bonus-active .screen-container {
+            box-shadow: inset 0 0 30px #ff3300;
+            border: 2px solid #ff3300;
+        }
+
+        .locked {
+            border: 1px solid gold;
+            background: rgba(50, 0, 0, 0.8);
+            box-sizing: border-box;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="cabinet-wrapper">
+        <div class="glow-overlay glow-header"></div>
+        <div class="glow-overlay glow-tubes"></div>
+
+        <div class="screen-container" id="grid">
+            </div>
+
+        <div class="display-text" id="display-msg">FIRE LINK!</div>
+
+        <div class="display-text" id="display-credits">1000</div>
+        <div class="display-text" id="display-bet">25</div>
+        <div class="display-text" id="display-win">0</div>
+
+        <div class="controls-layer">
+            <div class="btn-zone" id="btn-spin" onclick="spin()"></div>
+            <div class="btn-zone" id="btn-minus" onclick="changeBet(-5)"></div>
+            <div class="btn-zone" id="btn-plus" onclick="changeBet(5)"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- Game Configuration ---
+        const config = {
+            rows: 4,
+            cols: 5,
+            symbols: [
+                { id: '10', char: '10', type: 'sym-low', weight: 4 },
+                { id: 'J', char: 'J', type: 'sym-low', weight: 4 },
+                { id: 'Q', char: 'Q', type: 'sym-low', weight: 4 },
+                { id: 'K', char: 'K', type: 'sym-low', weight: 4 },
+                { id: 'A', char: 'A', type: 'sym-low', weight: 4 },
+                { id: 'CHIP', char: '💾', type: 'sym-mid', weight: 3 },
+                { id: 'DNA', char: '🧬', type: 'sym-mid', weight: 3 },
+                { id: 'BOT', char: '🤖', type: 'sym-high', weight: 2 },
+                { id: 'FIRE', char: '🔥', type: 'sym-bonus', weight: 1.5 } // Trigger
+            ],
+            bonusTriggerCount: 4 // Need 4 fireballs
+        };
+
+        // --- Game State ---
+        let state = {
+            credits: 1000,
+            bet: 25,
+            isSpinning: false,
+            gridData: [], // 5x4 array
+            bonusActive: false,
+            bonusSpins: 0,
+            lockedSymbols: [] // Coords of locked fireballs
+        };
+
+        // --- Audio Context (Placeholder) ---
+        // const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // --- Init ---
+        const gridEl = document.getElementById('grid');
+        const msgEl = document.getElementById('display-msg');
+
+        function init() {
+            // Build Reels
+            gridEl.innerHTML = '';
+            for(let c=0; c<config.cols; c++) {
+                let reel = document.createElement('div');
+                reel.className = 'reel';
+                reel.id = `reel-${c}`;
+                // Fill initial random symbols
+                for(let r=0; r<config.rows; r++) {
+                    let sym = getRandomSymbol();
+                    let div = createSymbolDiv(sym);
+                    reel.appendChild(div);
+                }
+                gridEl.appendChild(reel);
+            }
+            updateUI();
+        }
+
+        // --- Core Functions ---
+        
+        function createSymbolDiv(symObj, val = null) {
+            let div = document.createElement('div');
+            div.className = `symbol ${symObj.type}`;
+            div.textContent = symObj.char;
+            
+            // If it's a fireball, give it a cash value
+            if(symObj.id === 'FIRE') {
+                let valueSpan = document.createElement('span');
+                valueSpan.className = 'bonus-value';
+                valueSpan.textContent = val || (Math.floor(Math.random() * 5 + 1) * state.bet);
+                div.appendChild(valueSpan);
+                div.dataset.value = valueSpan.textContent;
+            }
+            return div;
+        }
+
+        function getRandomSymbol(onlyBonus = false) {
+            if(onlyBonus) {
+                // In bonus mode, mostly blanks, some fireballs
+                return Math.random() > 0.8 ? 
+                    config.symbols.find(s => s.id === 'FIRE') : 
+                    { id: 'BLANK', char: '', type: 'sym-low', weight: 0 };
+            }
+
+            // Weighted random
+            let totalWeight = config.symbols.reduce((a,b) => a + b.weight, 0);
+            let random = Math.random() * totalWeight;
+            for(let s of config.symbols) {
+                if(random < s.weight) return s;
+                random -= s.weight;
+            }
+            return config.symbols[0];
+        }
+
+        function changeBet(amount) {
+            if(state.isSpinning || state.bonusActive) return;
+            if(state.bet + amount >= 5 && state.bet + amount <= 500) {
+                state.bet += amount;
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('display-credits').textContent = state.credits;
+            document.getElementById('display-bet').textContent = state.bet;
+        }
+
+        // --- Spin Logic ---
+
+        function spin() {
+            if(state.isSpinning) return;
+            if(!state.bonusActive && state.credits < state.bet) {
+                alert("Low Credits");
+                return;
+            }
+
+            if(!state.bonusActive) {
+                state.credits -= state.bet;
+                document.getElementById('display-win').textContent = "0";
+                updateUI();
+            }
+
+            state.isSpinning = true;
+            msgEl.style.opacity = 0;
+
+            if (state.bonusActive) {
+                performBonusSpin();
+            } else {
+                performNormalSpin();
+            }
+        }
+
+        function performNormalSpin() {
+            // Animate reels
+            for(let c=0; c<config.cols; c++) {
+                let reel = document.getElementById(`reel-${c}`);
+                // CSS hack to simulate blur/spin: translateY
+                reel.style.transform = `translateY(-20px)`; 
+                
+                setTimeout(() => {
+                    reel.style.transition = 'none';
+                    reel.style.transform = `translateY(100%)`; // Move down instantly
+                    
+                    // Generate new data
+                    reel.innerHTML = '';
+                    let colData = [];
+                    for(let r=0; r<config.rows; r++) {
+                        let s = getRandomSymbol();
+                        reel.appendChild(createSymbolDiv(s));
+                        colData.push(s);
+                    }
+                    
+                    // Add blur animation class here if desired
+                    setTimeout(() => {
+                        reel.style.transition = 'transform 0.4s ease-out';
+                        reel.style.transform = `translateY(0)`;
+                    }, 50);
+
+                }, 200 + (c * 100)); // Staggered stops
+            }
+
+            setTimeout(() => {
+                checkResults();
+                state.isSpinning = false;
+            }, 1000);
+        }
+
+        // --- Bonus Logic (Fire Link Style) ---
+
+        function checkResults() {
+            // 1. Scan Grid for Fireballs
+            let fireballs = [];
+            const reels = document.querySelectorAll('.reel');
+            
+            reels.forEach((reel, c) => {
+                Array.from(reel.children).forEach((div, r) => {
+                    if(div.textContent.includes('🔥')) {
+                        fireballs.push({c, r, val: parseInt(div.dataset.value)});
+                    }
+                });
+            });
+
+            if(fireballs.length >= config.bonusTriggerCount) {
+                triggerBonus(fireballs);
+            } else {
+                // Simple Line Check (Example: Check Row 2 for 3+ match)
+                // In a real app, you'd check 25 lines matrix.
+                // Keeping it simple here for the single file constraint.
+                let centerRow = [];
+                reels.forEach(r => centerRow.push(r.children[1].textContent)); // Row 2
+                // Logic: if first 3 match... (simplified)
+            }
+        }
+
+        function triggerBonus(initialFireballs) {
+            state.bonusActive = true;
+            state.bonusSpins = 3;
+            document.body.classList.add('bonus-active');
+            msgEl.textContent = "FIRE LINK ACTIVE!";
+            msgEl.style.opacity = 1;
+            
+            // Lock initial symbols
+            lockSymbols(initialFireballs);
+
+            // Change Spin Button to 'Resume' visually (optional)
+            // Auto spin after 2 seconds
+            setTimeout(() => {
+                msgEl.textContent = `SPINS LEFT: ${state.bonusSpins}`;
+                spin(); 
+            }, 2000);
+        }
+
+        function lockSymbols(coords) {
+            coords.forEach(pt => {
+                let reel = document.getElementById(`reel-${pt.c}`);
+                let div = reel.children[pt.r];
+                if(!div.classList.contains('locked')) {
+                    div.classList.add('locked');
+                    // We need to structurally keep this div here during spins
+                    state.lockedSymbols.push({c: pt.c, r: pt.r, val: pt.val});
+                }
+            });
+        }
+
+        function performBonusSpin() {
+            if(state.bonusSpins <= 0) {
+                endBonus();
+                return;
+            }
+
+            state.bonusSpins--;
+            msgEl.textContent = `SPINS LEFT: ${state.bonusSpins}`;
+
+            // Spin only non-locked cells
+            for(let c=0; c<config.cols; c++) {
+                let reel = document.getElementById(`reel-${c}`);
+                let lockedInCol = state.lockedSymbols.filter(l => l.c === c).map(l => l.r);
+                
+                // Visual wiggle for spinning effect on non-locked
+                reel.style.transform = `translateY(5px)`;
+                setTimeout(() => reel.style.transform = `translateY(0)`, 100);
+
+                // Update content
+                for(let r=0; r<config.rows; r++) {
+                    if(lockedInCol.includes(r)) continue; // Skip locked
+
+                    let newSym = getRandomSymbol(true); // Bonus weighting
+                    let oldDiv = reel.children[r];
+                    let newDiv = createSymbolDiv(newSym);
+                    
+                    reel.replaceChild(newDiv, oldDiv);
+                    
+                    // If new fireball lands
+                    if(newSym.id === 'FIRE') {
+                        state.bonusSpins = 3; // Reset counter
+                        msgEl.textContent = "SPINS RESET!";
+                        lockSymbols([{c, r, val: parseInt(newDiv.dataset.value)}]);
+                    }
+                }
+            }
+
+            setTimeout(() => {
+                state.isSpinning = false;
+                if(state.bonusSpins > 0) {
+                    setTimeout(spin, 1000); // Auto spin
+                } else {
+                    endBonus();
+                }
+            }, 800);
+        }
+
+        function endBonus() {
+            let totalWin = state.lockedSymbols.reduce((a, b) => a + b.val, 0);
+            state.credits += totalWin;
+            document.getElementById('display-win').textContent = totalWin;
+            
+            msgEl.textContent = `TOTAL WIN: ${totalWin}`;
+            msgEl.style.opacity = 1;
+
+            state.bonusActive = false;
+            state.lockedSymbols = [];
+            document.body.classList.remove('bonus-active');
+            updateUI();
+            
+            // Clean up locks visually for next regular spin
+            setTimeout(() => {
+                document.querySelectorAll('.locked').forEach(el => el.classList.remove('locked'));
+            }, 2000);
+        }
+
+        // Start
+        init();
+
+    </script>
+</body>
+</html>

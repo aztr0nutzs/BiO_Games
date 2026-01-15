@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>5x4 Slot Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    background: radial-gradient(circle at top, #020202, #000);
+    font-family: Arial, sans-serif;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* CABINET */
+#slot {
+    width: 380px;
+    background: #0b0b0b;
+    border-radius: 16px;
+    padding: 10px;
+    box-shadow: 0 0 35px #00f3ff;
+}
+
+/* REELS */
+#reels {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    background: #000;
+    padding: 6px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.reel {
+    height: 320px; /* 4 symbols × 80px */
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(#111, #000);
+}
+
+.strip {
+    position: absolute;
+    width: 100%;
+}
+
+.symbol {
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.symbol img {
+    width: 70px;
+    height: 70px;
+    filter: drop-shadow(0 0 6px rgba(0,255,255,0.35));
+}
+
+/* WIN ANIMATION */
+.win {
+    animation: glow 0.9s infinite;
+}
+
+@keyframes glow {
+    0%   { filter: drop-shadow(0 0 6px gold); }
+    50%  { filter: drop-shadow(0 0 18px gold); }
+    100% { filter: drop-shadow(0 0 6px gold); }
+}
+
+/* HUD */
+#hud {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* CONTROLS */
+#controls {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+button {
+    background: linear-gradient(#00f3ff, #007a88);
+    border: none;
+    color: #000;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 8px;
+    width: 32%;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.4;
+}
+</style>
+</head>
+
+<body>
+
+<div id="slot">
+    <div id="reels"></div>
+
+    <div id="hud">
+        <div>CREDITS: <span id="credits">1000</span></div>
+        <div>BET: <span id="bet">10</span></div>
+        <div>WIN: <span id="win">0</span></div>
+    </div>
+
+    <div id="controls">
+        <button onclick="changeBet(-5)">− BET</button>
+        <button onclick="spin()">SPIN</button>
+        <button onclick="changeBet(5)">+ BET</button>
+    </div>
+</div>
+
+<script>
+/* ================= SYMBOL SET ================= */
+const SYMBOLS = [
+    { id: "s01", img: "s01.png", wild: true },
+    { id: "s02", img: "s02.png", scatter: true },
+    { id: "s03", img: "s03.png" },
+    { id: "s04", img: "s04.png" },
+    { id: "s05", img: "s05.png" },
+    { id: "s06", img: "s06.png" }
+];
+
+/* ================= PAYTABLE ================= */
+const PAYTABLE = {
+    s01: [0,0,10,50,200],
+    s02: [0,0,2,10,50],
+    s03: [0,0,5,20,100],
+    s04: [0,0,4,15,75],
+    s05: [0,0,3,10,50],
+    s06: [0,0,2,5,20]
+};
+
+/* ================= 5x4 PAYLINES ================= */
+/* Rows are 0 (top) to 3 (bottom) */
+const PAYLINES = [
+    [1,1,1,1,1],
+    [2,2,2,2,2],
+    [0,0,0,0,0],
+    [3,3,3,3,3],
+    [0,1,2,1,0],
+    [3,2,1,2,3],
+    [1,2,3,2,1],
+    [2,1,0,1,2],
+    [0,1,1,1,0],
+    [3,2,2,2,3]
+];
+
+/* ================= GAME STATE ================= */
+let credits = 1000;
+let bet = 10;
+let spinning = false;
+const reels = [];
+
+/* ================= INIT ================= */
+function init() {
+    const reelsDiv = document.getElementById("reels");
+    reelsDiv.innerHTML = "";
+    reels.length = 0;
+
+    for (let i = 0; i < 5; i++) {
+        const reel = document.createElement("div");
+        reel.className = "reel";
+
+        const strip = document.createElement("div");
+        strip.className = "strip";
+
+        for (let j = 0; j < 30; j++) {
+            strip.appendChild(createSymbol());
+        }
+
+        reel.appendChild(strip);
+        reelsDiv.appendChild(reel);
+        reels.push(strip);
+    }
+}
+
+/* ================= SYMBOL ================= */
+function createSymbol() {
+    const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+    const div = document.createElement("div");
+    div.className = "symbol";
+    div.dataset.sym = sym.id;
+    div.innerHTML = `<img src="${sym.img}">`;
+    return div;
+}
+
+/* ================= SPIN ================= */
+function spin() {
+    if (spinning || credits < bet) return;
+
+    spinning = true;
+    credits -= bet;
+    clearWins();
+    updateHUD();
+
+    reels.forEach((strip, i) => {
+        strip.style.transition = `transform ${0.9 + i * 0.2}s cubic-bezier(.15,.65,.35,1)`;
+        strip.style.transform = `translateY(-1280px)`;
+
+        setTimeout(() => {
+            strip.style.transition = "none";
+            strip.style.transform = "translateY(0)";
+            strip.innerHTML = "";
+            for (let j = 0; j < 30; j++) strip.appendChild(createSymbol());
+            if (i === 4) finishSpin();
+        }, 1000 + i * 200);
+    });
+}
+
+function finishSpin() {
+    spinning = false;
+    evaluateWins();
+}
+
+/* ================= WIN LOGIC ================= */
+function evaluateWins() {
+    let totalWin = 0;
+
+    const grid = reels.map(strip =>
+        Array.from(strip.children)
+            .slice(0, 4)
+            .map(s => s.dataset.sym)
+    );
+
+    PAYLINES.forEach(line => {
+        let base = grid[0][line[0]];
+        let count = 1;
+
+        for (let r = 1; r < 5; r++) {
+            const sym = grid[r][line[r]];
+            if (sym === base || SYMBOLS.find(s => s.id === sym)?.wild) {
+                count++;
+            } else break;
+        }
+
+        if (count >= 3) {
+            totalWin += PAYTABLE[base][count] * bet;
+            for (let r = 0; r < count; r++) {
+                reels[r].children[line[r]].classList.add("win");
+            }
+        }
+    });
+
+    /* Scatter pays anywhere */
+    const scatters = grid.flat().filter(s => s === "s02").length;
+    if (scatters >= 3) {
+        totalWin += PAYTABLE.s02[scatters] * bet;
+    }
+
+    credits += totalWin;
+    document.getElementById("win").textContent = totalWin;
+    updateHUD();
+}
+
+/* ================= UI ================= */
+function clearWins() {
+    document.querySelectorAll(".win").forEach(e => e.classList.remove("win"));
+    document.getElementById("win").textContent = 0;
+}
+
+function changeBet(v) {
+    bet = Math.max(5, bet + v);
+    updateHUD();
+}
+
+function updateHUD() {
+    document.getElementById("credits").textContent = credits;
+    document.getElementById("bet").textContent = bet;
+}
+
+init();
+</script>
+
+</body>
+</html>
