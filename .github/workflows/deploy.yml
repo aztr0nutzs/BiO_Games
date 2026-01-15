@@ -1,0 +1,108 @@
+name: Deploy to AWS EKS
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push Docker images
+        run: |
+          for service in auth matchmaking game-logic economy analytics; do
+            docker build -t ${{ steps.login-ecr.outputs.registry }}/$service:${{ github.sha }} ./services/$service
+            docker push ${{ steps.login-ecr.outputs.registry }}/$service:${{ github.sha }}
+          done
+
+  deploy-dev:
+    needs: build-and-push
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Deploy to EKS dev
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name bio-games-dev
+          kubectl apply -f k8s/dev/
+          kubectl set image deployment/auth auth=${{ steps.login-ecr.outputs.registry }}/auth:${{ github.sha }}
+          kubectl set image deployment/matchmaking matchmaking=${{ steps.login-ecr.outputs.registry }}/matchmaking:${{ github.sha }}
+          kubectl set image deployment/game-logic game-logic=${{ steps.login-ecr.outputs.registry }}/game-logic:${{ github.sha }}
+          kubectl set image deployment/economy economy=${{ steps.login-ecr.outputs.registry }}/economy:${{ github.sha }}
+          kubectl set image deployment/analytics analytics=${{ steps.login-ecr.outputs.registry }}/analytics:${{ github.sha }}
+
+  deploy-staging:
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Deploy to EKS staging
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name bio-games-staging
+          kubectl apply -f k8s/staging/
+          kubectl set image deployment/auth auth=${{ steps.login-ecr.outputs.registry }}/auth:${{ github.sha }}
+          kubectl set image deployment/matchmaking matchmaking=${{ steps.login-ecr.outputs.registry }}/matchmaking:${{ github.sha }}
+          kubectl set image deployment/game-logic game-logic=${{ steps.login-ecr.outputs.registry }}/game-logic:${{ github.sha }}
+          kubectl set image deployment/economy economy=${{ steps.login-ecr.outputs.registry }}/economy:${{ github.sha }}
+          kubectl set image deployment/analytics analytics=${{ steps.login-ecr.outputs.registry }}/analytics:${{ github.sha }}
+
+  deploy-prod:
+    needs: deploy-staging
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Deploy to EKS prod
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name bio-games-prod
+          kubectl apply -f k8s/prod/
+          kubectl set image deployment/auth auth=${{ steps.login-ecr.outputs.registry }}/auth:${{ github.sha }}
+          kubectl set image deployment/matchmaking matchmaking=${{ steps.login-ecr.outputs.registry }}/matchmaking:${{ github.sha }}
+          kubectl set image deployment/game-logic game-logic=${{ steps.login-ecr.outputs.registry }}/game-logic:${{ github.sha }}
+          kubectl set image deployment/economy economy=${{ steps.login-ecr.outputs.registry }}/economy:${{ github.sha }}
+          kubectl set image deployment/analytics analytics=${{ steps.login-ecr.outputs.registry }}/analytics:${{ github.sha }}

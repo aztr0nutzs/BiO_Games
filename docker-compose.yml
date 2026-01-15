@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: bio_games
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/database.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  auth:
+    build: ./services/auth
+    ports:
+      - "3001:3001"
+    environment:
+      - PG_HOST=postgres
+      - PG_USER=postgres
+      - PG_PASSWORD=password
+      - PG_DATABASE=bio_games
+      - JWT_SECRET=your_jwt_secret_here
+    depends_on:
+      - postgres
+
+  matchmaking:
+    build: ./services/matchmaking
+    ports:
+      - "3002:3002"
+    environment:
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+
+  game-logic:
+    build: ./services/game-logic
+    ports:
+      - "3003:3003"
+    environment:
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+
+  economy:
+    build: ./services/economy
+    ports:
+      - "3004:3004"
+    environment:
+      - PG_HOST=postgres
+      - PG_USER=postgres
+      - PG_PASSWORD=password
+      - PG_DATABASE=bio_games
+    depends_on:
+      - postgres
+
+  analytics:
+    build: ./services/analytics
+    ports:
+      - "3005:3005"
+    environment:
+      - PG_HOST=postgres
+      - PG_USER=postgres
+      - PG_PASSWORD=password
+      - PG_DATABASE=bio_games
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

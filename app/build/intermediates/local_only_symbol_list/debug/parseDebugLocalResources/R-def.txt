@@ -4,3 +4,4 @@ id webView
 layout activity_game
 layout activity_main
 style AppTheme
+xml network_security_config

@@ -902,6 +902,7 @@ com.bio.games:style/Base.V26.Theme.AppCompat = 0x7f0d005b
 com.bio.games:dimen/abc_text_size_button_material = 0x7f060041
 com.bio.games:color/abc_hint_foreground_material_light = 0x7f050008
 com.bio.games:attr/autoSizeStepGranularity = 0x7f030031
+com.bio.games:xml/network_security_config = 0x7f0f0000
 com.bio.games:attr/paddingBottomNoButtons = 0x7f0300bb
 com.bio.games:attr/selectableItemBackground = 0x7f0300d3
 com.bio.games:attr/trackTintMode = 0x7f030113
