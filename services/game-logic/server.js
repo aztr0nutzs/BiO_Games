@@ -4,6 +4,8 @@ const socketIo = require('socket.io');
 const redis = require('redis');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const { SlotMachine, WheelSpinner, KNXT4Validator, AntiCheatValidator } = require('../../server/game_validator');
+const { hmacMiddleware, generateHMAC } = require('../../server/hmac_validator');
 
 dotenv.config();
 
@@ -32,6 +34,12 @@ redisClient.on('error', (err) => {
 redisClient.connect()
   .then(() => console.log('Connected to Redis'))
   .catch(err => console.error('Redis connection error:', err));
+
+// Initialize game validators
+const slotMachine = new SlotMachine();
+const wheelSpinner = new WheelSpinner();
+const knxt4Validator = new KNXT4Validator();
+const antiCheat = new AntiCheatValidator();
 
 // Simple auth middleware
 const authenticate = (req, res, next) => {
@@ -125,6 +133,81 @@ io.on('connection', (socket) => {
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'game-logic' });
+});
+
+// Slot spin endpoint (server-authoritative)
+app.post('/slot/spin', authenticate, async (req, res) => {
+  const { bet } = req.body;
+
+  try {
+    // Anti-cheat check
+    if (antiCheat.detectSpeedHack(req.user.id, 'slot_spin')) {
+      return res.status(429).json({ error: 'Too many requests. Suspicious activity detected.' });
+    }
+
+    // Validate bet amount
+    if (!bet || bet <= 0) {
+      return res.status(400).json({ error: 'Invalid bet amount.' });
+    }
+
+    // Generate spin result
+    const result = slotMachine.spin(bet);
+
+    res.json(result);
+  } catch (err) {
+    console.error('Slot spin error:', err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// Wheel spin endpoint (server-authoritative)
+app.post('/wheel/spin', authenticate, async (req, res) => {
+  try {
+    // Anti-cheat check
+    if (antiCheat.detectSpeedHack(req.user.id, 'wheel_spin')) {
+      return res.status(429).json({ error: 'Too many requests. Suspicious activity detected.' });
+    }
+
+    // Generate spin result
+    const result = wheelSpinner.spin();
+
+    res.json(result);
+  } catch (err) {
+    console.error('Wheel spin error:', err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// KNXT4 move validation endpoint
+app.post('/knxt4/validate-move', authenticate, async (req, res) => {
+  const { board, column, player } = req.body;
+
+  try {
+    // Anti-cheat check
+    if (antiCheat.detectSpeedHack(req.user.id, 'knxt4_move')) {
+      return res.status(429).json({ error: 'Too many requests. Suspicious activity detected.' });
+    }
+
+    // Validate move
+    const validation = knxt4Validator.validateMove(board, column, player);
+
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
+    // Check for winner
+    const isWinner = knxt4Validator.checkWinner(board, validation.row, validation.column, player);
+
+    res.json({
+      valid: true,
+      row: validation.row,
+      column: validation.column,
+      isWinner
+    });
+  } catch (err) {
+    console.error('KNXT4 validation error:', err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
 });
 
 const PORT = process.env.PORT || 3003;

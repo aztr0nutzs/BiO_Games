@@ -21,7 +21,7 @@
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            background-color: #000;
+            background: #000 url('assets/lobby_bg.gif') center/cover no-repeat fixed;
             color: #fff; 
             font-family: 'Share Tech Mono', monospace; 
             height: 100vh; 
@@ -246,11 +246,11 @@
                 
                 <div class="stat-row">
                     <span>CREDITS</span>
-                    <span class="stat-val" id="credits">12,500</span>
+                    <span class="stat-val" id="credits">Loading...</span>
                 </div>
                 <div class="stat-row">
                     <span>TOXINS</span>
-                    <span class="stat-val" style="color:var(--neon-pink)">34</span>
+                    <span class="stat-val" style="color:var(--neon-pink)" id="toxins">Loading...</span>
                 </div>
             </div>
             
@@ -282,7 +282,7 @@
             <div class="sub-grid">
                 
                 <div class="std-card" id="playKNXT4Btn">
-                    <img src="https://placehold.co/100x100/111/00f3ff?text=K4&font=orbitron" class="card-thumb" style="border-color:var(--neon-cyan);">
+                    <img src="assets/knxt4_icon.png" class="card-thumb" style="border-color:var(--neon-cyan);">
                     <div>
                         <div style="font-family:'Orbitron'; color:var(--neon-cyan); font-size:1.1rem;">KNXT 4</div>
                         <div style="font-size:0.75rem; color:#888;">Bio-Lab Protocol :: Connect-4</div>
@@ -291,7 +291,7 @@
                 </div>
 
                 <div class="std-card" id="playBioWheelBtn">
-                    <img src="https://placehold.co/100x100/111/bc13fe?text=WHEEL&font=orbitron" class="card-thumb" style="border-color:var(--neon-purple);">
+                    <img src="assets/bio_wheel_icon.png" class="card-thumb" style="border-color:var(--neon-purple);">
                     <div>
                         <div style="font-family:'Orbitron'; color:var(--neon-purple); font-size:1.1rem;">BiO WHEEL</div>
                         <div style="font-size:0.75rem; color:#888;">Spin to Win Mutagens</div>
@@ -300,7 +300,7 @@
                 </div>
 
                 <div class="std-card" id="playBioPetzBtn">
-                    <img src="https://placehold.co/100x100/111/39ff14?text=PETZ&font=orbitron" class="card-thumb" style="border-color:var(--toxic-green);">
+                    <img src="assets/bio_petz_icon.png" class="card-thumb" style="border-color:var(--toxic-green);">
                     <div>
                         <div style="font-family:'Orbitron'; color:var(--toxic-green); font-size:1.1rem;">BiO PETZ</div>
                         <div style="font-size:0.75rem; color:#888;">Virtual Bio-Pet Simulation</div>
@@ -334,7 +334,32 @@
     </div>
 
     <script>
+        // Update credits and toxins from bridge
+        function updateBalance() {
+            try {
+                if (typeof BioGameJS !== 'undefined') {
+                    const credits = BioGameJS.getCredits();
+                    const toxins = BioGameJS.getToxins();
+                    document.getElementById('credits').textContent = credits.toLocaleString();
+                    document.getElementById('toxins').textContent = toxins;
+                } else {
+                    document.getElementById('credits').textContent = '0';
+                    document.getElementById('toxins').textContent = '0';
+                }
+            } catch(e) {
+                console.error('Error updating balance:', e);
+                document.getElementById('credits').textContent = '0';
+                document.getElementById('toxins').textContent = '0';
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
+            // Update balance on load
+            updateBalance();
+            
+            // Update balance every 2 seconds
+            setInterval(updateBalance, 2000);
+            
             document.getElementById("testBridgeBtn").addEventListener("click", () => BioGameJS.testBridge());
             document.getElementById("playBioSlotzBtn").addEventListener("click", () => BioGameJS.playSlotz());
             document.getElementById("playKNXT4Btn").addEventListener("click", () => BioGameJS.playKNXT4());
