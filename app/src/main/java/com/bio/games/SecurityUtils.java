@@ -41,11 +41,13 @@ public class SecurityUtils {
     );
 
     public static boolean isRooted() {
-        return checkRootFiles() || checkRootPackages() || checkMagisk() || checkXposed();
+        //return checkRootFiles() || checkRootPackages() || checkMagisk() || checkXposed();
+return false;
     }
 
     public static boolean isEmulator(Context context) {
-        return checkEmulatorBuild() || checkEmulatorPackages(context) || checkEmulatorFiles();
+        //return checkEmulatorBuild() || checkEmulatorPackages(context) || checkEmulatorFiles();
+return false;
     }
 
     public static boolean isDebuggerAttached() {

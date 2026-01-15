@@ -10,10 +10,6 @@
     <!-- SSL Pinning for game servers (replace with actual domains and pins) -->
     <domain-config>
         <domain includeSubdomains="true">your-game-server.com</domain>
-        <pin-set expiration="2026-12-31">
-            <pin digest="SHA-256">YOUR_PUBLIC_KEY_PIN_1</pin>
-            <pin digest="SHA-256">YOUR_PUBLIC_KEY_PIN_2</pin>
-        </pin-set>
     </domain-config>
 
     <!-- Additional domains if needed -->

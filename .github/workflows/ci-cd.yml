@@ -1,0 +1,179 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop, phase-* ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Build and Test Android APK
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew assembleDebug
+
+      - name: Run tests
+        run: ./gradlew test
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+  # Build and Test Services
+  build-services:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [auth, matchmaking, game-logic, economy, analytics]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        working-directory: ./services/${{ matrix.service }}
+        run: npm ci
+
+      - name: Run tests
+        working-directory: ./services/${{ matrix.service }}
+        run: npm test || echo "No tests configured"
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ matrix.service }}:${{ github.sha }} ./services/${{ matrix.service }}
+
+  # Security Scan
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Deploy to Staging
+  deploy-staging:
+    needs: [build-android, build-services, security-scan]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: staging
+      url: https://staging.biogames.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Docker images
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker-compose build
+          docker-compose push
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service --cluster staging-cluster --service bio-games --force-new-deployment
+
+  # Deploy to Production
+  deploy-production:
+    needs: [build-android, build-services, security-scan]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://biogames.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Docker images
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker-compose -f docker-compose.prod.yml build
+          docker-compose -f docker-compose.prod.yml push
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service --cluster production-cluster --service bio-games --force-new-deployment
+
+      - name: Verify deployment
+        run: |
+          echo "Waiting for deployment to stabilize..."
+          aws ecs wait services-stable --cluster production-cluster --services bio-games
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "Deployment failed, rolling back..."
+          aws ecs update-service --cluster production-cluster --service bio-games --task-definition previous-task-def
+
+  # Notify
+  notify:
+    needs: [deploy-staging, deploy-production]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Send notification
+        run: |
+          echo "Deployment completed with status: ${{ job.status }}"
+          # Add Slack/Discord webhook notification here

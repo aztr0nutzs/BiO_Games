@@ -12,11 +12,26 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./server/database.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
 
   auth:
     build: ./services/auth
@@ -27,9 +42,14 @@ services:
       - PG_USER=postgres
       - PG_PASSWORD=password
       - PG_DATABASE=bio_games
-      - JWT_SECRET=your_jwt_secret_here
+      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_here}
+      - REDIS_URL=redis://redis:6379
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
 
   matchmaking:
     build: ./services/matchmaking
@@ -38,7 +58,9 @@ services:
     environment:
       - REDIS_URL=redis://redis:6379
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
 
   game-logic:
     build: ./services/game-logic
@@ -46,8 +68,11 @@ services:
       - "3003:3003"
     environment:
       - REDIS_URL=redis://redis:6379
+      - HMAC_SECRET=${HMAC_SECRET:-your_hmac_secret_here}
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
 
   economy:
     build: ./services/economy
@@ -58,8 +83,13 @@ services:
       - PG_USER=postgres
       - PG_PASSWORD=password
       - PG_DATABASE=bio_games
+      - REDIS_URL=redis://redis:6379
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
 
   analytics:
     build: ./services/analytics
@@ -71,7 +101,9 @@ services:
       - PG_PASSWORD=password
       - PG_DATABASE=bio_games
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
   admin:
     build: ./admin
@@ -82,9 +114,12 @@ services:
       - PG_USER=postgres
       - PG_PASSWORD=password
       - PG_DATABASE=bio_games
-      - JWT_SECRET=admin_jwt_secret
+      - JWT_SECRET=${ADMIN_JWT_SECRET:-admin_jwt_secret}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   postgres_data:
+  redis_data:

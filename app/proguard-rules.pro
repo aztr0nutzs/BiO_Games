@@ -6,16 +6,12 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Enable obfuscation, optimization, and shrinking for hardening
--obfuscate
 -optimizationpasses 5
 -allowaccessmodification
 -dontpreverify
 -repackageclasses ''
 -flattenpackagehierarchy ''
 -mergeinterfacesaggressively
-
-# String encryption
--encryptstrings
 
 # Control flow flattening
 -flattenpackagehierarchy

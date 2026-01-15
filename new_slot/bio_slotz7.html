@@ -136,12 +136,21 @@ body {
 
 <script>
 /* ================= AUDIO ================= */
+/*
 const snd = {
     spin:new Audio('spin.wav'),
     stop:new Audio('stop.wav'),
     win:new Audio('win.wav'),
     bonus:new Audio('bonus.wav'),
     collect:new Audio('collect.wav')
+};
+*/
+const snd = {
+    spin: { play: () => {} },
+    stop: { play: () => {} },
+    win: { play: () => {} },
+    bonus: { play: () => {} },
+    collect: { play: () => {} },
 };
 const buzz = () => navigator.vibrate?.(30);
 

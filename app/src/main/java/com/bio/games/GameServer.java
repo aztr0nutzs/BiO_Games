@@ -27,8 +27,9 @@ public class GameServer {
     public String generateSessionToken(String playerId) {
         String sessionToken = UUID.randomUUID().toString();
         sessionTokens.put(playerId, sessionToken);
-        playerCredits.put(playerId, 1000); // Initial credits
+        playerCredits.put(playerId, 10000); // Initial credits - INCREASED for testing
         playerToxins.put(playerId, 0); // Initial toxins
+        Log.d(TAG, "Generated session for player: " + playerId + " with 10000 credits");
         return sessionToken;
     }
 

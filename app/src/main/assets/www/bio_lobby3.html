@@ -21,7 +21,7 @@
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            background-color: #000;
+            background: #000 url('assets/lobby_bg.gif') center/cover no-repeat fixed;
             color: #fff; 
             font-family: 'Share Tech Mono', monospace; 
             height: 100vh; 
@@ -228,7 +228,7 @@
             <div class="nav-btn active"><i class="fas fa-gamepad"></i></div>
             <div class="nav-btn"><i class="fas fa-flask"></i></div>
             <div class="nav-btn"><i class="fas fa-dna"></i></div>
-            <div class="nav-btn" style="margin-top:auto" onclick="BioGameJS.testBridge()"><i class="fas fa-vial"></i></div>
+            <div class="nav-btn" style="margin-top:auto" id="testBridgeBtn"><i class="fas fa-vial"></i></div>
         </nav>
 
         <div class="profile-panel">
@@ -246,11 +246,11 @@
                 
                 <div class="stat-row">
                     <span>CREDITS</span>
-                    <span class="stat-val" id="credits">12,500</span>
+                    <span class="stat-val" id="credits">Loading...</span>
                 </div>
                 <div class="stat-row">
                     <span>TOXINS</span>
-                    <span class="stat-val" style="color:var(--neon-pink)">34</span>
+                    <span class="stat-val" style="color:var(--neon-pink)" id="toxins">Loading...</span>
                 </div>
             </div>
             
@@ -272,7 +272,7 @@
                         High-voltage gambling. Spin the toxic core to match mutagen sequences. 
                         <span style="color:var(--toxic-green)">Jackpot: 5,000 Credits.</span>
                     </p>
-                    <a onclick="BioGameJS.playBioSlotz()" class="action-btn">iNiTiALiZE</a>
+                    <a id="playBioSlotzBtn" class="action-btn">iNiTiALiZE</a>
                 </div>
                 
                 <div class="hero-visual">
@@ -281,8 +281,8 @@
 
             <div class="sub-grid">
                 
-                <div class="std-card" onclick="BioGameJS.playKNXT4()">
-                    <img src="https://placehold.co/100x100/111/00f3ff?text=K4&font=orbitron" class="card-thumb" style="border-color:var(--neon-cyan);">
+                <div class="std-card" id="playKNXT4Btn">
+                    <img src="assets/knxt4_icon.png" class="card-thumb" style="border-color:var(--neon-cyan);">
                     <div>
                         <div style="font-family:'Orbitron'; color:var(--neon-cyan); font-size:1.1rem;">KNXT 4</div>
                         <div style="font-size:0.75rem; color:#888;">Bio-Lab Protocol :: Connect-4</div>
@@ -290,8 +290,8 @@
                     </div>
                 </div>
 
-                <div class="std-card" onclick="BioGameJS.playBioWheel()">
-                    <img src="https://placehold.co/100x100/111/bc13fe?text=WHEEL&font=orbitron" class="card-thumb" style="border-color:var(--neon-purple);">
+                <div class="std-card" id="playBioWheelBtn">
+                    <img src="assets/bio_wheel_icon.png" class="card-thumb" style="border-color:var(--neon-purple);">
                     <div>
                         <div style="font-family:'Orbitron'; color:var(--neon-purple); font-size:1.1rem;">BiO WHEEL</div>
                         <div style="font-size:0.75rem; color:#888;">Spin to Win Mutagens</div>
@@ -299,8 +299,8 @@
                     </div>
                 </div>
 
-                <div class="std-card" onclick="BioGameJS.playBioPetz()">
-                    <img src="https://placehold.co/100x100/111/39ff14?text=PETZ&font=orbitron" class="card-thumb" style="border-color:var(--toxic-green);">
+                <div class="std-card" id="playBioPetzBtn">
+                    <img src="assets/bio_petz_icon.png" class="card-thumb" style="border-color:var(--toxic-green);">
                     <div>
                         <div style="font-family:'Orbitron'; color:var(--toxic-green); font-size:1.1rem;">BiO PETZ</div>
                         <div style="font-size:0.75rem; color:#888;">Virtual Bio-Pet Simulation</div>
@@ -334,6 +334,39 @@
     </div>
 
     <script>
+        // Update credits and toxins from bridge
+        function updateBalance() {
+            try {
+                if (typeof BioGameJS !== 'undefined') {
+                    const credits = BioGameJS.getCredits();
+                    const toxins = BioGameJS.getToxins();
+                    document.getElementById('credits').textContent = credits.toLocaleString();
+                    document.getElementById('toxins').textContent = toxins;
+                } else {
+                    document.getElementById('credits').textContent = '0';
+                    document.getElementById('toxins').textContent = '0';
+                }
+            } catch(e) {
+                console.error('Error updating balance:', e);
+                document.getElementById('credits').textContent = '0';
+                document.getElementById('toxins').textContent = '0';
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Update balance on load
+            updateBalance();
+            
+            // Update balance every 2 seconds
+            setInterval(updateBalance, 2000);
+            
+            document.getElementById("testBridgeBtn").addEventListener("click", () => BioGameJS.testBridge());
+            document.getElementById("playBioSlotzBtn").addEventListener("click", () => BioGameJS.playSlotz());
+            document.getElementById("playKNXT4Btn").addEventListener("click", () => BioGameJS.playKNXT4());
+            document.getElementById("playBioWheelBtn").addEventListener("click", () => BioGameJS.playWheel());
+            document.getElementById("playBioPetzBtn").addEventListener("click", () => BioGameJS.playBioPetz());
+        });
+
         // --- MATRIX RAIN ANIMATION (Canvas) ---
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
@@ -422,7 +455,7 @@ html,body{height:100%}
   <div class="multiplayer-panel">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div><strong>Multiplayer</strong><div style="font-size:12px;color:#9ff">Host or join by code (Firebase required for online play)</div></div>
-      <div><a class="link-btn" onclick="BioGameJS.openStore()">STORE</a></div>
+      <div><a class="link-btn" id="openStoreBtn">STORE</a></div>
     </div>
     <div style="margin-top:8px">
       <button id="hostBtn" class="link-btn">Create Game</button>
@@ -434,105 +467,109 @@ html,body{height:100%}
 </div>
 
 <script>
-const firebaseConfig = null;
+document.addEventListener("DOMContentLoaded", function() {
+    const firebaseConfig = null;
 
-const mpStatus = document.getElementById('mpStatus');
-const hostBtn = document.getElementById('hostBtn');
-const joinBtn = document.getElementById('joinBtn');
-const joinCodeInput = document.getElementById('joinCode');
+    const mpStatus = document.getElementById('mpStatus');
+    const hostBtn = document.getElementById('hostBtn');
+    const joinBtn = document.getElementById('joinBtn');
+    const joinCodeInput = document.getElementById('joinCode');
 
-let firebaseApp = null;
-let database = null;
-let ROOM = null;
-let PLAYER_ID = Math.random().toString(36).slice(2,9);
+    document.getElementById("openStoreBtn").addEventListener("click", () => BioGameJS.openStore());
 
-function setStatus(s){ mpStatus.textContent = 'Status: ' + s; }
+    let firebaseApp = null;
+    let database = null;
+    let ROOM = null;
+    let PLAYER_ID = Math.random().toString(36).slice(2,9);
 
-async function initFirebase(){
-  if(!firebaseConfig){
-    setStatus('local-only mode (no Firebase configured). Hosting/joining will work on same device only.');
-    return false;
-  }
-  // Load firebase scripts dynamically
-  await loadScript('https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js');
-  await loadScript('https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js');
-  firebaseApp = firebase.initializeApp(firebaseConfig);
-  database = firebase.database();
-  setStatus('Connected to Firebase. Ready.');
-  return true;
-}
+    function setStatus(s){ mpStatus.textContent = 'Status: ' + s; }
 
-function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }) }
-
-function makeRoomId(){ // human-friendly code
-  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-  let id=''; for(let i=0;i<5;i++) id+=chars[Math.floor(Math.random()*chars.length)];
-  return id;
-}
-
-async function hostGame(){
-  const online = await initFirebase();
-  const roomId = makeRoomId();
-  ROOM = roomId;
-  if(online && database){
-    const roomRef = database.ref('rooms/' + roomId);
-    await roomRef.set({host: PLAYER_ID, created: Date.now(), players:{ [PLAYER_ID]: {joined: Date.now()} }, state: {stage:'lobby'}});
-    roomRef.on('value', snap=>{ console.log('room', snap.val()); setStatus('Room ' + ROOM + ' — players: ' + (snap.val()?.players ? Object.keys(snap.val().players).length:1)); });
-    alert('Room created. Share code: ' + roomId);
-  } else {
-    // local-only: simulate room in-memory using localStorage
-    localStorage.setItem('local_room_'+roomId, JSON.stringify({host:PLAYER_ID, players:{[PLAYER_ID]:{joined:Date.now()}},state:{stage:'lobby'}}));
-    setStatus('Local room ' + roomId + ' created. Share this code with others on same device: ' + roomId);
-    alert('Local room created. Code: ' + roomId);
-  }
-}
-
-async function joinGame(){
-  const code = joinCodeInput.value.trim().toUpperCase();
-  if(!code){ alert('Enter a room code'); return; }
-  const online = (firebaseConfig !== null);
-  ROOM = code;
-  if(online && database){
-    const roomRef = database.ref('rooms/' + ROOM + '/players/' + PLAYER_ID);
-    await roomRef.set({joined: Date.now()});
-    setStatus('Joined room ' + ROOM);
-    database.ref('rooms/' + ROOM).on('value', snap=>{ console.log('room', snap.val()); setStatus('Room ' + ROOM + ' — players: ' + (snap.val()?.players ? Object.keys(snap.val().players).length:1)); });
-  } else {
-    // local-only
-    const k = 'local_room_' + ROOM;
-    const raw = localStorage.getItem(k);
-    if(!raw){ alert('Local room not found: ' + ROOM); return; }
-    const data = JSON.parse(raw);
-    data.players[PLAYER_ID] = {joined: Date.now()};
-    localStorage.setItem(k, JSON.stringify(data));
-    setStatus('Joined local room ' + ROOM + '. Players: ' + Object.keys(data.players).length);
-    alert('Joined local room ' + ROOM);
-  }
-}
-
-hostBtn.addEventListener('click', hostGame);
-joinBtn.addEventListener('click', joinGame);
-
-// Boot sequence animation
-(function bootSequence(){
-  const overlay = document.getElementById('boot-overlay');
-  const fill = document.getElementById('bootFill');
-  const msg = document.getElementById('boot-msg');
-  const steps = ['Initializing UI','Loading assets','Checking systems','Finalizing'];
-  let i=0;
-  function step(){
-    if(i<steps.length){
-      msg.textContent = steps[i];
-      fill.style.width = ((i+1)/steps.length*100)+'%';
-      i++; setTimeout(step,600);
-    } else {
-      // done
-      fill.style.width='100%';
-      setTimeout(()=>{ overlay.style.display='none'; setStatus('Ready.'); }, 600);
+    async function initFirebase(){
+      if(!firebaseConfig){
+        setStatus('local-only mode (no Firebase configured). Hosting/joining will work on same device only.');
+        return false;
+      }
+      // Load firebase scripts dynamically
+      await loadScript('https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js');
+      await loadScript('https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js');
+      firebaseApp = firebase.initializeApp(firebaseConfig);
+      database = firebase.database();
+      setStatus('Connected to Firebase. Ready.');
+      return true;
     }
-  }
-  step();
-})();
+
+    function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }) }
+
+    function makeRoomId(){ // human-friendly code
+      const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+      let id=''; for(let i=0;i<5;i++) id+=chars[Math.floor(Math.random()*chars.length)];
+      return id;
+    }
+
+    async function hostGame(){
+      const online = await initFirebase();
+      const roomId = makeRoomId();
+      ROOM = roomId;
+      if(online && database){
+        const roomRef = database.ref('rooms/' + roomId);
+        await roomRef.set({host: PLAYER_ID, created: Date.now(), players:{ [PLAYER_ID]: {joined: Date.now()} }, state: {stage:'lobby'}});
+        roomRef.on('value', snap=>{ console.log('room', snap.val()); setStatus('Room ' + ROOM + ' — players: ' + (snap.val()?.players ? Object.keys(snap.val().players).length:1)); });
+        alert('Room created. Share code: ' + roomId);
+      } else {
+        // local-only: simulate room in-memory using localStorage
+        localStorage.setItem('local_room_'+roomId, JSON.stringify({host:PLAYER_ID, players:{[PLAYER_ID]:{joined:Date.now()}},state:{stage:'lobby'}}));
+        setStatus('Local room ' + roomId + ' created. Share this code with others on same device: ' + roomId);
+        alert('Local room created. Code: ' + roomId);
+      }
+    }
+
+    async function joinGame(){
+      const code = joinCodeInput.value.trim().toUpperCase();
+      if(!code){ alert('Enter a room code'); return; }
+      const online = (firebaseConfig !== null);
+      ROOM = code;
+      if(online && database){
+        const roomRef = database.ref('rooms/' + ROOM + '/players/' + PLAYER_ID);
+        await roomRef.set({joined: Date.now()});
+        setStatus('Joined room ' + ROOM);
+        database.ref('rooms/' + ROOM).on('value', snap=>{ console.log('room', snap.val()); setStatus('Room ' + ROOM + ' — players: ' + (snap.val()?.players ? Object.keys(snap.val().players).length:1)); });
+      } else {
+        // local-only
+        const k = 'local_room_' + ROOM;
+        const raw = localStorage.getItem(k);
+        if(!raw){ alert('Local room not found: ' + ROOM); return; }
+        const data = JSON.parse(raw);
+        data.players[PLAYER_ID] = {joined: Date.now()};
+        localStorage.setItem(k, JSON.stringify(data));
+        setStatus('Joined local room ' + ROOM + '. Players: ' + Object.keys(data.players).length);
+        alert('Joined local room ' + ROOM);
+      }
+    }
+
+    hostBtn.addEventListener('click', hostGame);
+    joinBtn.addEventListener('click', joinGame);
+
+    // Boot sequence animation
+    (function bootSequence(){
+      const overlay = document.getElementById('boot-overlay');
+      const fill = document.getElementById('bootFill');
+      const msg = document.getElementById('boot-msg');
+      const steps = ['Initializing UI','Loading assets','Checking systems','Finalizing'];
+      let i=0;
+      function step(){
+        if(i<steps.length){
+          msg.textContent = steps[i];
+          fill.style.width = ((i+1)/steps.length*100)+'%';
+          i++; setTimeout(step,600);
+        } else {
+          // done
+          fill.style.width='100%';
+          setTimeout(()=>{ overlay.style.display='none'; setStatus('Ready.'); }, 600);
+        }
+      }
+      step();
+    })();
+});
 </script>
 <!-- END: Multiplayer & Boot Injection -->
 

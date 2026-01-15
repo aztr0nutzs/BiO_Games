@@ -1,7 +1,10 @@
 
 // Persistent identity
-const PLAYER_ID = localStorage.getItem("bio_player_id") || (''+Math.random()).substring(2);
-localStorage.setItem("bio_player_id", PLAYER_ID);
+if(typeof PLAYER_ID === 'undefined'){
+  const PLAYER_ID = localStorage.getItem("bio_player_id") || (''+Math.random()).substring(2);
+  localStorage.setItem("bio_player_id", PLAYER_ID);
+}
+
 
 const PLAYER_NAME = localStorage.getItem("bio_player_name") || ("Player-" + PLAYER_ID.slice(0,4));
 localStorage.setItem("bio_player_name", PLAYER_NAME);
