@@ -161,10 +161,10 @@
         @keyframes spinSlow { 100% { transform: rotate(360deg); } }
 
         /* SUB GRID (The Other Games) */
-        .sub-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .sub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
         
         .std-card {
-            min-height: 160px; background: rgba(255,255,255,0.02); border: 2px solid #444;
+            height: 160px; background: rgba(255,255,255,0.02); border: 2px solid #444;
             display: flex; align-items: center; padding: 25px; gap: 25px;
             cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
         }
@@ -291,7 +291,7 @@
                         <div style="font-size:0.8rem; color:var(--toxic-green); margin-top:8px;">▶ SPIN TO WIN</div>
                     </div>
                 </div>
-                
+
                 <div class="std-card" id="playKNXT4Btn">
                     <img src="assets/knxt4_icon.png" class="card-thumb" style="border-color:var(--neon-cyan);">
                     <div>
@@ -393,12 +393,12 @@
                 });
                 
                 document.getElementById("playBioSlotzBtn").addEventListener("click", () => {
-                    console.log('BiO-SLoTz clicked (hero)');
+                    console.log('BiO-SLoTz (hero) clicked');
                     BioGameJS.playSlotz();
                 });
                 
                 document.getElementById("playBioSlotzBtn2").addEventListener("click", () => {
-                    console.log('BiO-SLoTz clicked (card)');
+                    console.log('BiO-SLoTz (card) clicked');
                     BioGameJS.playSlotz();
                 });
                 
