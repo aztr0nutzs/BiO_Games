@@ -29,61 +29,61 @@ const f2 = [
   x: 741.8240827102197,
   y: 241.03325561245896,
   rt: 108,
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-lmvdrrhl.png" },
+  image: "assets/wheel_prize0.png" },
 
 {
   x: 458.47249678812904,
   y: 631.033255612459,
   rt: 144,
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-lboxprxz.png" },
+  image: "assets/wheel_prize1.png" },
 
 {
   x: 4.776122516674678e-14,
   y: 780,
   rt: 180,
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-gydimcwp.png" },
+  image: "assets/wheel_prize2.png" },
 
 {
   x: -458.472496788129,
   y: 631.033255612459,
   rt: 216,
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-csqvlgov.png" },
+  image: "assets/wheel_prize3.png" },
 
 {
   x: -741.8240827102197,
   y: 241.03325561245904,
   rt: 252,
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-nxffhdul.png" },
+  image: "assets/wheel_prize4.png" },
 
 {
   x: -741.8240827102198,
   y: -241.03325561245887,
   rt: 288,
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-xiquzhpo.png" },
+  image: "assets/wheel_prize5.png" },
 
 {
   x: -458.47249678812915,
   y: -631.0332556124589,
   rt: 324,
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-lmvdrrhl.png" },
+  image: "assets/wheel_prize6.png" },
 
 {
   x: -1.4328367550024033e-13,
   y: -780,
   rt: 360,
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-lboxprxz.png" },
+  image: "assets/wheel_prize7.png" },
 
 {
   x: 458.47249678812886,
   y: -631.0332556124591,
   rt: 396,
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-gydimcwp.png" },
+  image: "assets/wheel_prize8.png" },
 
 {
   x: 741.8240827102197,
   y: -241.03325561245913,
   rt: 432,
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-csqvlgov.png" }];
+  image: "assets/wheel_prize9.png" }];
 
 
 
@@ -172,63 +172,63 @@ const f4 = [
 
 const items = [
 {
-  title: "Crow Skull",
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-lmvdrrhl.png",
+  title: "Prize 0",
+  image: "assets/wheel_prize0.png",
   dropRate: "24" },
 
 {
-  title: "Oblivion Portion",
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-lboxprxz.png",
+  title: "Prize 1",
+  image: "assets/wheel_prize1.png",
   dropRate: "15" },
 
 {
-  title: "Poison Cauldron",
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-gydimcwp.png",
+  title: "Prize 2",
+  image: "assets/wheel_prize2.png",
   dropRate: "5" },
 
 {
-  title: "Fly Agaric",
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-csqvlgov.png",
+  title: "Prize 3",
+  image: "assets/wheel_prize3.png",
   dropRate: "50" },
 
 {
-  title: "Witch's cap",
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-nxffhdul.png",
+  title: "Prize 4",
+  image: "assets/wheel_prize4.png",
   dropRate: "1" },
 
 {
-  title: "Flying broom",
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-xiquzhpo.png",
+  title: "Prize 5",
+  image: "assets/wheel_prize5.png",
   dropRate: "80" },
 
 {
-  title: "Crow Skull",
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-lmvdrrhl.png",
+  title: "Prize 6",
+  image: "assets/wheel_prize6.png",
   dropRate: "24" },
 
 {
-  title: "Oblivion Portion",
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-lboxprxz.png",
+  title: "Prize 7",
+  image: "assets/wheel_prize7.png",
   dropRate: "15" },
 
 {
-  title: "Poison Cauldron",
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-gydimcwp.png",
+  title: "Prize 8",
+  image: "assets/wheel_prize8.png",
   dropRate: "5" },
 
 {
-  title: "Fly Agaric",
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-csqvlgov.png",
+  title: "Prize 9",
+  image: "assets/wheel_prize9.png",
   dropRate: "50" },
 
 {
-  title: "Witch's cap",
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-nxffhdul.png",
+  title: "Prize 0",
+  image: "assets/wheel_prize0.png",
   dropRate: "1" },
 
 {
-  title: "Flying broom",
-  image: "https://assets.codepen.io/3685267/wheel-of-fortune-xiquzhpo.png",
+  title: "Prize 1",
+  image: "assets/wheel_prize1.png",
   dropRate: "80" }];
 
 
@@ -844,38 +844,38 @@ function BottomBar() {
     React.createElement("div", { className: "grid grid-cols-6 gap-2 mt-3 px-2 pb-4 " },
     [
     {
-      title: "Witch's cap",
-      image: "https://assets.codepen.io/3685267/wheel-of-fortune-nxffhdul.png",
+      title: "Prize 4",
+      image: "assets/wheel_prize4.png",
       dropRate: "1",
       price: "3,300.00" },
 
     {
-      title: "Poison Cauldron",
-      image: "https://assets.codepen.io/3685267/wheel-of-fortune-gydimcwp.png",
+      title: "Prize 2",
+      image: "assets/wheel_prize2.png",
       dropRate: "5",
       price: "1,500.00" },
 
     {
-      title: "Oblivion Portion",
-      image: "https://assets.codepen.io/3685267/wheel-of-fortune-lboxprxz.png",
+      title: "Prize 1",
+      image: "assets/wheel_prize1.png",
       dropRate: "15",
       price: "550.0" },
 
     {
-      title: "Crow Skull",
-      image: "https://assets.codepen.io/3685267/wheel-of-fortune-lmvdrrhl.png",
+      title: "Prize 0",
+      image: "assets/wheel_prize0.png",
       dropRate: "24",
       price: "150.00" },
 
     {
-      title: "Fly Agaric",
-      image: "https://assets.codepen.io/3685267/wheel-of-fortune-csqvlgov.png",
+      title: "Prize 3",
+      image: "assets/wheel_prize3.png",
       dropRate: "50",
       price: "250.00" },
 
     {
-      title: "Flying broom",
-      image: "https://assets.codepen.io/3685267/wheel-of-fortune-xiquzhpo.png",
+      title: "Prize 5",
+      image: "assets/wheel_prize5.png",
       dropRate: "80",
       price: "50.00" }].
 
