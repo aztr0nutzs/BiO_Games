@@ -203,6 +203,78 @@ app.get('/api/admin/audit-logs', authenticateAdmin, async (req, res) => {
   }
 });
 
+const wheelSegments = [
+    { text: "GENGAR", color: "#4b0082", labelColor: "#ffffff", src: "assets/s21.jpeg", multiplier: 50 },
+    { text: "BUNNY", color: "#ff69b4", labelColor: "#000000", src: "assets/s11 (2).png", multiplier: 69 },
+    { text: "STAR", color: "#330066", labelColor: "#ffffff", src: "assets/s31.jpeg", multiplier: 25 },
+    { text: "BAG", color: "#00ff00", labelColor: "#000000", src: "assets/s03 (2).png", multiplier: 100 },
+    { text: "PILL", color: "#ff4500", labelColor: "#ffffff", src: "assets/s29 (2).jpeg", multiplier: 15 },
+    { text: "SPIDER", color: "#800080", labelColor: "#ffffff", src: "assets/s34.jpeg", multiplier: 30 },
+    { text: "SHROOM", color: "#0000ff", labelColor: "#ffffff", src: "assets/s32.jpeg", multiplier: 10 },
+    { text: "TOXIC", color: "#39ff14", labelColor: "#000000", src: "assets/s29 (2).jpeg", multiplier: 5 }, // Reusing pill as toxic filler
+    { text: "JACKPOT", color: "#00eaff", labelColor: "#000000", src: "assets/s11 (2).png", multiplier: 500 }, // Bunny Jackpot
+    { text: "X2", color: "#333333", labelColor: "#ffffff", src: "assets/s03 (2).png", multiplier: 2 } 
+];
+
+// Wheel spin endpoint
+app.post('/api/game/wheel/spin', async (req, res) => {
+    const { userId, betAmount } = req.body;
+
+    if (!userId || !betAmount) {
+        return res.status(400).json({ error: 'userId and betAmount are required.' });
+    }
+
+    try {
+        // Start a transaction
+        const client = await pool.connect();
+        try {
+            await client.query('BEGIN');
+
+            // Get user
+            const userResult = await client.query('SELECT * FROM users WHERE id = $1', [userId]);
+            if (userResult.rows.length === 0) {
+                return res.status(404).json({ error: 'User not found.' });
+            }
+            const user = userResult.rows[0];
+
+            // Check currency
+            if (user.currency < betAmount) {
+                return res.status(400).json({ error: 'Insufficient currency.' });
+            }
+
+            // Deduct bet
+            const newCurrency = user.currency - betAmount;
+            await client.query('UPDATE users SET currency = $1 WHERE id = $2', [newCurrency, userId]);
+
+            // Determine result
+            const winningSegmentIndex = Math.floor(Math.random() * wheelSegments.length);
+            const winningSegment = wheelSegments[winningSegmentIndex];
+            const winAmount = betAmount * winningSegment.multiplier;
+
+            // Add winnings
+            const finalCurrency = newCurrency + winAmount;
+            await client.query('UPDATE users SET currency = $1 WHERE id = $2', [finalCurrency, userId]);
+            
+            await client.query('COMMIT');
+
+            res.json({
+                winningSegmentIndex,
+                newCurrency: finalCurrency
+            });
+
+        } catch (err) {
+            await client.query('ROLLBACK');
+            throw err;
+        } finally {
+            client.release();
+        }
+    } catch (err) {
+        console.error('Wheel spin error:', err);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'admin-panel' });

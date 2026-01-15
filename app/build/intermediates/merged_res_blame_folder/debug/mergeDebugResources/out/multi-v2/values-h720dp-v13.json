@@ -4,7 +4,7 @@
             "outputFile": "com.bio.games.app-mergeDebugResources-18:/values-h720dp-v13/values-h720dp-v13.xml",
             "map": [
                 {
-                    "source": "/home/aztr0nutzs/.gradle/caches/9.0-milestone-1/transforms/5537c2dee069ec385d7102494305b747/transformed/appcompat-1.6.1/res/values-h720dp-v13/values-h720dp-v13.xml",
+                    "source": "C:\\Program Files\\Android\\Android Studio\\jbr\\caches\\9.0-milestone-1\\transforms\\5537c2dee069ec385d7102494305b747\\transformed\\appcompat-1.6.1\\res\\values-h720dp-v13\\values-h720dp-v13.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
