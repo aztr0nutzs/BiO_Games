@@ -14,8 +14,25 @@ android {
         versionName "1.0"
     }
 
+    signingConfigs {
+        release {
+            // Option 1: Use keystore file (create with: keytool -genkey -v -keystore bio-games.keystore -alias bio-games -keyalg RSA -keysize 2048 -validity 10000)
+            // storeFile file('bio-games.keystore')
+            // storePassword System.getenv("KEYSTORE_PASSWORD") ?: ""
+            // keyAlias 'bio-games'
+            // keyPassword System.getenv("KEY_PASSWORD") ?: ""
+            
+            // Option 2: Use debug keystore for testing (remove for production)
+            storeFile file(System.getProperty("user.home") + "/.android/debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
