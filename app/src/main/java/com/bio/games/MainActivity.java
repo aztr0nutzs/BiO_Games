@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         BioGameBridge bridge = new BioGameBridge(this, webView);
         webView.addJavascriptInterface(bridge, "BioGameJS");
 
-        webView.loadUrl("file:///android_asset/www/bio_lobby3.html");
+        webView.loadUrl("file:///android_asset/www/splash.html");
     }
 
     private void performSecurityChecks() {

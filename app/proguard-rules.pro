@@ -10,11 +10,7 @@
 -allowaccessmodification
 -dontpreverify
 -repackageclasses ''
--flattenpackagehierarchy ''
 -mergeinterfacesaggressively
-
-# Control flow flattening
--flattenpackagehierarchy
 
 # Keep WebView JavaScript interface
 -keepclassmembers class com.bio.games.BioGameBridge {

@@ -3,20 +3,30 @@
     <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
-            <certificates src="user" />
         </trust-anchors>
     </base-config>
 
-    <!-- SSL Pinning for game servers (replace with actual domains and pins) -->
-    <domain-config>
-        <domain includeSubdomains="true">your-game-server.com</domain>
-    </domain-config>
-
-    <!-- Additional domains if needed -->
-    <domain-config>
-        <domain includeSubdomains="true">firebase.googleapis.com</domain>
+    <!-- Production game server - update domain before release -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.biogames.com</domain>
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>
     </domain-config>
+
+    <!-- Firebase services -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">firebase.googleapis.com</domain>
+        <domain includeSubdomains="true">firebaseio.com</domain>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+
+    <!-- Debug config - remove for production store release -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
 </network-security-config>

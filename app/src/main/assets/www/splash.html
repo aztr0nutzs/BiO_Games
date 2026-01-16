@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>BiO Games - Loading</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  background: #03060c;
+  overflow: hidden;
+  font-family: 'Courier New', monospace;
+}
+
+/* Animated background grid */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(40px, 40px); }
+}
+
+/* Scanline effect */
+.scanline {
+  position: fixed;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, rgba(0,255,255,0.4), transparent);
+  animation: scan 2s linear infinite;
+  box-shadow: 0 0 20px rgba(0,255,255,0.5);
+}
+
+@keyframes scan {
+  0% { top: -4px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* Floating particles */
+.particles {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  animation: float 8s infinite ease-in-out;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; transform: translateY(90vh) scale(1); }
+  90% { opacity: 1; transform: translateY(10vh) scale(1); }
+  100% { transform: translateY(-10vh) scale(0); opacity: 0; }
+}
+
+/* Main container */
+.center {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* Logo container */
+.logo-container {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+/* Hexagon logo */
+.hex-logo {
+  width: 120px;
+  height: 140px;
+  position: relative;
+  animation: logoFloat 3s ease-in-out infinite, logoGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes logoGlow {
+  0% { filter: drop-shadow(0 0 10px rgba(0,255,255,0.5)); }
+  100% { filter: drop-shadow(0 0 30px rgba(0,255,255,0.8)) drop-shadow(0 0 60px rgba(255,0,255,0.4)); }
+}
+
+.hex-logo svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Orbiting rings */
+.orbit {
+  position: absolute;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  animation: orbit 4s linear infinite;
+}
+
+.orbit-1 {
+  width: 180px;
+  height: 180px;
+  top: 50%;
+  left: 50%;
+  margin: -90px 0 0 -90px;
+  border-top-color: #00ffff;
+  border-bottom-color: #00ffff;
+  animation-duration: 3s;
+}
+
+.orbit-2 {
+  width: 220px;
+  height: 220px;
+  top: 50%;
+  left: 50%;
+  margin: -110px 0 0 -110px;
+  border-left-color: #ff00ff;
+  border-right-color: #ff00ff;
+  animation-duration: 4s;
+  animation-direction: reverse;
+}
+
+.orbit-3 {
+  width: 260px;
+  height: 260px;
+  top: 50%;
+  left: 50%;
+  margin: -130px 0 0 -130px;
+  border-top-color: #39ff14;
+  animation-duration: 5s;
+}
+
+@keyframes orbit {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Title */
+.title {
+  font-size: 48px;
+  font-weight: bold;
+  letter-spacing: 8px;
+  margin-bottom: 10px;
+  animation: titlePulse 2s ease-in-out infinite;
+}
+
+.title .bio {
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff;
+}
+
+.title .games {
+  color: #ff00ff;
+  text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 40px #ff00ff;
+}
+
+@keyframes titlePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Subtitle */
+.subtitle {
+  color: #39ff14;
+  font-size: 14px;
+  letter-spacing: 4px;
+  margin-bottom: 40px;
+  animation: subtitleGlitch 5s infinite;
+}
+
+@keyframes subtitleGlitch {
+  0%, 90%, 100% { opacity: 1; transform: translateX(0); }
+  92% { opacity: 0.8; transform: translateX(-2px); color: #ff00ff; }
+  94% { opacity: 0.8; transform: translateX(2px); color: #00ffff; }
+  96% { opacity: 1; transform: translateX(0); }
+}
+
+/* Loading box */
+.loading-box {
+  border: 2px solid #00ffff;
+  padding: 20px 40px;
+  background: rgba(0,20,40,0.8);
+  box-shadow: 0 0 20px rgba(0,255,255,0.3), inset 0 0 20px rgba(0,255,255,0.1);
+  animation: boxPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes boxPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(0,255,255,0.3), inset 0 0 20px rgba(0,255,255,0.1); }
+  50% { box-shadow: 0 0 40px rgba(0,255,255,0.5), inset 0 0 30px rgba(0,255,255,0.2); }
+}
+
+.loading-text {
+  color: #00ffff;
+  font-size: 14px;
+  letter-spacing: 3px;
+  margin-bottom: 15px;
+  animation: textBlink 0.5s infinite;
+}
+
+@keyframes textBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.7; }
+}
+
+/* Progress bar */
+.progress-container {
+  width: 200px;
+  height: 8px;
+  background: rgba(0,255,255,0.1);
+  border: 1px solid #00ffff;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #00ffff, #39ff14, #ff00ff);
+  width: 0;
+  animation: loadProgress 2.5s ease-out forwards;
+  box-shadow: 0 0 10px #00ffff;
+}
+
+@keyframes loadProgress {
+  0% { width: 0; }
+  20% { width: 20%; }
+  40% { width: 45%; }
+  60% { width: 70%; }
+  80% { width: 85%; }
+  100% { width: 100%; }
+}
+
+.progress-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+  animation: progressGlow 1s linear infinite;
+}
+
+@keyframes progressGlow {
+  0% { left: -30px; }
+  100% { left: 100%; }
+}
+
+/* Status text */
+.status {
+  color: #666;
+  font-size: 11px;
+  margin-top: 15px;
+  letter-spacing: 2px;
+}
+
+.status span {
+  animation: statusCycle 2.5s steps(1) forwards;
+}
+
+@keyframes statusCycle {
+  0% { content: "INITIALIZING SYSTEMS..."; }
+  25% { content: "LOADING ASSETS..."; }
+  50% { content: "CONNECTING NEURAL LINK..."; }
+  75% { content: "CALIBRATING INTERFACE..."; }
+  100% { content: "READY"; }
+}
+
+/* Corner decorations */
+.corner {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  border: 2px solid;
+  opacity: 0.5;
+}
+
+.corner-tl { top: 20px; left: 20px; border-color: #00ffff; border-right: none; border-bottom: none; }
+.corner-tr { top: 20px; right: 20px; border-color: #ff00ff; border-left: none; border-bottom: none; }
+.corner-bl { bottom: 20px; left: 20px; border-color: #39ff14; border-right: none; border-top: none; }
+.corner-br { bottom: 20px; right: 20px; border-color: #00ffff; border-left: none; border-top: none; }
+
+/* DNA helix animation */
+.dna-container {
+  position: fixed;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 200px;
+  width: 40px;
+  opacity: 0.3;
+}
+
+.dna-strand {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.dna-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: dnaSpin 2s linear infinite;
+}
+
+@keyframes dnaSpin {
+  0% { transform: translateX(0) scale(1); }
+  25% { transform: translateX(15px) scale(0.7); }
+  50% { transform: translateX(0) scale(1); }
+  75% { transform: translateX(-15px) scale(0.7); }
+  100% { transform: translateX(0) scale(1); }
+}
+
+/* Version info */
+.version {
+  position: fixed;
+  bottom: 20px;
+  right: 30px;
+  color: #333;
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="scanline"></div>
+
+<div class="particles" id="particles"></div>
+
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<div class="dna-container">
+  <div class="dna-strand" id="dna"></div>
+</div>
+
+<div class="center">
+  <div class="logo-container">
+    <div class="orbit orbit-1"></div>
+    <div class="orbit orbit-2"></div>
+    <div class="orbit orbit-3"></div>
+    <div class="hex-logo">
+      <svg viewBox="0 0 100 115">
+        <defs>
+          <linearGradient id="hexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#00ffff"/>
+            <stop offset="50%" style="stop-color:#39ff14"/>
+            <stop offset="100%" style="stop-color:#ff00ff"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <!-- Hexagon -->
+        <polygon points="50,5 95,30 95,80 50,105 5,80 5,30" 
+                 fill="rgba(0,20,40,0.9)" 
+                 stroke="url(#hexGrad)" 
+                 stroke-width="2"
+                 filter="url(#glow)"/>
+        <!-- Inner hexagon -->
+        <polygon points="50,20 80,38 80,72 50,90 20,72 20,38" 
+                 fill="none" 
+                 stroke="#00ffff" 
+                 stroke-width="1"
+                 opacity="0.5"/>
+        <!-- Bio hazard symbol -->
+        <circle cx="50" cy="55" r="8" fill="#39ff14" filter="url(#glow)"/>
+        <path d="M50,35 Q60,45 50,60 Q40,45 50,35" fill="#39ff14" opacity="0.8"/>
+        <path d="M35,65 Q45,55 55,70 Q45,75 35,65" fill="#39ff14" opacity="0.8"/>
+        <path d="M65,65 Q55,55 45,70 Q55,75 65,65" fill="#39ff14" opacity="0.8"/>
+        <!-- Glowing dots -->
+        <circle cx="30" cy="30" r="3" fill="#00ffff">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="70" cy="30" r="3" fill="#ff00ff">
+          <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="50" cy="95" r="3" fill="#39ff14">
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="1s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+  </div>
+  
+  <div class="title">
+    <span class="bio">BiO</span><span class="games">GAMES</span>
+  </div>
+  <div class="subtitle">// NEURAL GAMING INTERFACE //</div>
+  
+  <div class="loading-box">
+    <div class="loading-text">INITIALIZING SYSTEM</div>
+    <div class="progress-container">
+      <div class="progress-bar"></div>
+      <div class="progress-glow"></div>
+    </div>
+    <div class="status"><span id="status-text">LOADING ASSETS...</span></div>
+  </div>
+</div>
+
+<div class="version">v1.0.0 // NEURAL BUILD</div>
+
+<audio id="boot" src="boot.wav" preload="auto"></audio>
+
+<script>
+// Create floating particles
+const particlesContainer = document.getElementById('particles');
+const colors = ['#00ffff', '#ff00ff', '#39ff14', '#ffffff'];
+
+for (let i = 0; i < 30; i++) {
+  const particle = document.createElement('div');
+  particle.className = 'particle';
+  particle.style.left = Math.random() * 100 + '%';
+  particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+  particle.style.animationDelay = Math.random() * 8 + 's';
+  particle.style.animationDuration = (5 + Math.random() * 5) + 's';
+  particlesContainer.appendChild(particle);
+}
+
+// Create DNA helix
+const dnaContainer = document.getElementById('dna');
+for (let i = 0; i < 10; i++) {
+  const dot1 = document.createElement('div');
+  const dot2 = document.createElement('div');
+  dot1.className = 'dna-dot';
+  dot2.className = 'dna-dot';
+  dot1.style.top = (i * 20) + 'px';
+  dot2.style.top = (i * 20) + 'px';
+  dot1.style.backgroundColor = '#00ffff';
+  dot2.style.backgroundColor = '#ff00ff';
+  dot1.style.animationDelay = (i * 0.1) + 's';
+  dot2.style.animationDelay = (i * 0.1 + 1) + 's';
+  dnaContainer.appendChild(dot1);
+  dnaContainer.appendChild(dot2);
+}
+
+// Status text animation
+const statusTexts = [
+  'INITIALIZING SYSTEMS...',
+  'LOADING NEURAL ASSETS...',
+  'CONNECTING BIO-LINK...',
+  'CALIBRATING INTERFACE...',
+  'SYSTEM READY'
+];
+
+let statusIndex = 0;
+const statusEl = document.getElementById('status-text');
+
+const statusInterval = setInterval(() => {
+  statusIndex++;
+  if (statusIndex < statusTexts.length) {
+    statusEl.textContent = statusTexts[statusIndex];
+  } else {
+    clearInterval(statusInterval);
+  }
+}, 500);
+
+// Play boot sound
+document.getElementById('boot').play().catch(() => {});
+
+// Navigate to lobby
+setTimeout(() => {
+  window.location.href = 'bio_lobby3.html';
+}, 3000);
+</script>
+</body>
+</html>

@@ -16,11 +16,18 @@ import java.util.Arrays;
 
 public class IntegrityChecker {
     private static final String TAG = "IntegrityChecker";
-    private static final String EXPECTED_SIGNATURE_SHA256 = "YOUR_EXPECTED_SHA256_SIGNATURE"; // Replace with actual
-    private static final String EXPECTED_APK_HASH = "YOUR_EXPECTED_APK_SHA256_HASH"; // Replace with actual
+    // Set to actual values after first release build, or leave empty to skip check
+    private static final String EXPECTED_SIGNATURE_SHA256 = ""; 
+    private static final String EXPECTED_APK_HASH = "";
 
     public static boolean checkApkIntegrity(Context context) {
-        return checkSignature(context) && checkApkHash(context) && checkInstallSource(context);
+        // Skip signature/hash checks if not configured (first build)
+        // Install source check is skipped for sideloaded/debug builds
+        boolean signatureOk = EXPECTED_SIGNATURE_SHA256.isEmpty() || checkSignature(context);
+        boolean hashOk = EXPECTED_APK_HASH.isEmpty() || checkApkHash(context);
+        // Skip install source check - allows sideloading for testing
+        // Enable for production: && checkInstallSource(context)
+        return signatureOk && hashOk;
     }
 
     private static boolean checkSignature(Context context) {

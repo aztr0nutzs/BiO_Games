@@ -2,485 +2,688 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BiO_PETZ // Virtual Bio-Pet Laboratory</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="bio_petz_style.css">
-    <link rel="stylesheet" href="cyber.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BiO_PETZ - Virtual Bio-Pet Laboratory</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --neon-cyan: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --bg-dark: #0a0014;
+            --bg-panel: rgba(10, 0, 30, 0.9);
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: var(--bg-dark);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Scanline effect */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.1) 2px,
+                rgba(0,0,0,0.1) 4px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+            background: rgba(0,255,255,0.1);
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px 20px;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+        }
+        
+        .game-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 60px 15px 20px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 2px solid var(--neon-pink);
+            background: var(--bg-panel);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+        
+        .header h1 span { color: var(--neon-pink); }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 10px;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--neon-green);
+        }
+        
+        /* Pet Display */
+        .pet-container {
+            background: var(--bg-panel);
+            border: 2px solid var(--neon-cyan);
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pet-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(0,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .pet-image {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .pet-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px var(--neon-green));
+            animation: petBob 2s ease-in-out infinite;
+        }
+        
+        @keyframes petBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .pet-name {
+            font-size: 24px;
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+            margin-bottom: 5px;
+        }
+        
+        .pet-species {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .pet-level {
+            color: var(--neon-green);
+            font-size: 14px;
+        }
+        
+        /* Status Bars */
+        .status-bars {
+            background: var(--bg-panel);
+            border: 2px solid var(--neon-green);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .status-bar {
+            margin-bottom: 12px;
+        }
+        
+        .status-bar:last-child { margin-bottom: 0; }
+        
+        .status-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #aaa;
+        }
+        
+        .bar-container {
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        
+        .bar-health { background: linear-gradient(90deg, #ff0055, #ff00ff); }
+        .bar-happiness { background: linear-gradient(90deg, #ffff00, #39ff14); }
+        .bar-hunger { background: linear-gradient(90deg, #ff8800, #ff0055); }
+        .bar-energy { background: linear-gradient(90deg, #00ffff, #0088ff); }
+        
+        /* Action Buttons */
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .action-btn {
+            background: var(--bg-panel);
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 15px;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .action-btn:hover:not(:disabled) {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+        
+        .action-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .action-btn .icon { font-size: 24px; }
+        
+        /* Pet Selection */
+        .pet-select {
+            background: var(--bg-panel);
+            border: 2px solid var(--neon-pink);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .pet-select h3 {
+            color: var(--neon-pink);
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .pet-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        
+        .pet-option {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid #333;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .pet-option:hover, .pet-option.active {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+        
+        .pet-option img {
+            width: 100%;
+            height: 50px;
+            object-fit: contain;
+        }
+        
+        .pet-option .name {
+            font-size: 10px;
+            color: #888;
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        /* Log Console */
+        .console {
+            background: #000;
+            border: 2px solid #333;
+            padding: 10px;
+            height: 120px;
+            overflow-y: auto;
+            font-size: 11px;
+            color: var(--neon-green);
+        }
+        
+        .console .log-entry {
+            margin-bottom: 3px;
+            opacity: 0.8;
+        }
+        
+        .console .log-entry.action { color: var(--neon-cyan); }
+        .console .log-entry.warning { color: #ff8800; }
+        .console .log-entry.success { color: var(--neon-green); }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--neon-green);
+            color: #000;
+            padding: 12px 24px;
+            font-weight: bold;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 200;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
-    <!-- Background Effects -->
-    <div class="crt-overlay"></div>
-    <div class="vignette"></div>
-    <canvas id="background-canvas" class="background-canvas"></canvas>
-
-    <!-- Main Game Container -->
+    <a href="../bio_lobby3.html" class="back-btn">← LOBBY</a>
+    
     <div class="game-container">
-        <!-- Header -->
-        <header class="game-header">
-            <div class="logo">
-                <h1>BiO<span style="color: var(--neon-pink)">_PETZ</span></h1>
-                <div class="subtitle">// Virtual Bio-Pet Laboratory</div>
-            </div>
-            <div class="header-stats">
-                <div class="currency">
-                    <i class="fas fa-coins"></i>
-                    <span id="credits-display">100</span>
-                </div>
-                <div class="currency">
-                    <i class="fas fa-flask"></i>
-                    <span id="toxins-display">0</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Navigation -->
-        <nav class="game-nav">
-            <button class="nav-btn active" data-screen="home">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
-            </button>
-            <button class="nav-btn" data-screen="lab">
-                <i class="fas fa-flask"></i>
-                <span>Lab</span>
-            </button>
-            <button class="nav-btn" data-screen="inventory">
-                <i class="fas fa-box"></i>
-                <span>Inventory</span>
-            </button>
-            <button class="nav-btn" data-screen="shop">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Shop</span>
-            </button>
-        </nav>
-
-        <!-- Game Screens -->
-        <main class="game-content">
-            <!-- Home Screen -->
-            <div id="home-screen" class="screen active">
-                <div class="home-layout">
-                    <!-- Pet Display Area -->
-                    <div class="pet-display-section">
-                        <div id="pet-display" class="pet-display">
-                            <div class="pet-card">
-                                <div class="pet-image" id="pet-image-wrap">
-                                    <img id="pet-img" src="https://i.imgur.com/8Km9tLL.png" alt="pet">
-                                    <div class="mut-overlay ears" id="mut-ears"></div>
-                                    <div class="mut-overlay spikes" id="mut-spikes"></div>
-                                    <div class="mut-overlay eyes" id="mut-eyes"></div>
-                                </div>
-                                <div class="pet-stats">
-                                    <h3 id="pet-name-display">Biofluff</h3>
-                                    <div class="stat"><span>Hunger:</span> <span id="hunger-stat">50</span></div>
-                                    <div class="stat"><span>Happiness:</span> <span id="happiness-stat">50</span></div>
-                                    <div class="stat"><span>Hygiene:</span> <span id="hygiene-stat">50</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    
-    <!-- Avatar / Profile Panel -->
-    <aside class="avatar-panel" aria-label="Avatar panel">
-        <div class="avatar-card glass">
-            <div class="avatar-visual">
-                <img id="avatar-img" src="https://i.imgur.com/6rkqGkR.png" alt="Avatar preview">
-                <div class="avatar-glow"></div>
-            </div>
-            <div class="avatar-info">
-                <h2 id="player-name">Dr. BiO</h2>
-                <div class="lvl-xp">
-                    <div class="level">Lv <span id="player-level">7</span></div>
-                    <div class="xp-bar" title="Experience">
-                        <div id="xp-fill" class="xp-fill" style="width: 58%"></div>
-                    </div>
-                </div>
-                <div class="avatar-actions">
-                    <button id="open-settings" class="btn">Pet Settings</button>
-                    <button id="customize-btn" class="btn secondary">Customize</button>
-                </div>
+        <div class="header">
+            <h1>BiO<span>_PETZ</span></h1>
+            <div class="stats-bar">
+                <div class="stat-item">💰 <span id="credits">100</span></div>
+                <div class="stat-item">🧪 <span id="toxins">0</span></div>
             </div>
         </div>
-    </aside>
-
-    <!-- Pet Settings Modal -->
-    <div id="pet-settings-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <div class="modal-panel glass">
-        <header class="modal-header">
-          <h3 id="modal-title">Pet Settings</h3>
-          <button id="close-modal" class="icon-btn" aria-label="Close">&times;</button>
-        </header>
         
-<div class="modal-body">
-  <div class="console-tabs">
-    <button class="tab active" data-tab="general">GENERAL</button>
-    <button class="tab" data-tab="appearance">APPEARANCE</button>
-    <button class="tab" data-tab="dna">DNA</button>
-  </div>
-
-  <div class="tab-content active" id="tab-general">
-    <label>Pet Name
-      <input id="pet-name" type="text">
-    </label>
-    <label class="switch">
-      <input id="neon-toggle" type="checkbox" checked>
-      <span class="slider"></span>
-      <span class="label">Neon Effects</span>
-    </label>
-  </div>
-
-  <div class="tab-content" id="tab-appearance">
-    <label>Accent Color
-      <input id="pet-color" type="color" value="#00ffd1">
-    </label>
-  </div>
-
-  <div class="tab-content" id="tab-dna">
-    <label>Aggression
-      <input type="range" min="0" max="100" value="40" class="dna-slider" data-gene="aggression">
-    </label>
-    <label>Intelligence
-      <input type="range" min="0" max="100" value="55" class="dna-slider" data-gene="intelligence">
-    </label>
-    <label>Mutation Rate
-      <input type="range" min="0" max="100" value="20" class="dna-slider" data-gene="mutation">
-    </label>
-  
-    <div class="pet-catalog">
-      <div class="catalog-hint">Quick adopt: choose a unique Petz</div>
-      <div class="catalog-list">
-        <button class="catalog-item" data-id="biofluff"><img src="https://i.imgur.com/8Km9tLL.png"><div>Biofluff</div></button>
-        <button class="catalog-item" data-id="neonbyte"><img src="https://i.imgur.com/6rkqGkR.png"><div>NeonByte</div></button>
-        <button class="catalog-item" data-id="spikeling"><img src="https://i.imgur.com/4AiXzf8.png"><div>Spikeling</div></button>
-        <button class="catalog-item" data-id="eyeshift"><img src="https://i.imgur.com/3Z3L0X2.png"><div>EyeShift</div></button>
-      </div>
-    </div></div>
-
-  <div class="form-actions">
-    <button type="button" id="save-settings" class="btn">APPLY</button>
-    <button type="button" id="reset-settings" class="btn secondary">RESET</button>
-  </div>
-</div>
-</div>
-</div>
-
-    </div>
-<!-- Care Actions Panel -->
-                    <div class="care-panel">
-                        <h3>Care Actions</h3>
-                        <div class="care-buttons">
-                            <button id="feed-btn" class="care-btn" onclick="Pet.feed()">
-                                <i class="fas fa-utensils"></i>
-                                <span>Feed</span>
-                            </button>
-                            <button id="clean-btn" class="care-btn" onclick="Pet.clean()">
-                                <i class="fas fa-shower"></i>
-                                <span>Clean</span>
-                            </button>
-                            <button id="play-btn" class="care-btn" onclick="Pet.play()">
-                                <i class="fas fa-gamepad"></i>
-                                <span>Play</span>
-                            </button>
-                            <button id="inject-btn" class="care-btn">
-                                <i class="fas fa-vial"></i>
-                                <span>Inject</span>
-                            </button>
-                            <button id="medicate-btn" class="care-btn">
-                                <i class="fas fa-pills"></i>
-                                <span>Medicate</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Pet Status Panel -->
-                    <div class="status-panel">
-                        <h3>Pet Status</h3>
-                        <div id="pet-status" class="status-info">
-                            <!-- Status information will be populated by JS -->
-                        </div>
-                    </div>
-                </div>
+        <div class="pet-container">
+            <div class="pet-image">
+                <img id="pet-img" src="assets/pets/pet_frog1.png" alt="Pet">
             </div>
-
-            <!-- Lab Screen -->
-            <div id="lab-screen" class="screen">
-                <div class="lab-layout">
-                    <div class="lab-header">
-                        <h2>Genetic Research Laboratory</h2>
-                        <div class="lab-level">Level <span id="lab-level">1</span></div>
-                    </div>
-
-                    <div class="lab-workspace">
-                        <!-- Experiment selection -->
-                        <div class="experiment-panel">
-                            <h3>Available Experiments</h3>
-                            <div class="experiment-buttons">
-                                <button class="experiment-btn" data-experiment="breeding">
-                                    <i class="fas fa-dna"></i>
-                                    <span>Breeding</span>
-                                </button>
-                                <button class="experiment-btn" data-experiment="radiation">
-                                    <i class="fas fa-radiation"></i>
-                                    <span>Radiation</span>
-                                </button>
-                                <button class="experiment-btn" data-experiment="chemical">
-                                    <i class="fas fa-flask"></i>
-                                    <span>Chemical</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Experiment results -->
-                        <div class="results-panel">
-                            <h3>Experiment Results</h3>
-                            <div id="experiment-results" class="results-display">
-                                Select an experiment to begin...
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Inventory Screen -->
-            <div id="inventory-screen" class="screen">
-                <div class="inventory-layout">
-                    <h2>Inventory</h2>
-                    <div class="inventory-grid" id="inventory-grid">
-                        <!-- Items will be populated by JS -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Shop Screen -->
-            <div id="shop-screen" class="screen">
-                <div class="shop-layout">
-                    <h2>Bio-Shop</h2>
-                    <div class="shop-grid" id="shop-grid">
-                        <!-- Shop items will be populated by JS -->
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Footer -->
-        
-    <!-- Terminal Logs Console -->
-    <aside class="terminal-console glass">
-      <div class="console-header">
-        <div class="console-title">SYSTEM LOG</div>
-        <div class="console-controls">
-          <button id="clear-logs" class="btn small">CLEAR</button>
+            <div class="pet-name" id="pet-name">BioFluff</div>
+            <div class="pet-species" id="pet-species">Proto-Slime // Common</div>
+            <div class="pet-level">Level <span id="pet-level">1</span> • XP: <span id="pet-xp">0</span>/<span id="pet-xp-max">100</span></div>
         </div>
-      </div>
-      <div id="console-log" class="console-log" role="log" aria-live="polite"></div>
-    </aside>
-<footer class="game-footer">
-            <button class="back-btn" onclick="window.location.href='../bio_lobby3.html'">
-                <i class="fas fa-arrow-left"></i>
-                Back to Lobby
+        
+        <div class="status-bars">
+            <div class="status-bar">
+                <div class="status-label"><span>❤️ HEALTH</span><span id="health-val">100</span></div>
+                <div class="bar-container"><div class="bar-fill bar-health" id="health-bar" style="width:100%"></div></div>
+            </div>
+            <div class="status-bar">
+                <div class="status-label"><span>😊 HAPPINESS</span><span id="happiness-val">80</span></div>
+                <div class="bar-container"><div class="bar-fill bar-happiness" id="happiness-bar" style="width:80%"></div></div>
+            </div>
+            <div class="status-bar">
+                <div class="status-label"><span>🍖 HUNGER</span><span id="hunger-val">20</span></div>
+                <div class="bar-container"><div class="bar-fill bar-hunger" id="hunger-bar" style="width:20%"></div></div>
+            </div>
+            <div class="status-bar">
+                <div class="status-label"><span>⚡ ENERGY</span><span id="energy-val">100</span></div>
+                <div class="bar-container"><div class="bar-fill bar-energy" id="energy-bar" style="width:100%"></div></div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="action-btn" id="btn-feed" onclick="game.feed()">
+                <span class="icon">🍖</span>
+                <span>FEED (-10💰)</span>
             </button>
-            <div class="version">v1.0.0</div>
-        </footer>
+            <button class="action-btn" id="btn-play" onclick="game.play()">
+                <span class="icon">🎮</span>
+                <span>PLAY</span>
+            </button>
+            <button class="action-btn" id="btn-clean" onclick="game.clean()">
+                <span class="icon">🚿</span>
+                <span>CLEAN</span>
+            </button>
+            <button class="action-btn" id="btn-heal" onclick="game.heal()">
+                <span class="icon">💊</span>
+                <span>HEAL (-25💰)</span>
+            </button>
+            <button class="action-btn" id="btn-mutate" onclick="game.mutate()">
+                <span class="icon">🧬</span>
+                <span>MUTATE (-50💰)</span>
+            </button>
+            <button class="action-btn" id="btn-sleep" onclick="game.sleep()">
+                <span class="icon">😴</span>
+                <span>SLEEP</span>
+            </button>
+        </div>
+        
+        <div class="pet-select">
+            <h3>// SELECT PET SPECIMEN</h3>
+            <div class="pet-grid" id="pet-grid"></div>
+        </div>
+        
+        <div class="console" id="console"></div>
     </div>
-
-    <!-- Scripts -->
-    <script src="data/specimens.js"></script>
-    <script src="data/items.js"></script>
-    <script src="data/mutations.js"></script>
-    <script src="game.js"></script>
+    
+    <div class="toast" id="toast"></div>
 
 <script>
-// Navigation system
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('BiO-Petz initializing...');
-    
-    // Navigation tabs
-    const navBtns = document.querySelectorAll('.nav-btn');
-    const screens = document.querySelectorAll('.screen');
-    
-    navBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const targetScreen = btn.dataset.screen;
-            console.log('Switching to screen:', targetScreen);
-            
-            // Remove active from all
-            navBtns.forEach(b => b.classList.remove('active'));
-            screens.forEach(s => s.classList.remove('active'));
-            
-            // Add active to clicked
-            btn.classList.add('active');
-            document.getElementById(targetScreen + '-screen').classList.add('active');
-        });
-    });
-    
-    // Modal tabs
-    const modalTabs = document.querySelectorAll('.tab');
-    const tabContents = document.querySelectorAll('.tab-content');
-    
-    modalTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const targetTab = tab.dataset.tab;
-            
-            modalTabs.forEach(t => t.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
-            
-            tab.classList.add('active');
-            document.getElementById('tab-' + targetTab).classList.add('active');
-        });
-    });
-    
-    // Catalog items
-    const catalogItems = document.querySelectorAll('.catalog-item');
-    catalogItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const petId = item.dataset.id;
-            const petImg = item.querySelector('img').src;
-            console.log('Selected pet:', petId);
-            
-            // Update pet display
-            document.getElementById('pet-img').src = petImg;
-            document.getElementById('pet-name-display').textContent = petId;
-            
-            // Close modal
-            document.getElementById('pet-settings-modal').classList.add('hidden');
-        });
-    });
-    
-    // Initialize pet stats display
-    if (typeof Pet !== 'undefined') {
-        Pet.draw();
-        console.log('Pet initialized:', Pet.name);
+const PETS = [
+    { id: 'frog1', name: 'BioFrog', img: 'assets/pets/pet_frog1.png', species: 'Amphibian Mutant', rarity: 'Common' },
+    { id: 'frog2', name: 'NeonFrog', img: 'assets/pets/pet_frog2.png', species: 'Glowing Amphibian', rarity: 'Uncommon' },
+    { id: 'frog3', name: 'ToxiFrog', img: 'assets/pets/pet_frog3.gif', species: 'Toxic Specimen', rarity: 'Rare' },
+    { id: 'cat1', name: 'BioCat', img: 'assets/pets/pet_cat1.png', species: 'Feline Hybrid', rarity: 'Common' },
+    { id: 'cat2', name: 'CyberCat', img: 'assets/pets/pet_cat2.png', species: 'Cyber Feline', rarity: 'Uncommon' },
+    { id: 'cat3', name: 'VoidCat', img: 'assets/pets/pet_cat3.png', species: 'Shadow Entity', rarity: 'Rare' },
+    { id: 'cat4', name: 'NeonCat', img: 'assets/pets/pet_cat4.png', species: 'Luminescent Feline', rarity: 'Epic' },
+    { id: 'rat1', name: 'BioRat', img: 'assets/pets/pet_rat1.png', species: 'Lab Specimen', rarity: 'Common' }
+];
+
+class BioPetzGame {
+    constructor() {
+        this.pet = {
+            id: 'frog1',
+            name: 'BioFrog',
+            img: 'assets/pets/pet_frog1.png',
+            species: 'Amphibian Mutant',
+            rarity: 'Common',
+            level: 1,
+            xp: 0,
+            xpMax: 100,
+            health: 100,
+            maxHealth: 100,
+            happiness: 80,
+            hunger: 20,
+            energy: 100
+        };
+        this.credits = 100;
+        this.toxins = 0;
+        this.lastUpdate = Date.now();
+        
+        this.load();
+        this.renderPetGrid();
+        this.update();
+        this.startLoop();
+        this.log('System initialized. Welcome to BiO_PETZ!', 'success');
     }
     
-    // Populate inventory
-    const inventoryGrid = document.getElementById('inventory-grid');
-    if (inventoryGrid) {
-        inventoryGrid.innerHTML = `
-            <div class="inventory-item">
-                <div class="item-icon">🍖</div>
-                <div class="item-name">Bio-Food</div>
-                <div class="item-count">x5</div>
+    renderPetGrid() {
+        const grid = document.getElementById('pet-grid');
+        grid.innerHTML = PETS.map(p => `
+            <div class="pet-option ${p.id === this.pet.id ? 'active' : ''}" onclick="game.selectPet('${p.id}')">
+                <img src="${p.img}" alt="${p.name}">
+                <div class="name">${p.name}</div>
             </div>
-            <div class="inventory-item">
-                <div class="item-icon">💊</div>
-                <div class="item-name">Medicine</div>
-                <div class="item-count">x3</div>
-            </div>
-            <div class="inventory-item">
-                <div class="item-icon">🧪</div>
-                <div class="item-name">Mutagen</div>
-                <div class="item-count">x1</div>
-            </div>
-        `;
+        `).join('');
     }
     
-    // Populate shop
-    const shopGrid = document.getElementById('shop-grid');
-    if (shopGrid) {
-        shopGrid.innerHTML = `
-            <div class="shop-item">
-                <div class="item-icon">🍖</div>
-                <div class="item-name">Bio-Food</div>
-                <div class="item-price">10 Credits</div>
-                <button class="btn small">Buy</button>
-            </div>
-            <div class="shop-item">
-                <div class="item-icon">💊</div>
-                <div class="item-name">Medicine</div>
-                <div class="item-price">25 Credits</div>
-                <button class="btn small">Buy</button>
-            </div>
-            <div class="shop-item">
-                <div class="item-icon">🧪</div>
-                <div class="item-name">Mutagen</div>
-                <div class="item-price">50 Credits</div>
-                <button class="btn small">Buy</button>
-            </div>
-        `;
+    selectPet(id) {
+        const pet = PETS.find(p => p.id === id);
+        if (pet) {
+            this.pet.id = pet.id;
+            this.pet.name = pet.name;
+            this.pet.img = pet.img;
+            this.pet.species = pet.species;
+            this.pet.rarity = pet.rarity;
+            this.update();
+            this.renderPetGrid();
+            this.log(`Selected ${pet.name} - ${pet.species}`, 'action');
+            this.save();
+        }
     }
     
-    // Experiment buttons
-    const experimentBtns = document.querySelectorAll('.experiment-btn');
-    const resultsDisplay = document.getElementById('experiment-results');
-    
-    experimentBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const experiment = btn.dataset.experiment;
-            console.log('Running experiment:', experiment);
-            
-            resultsDisplay.innerHTML = `
-                <div class="experiment-running">
-                    <h4>Running ${experiment} experiment...</h4>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 75%"></div>
-                    </div>
-                    <p>Mutation chance: ${Math.floor(Math.random() * 50 + 10)}%</p>
-                    <p>Expected completion: ${Math.floor(Math.random() * 60 + 30)} seconds</p>
-                </div>
-            `;
-        });
-    });
-    
-    console.log('BiO-Petz fully initialized!');
-});
-
-(function(){
-  function qs(sel){return document.querySelector(sel);}
-  const modal = qs('#pet-settings-modal');
-  const openBtn = qs('#open-settings');
-  const closeBtn = qs('#close-modal');
-  const saveBtn = qs('#save-settings');
-  const resetBtn = qs('#reset-settings');
-  const petNameInput = qs('#pet-name');
-  const petColorInput = qs('#pet-color');
-  const neonToggle = qs('#neon-toggle');
-
-  function openModal(){
-    modal.classList.remove('hidden');
-    document.body.classList.add('modal-open');
-  }
-  function closeModal(){
-    modal.classList.add('hidden');
-    document.body.classList.remove('modal-open');
-  }
-  openBtn && openBtn.addEventListener('click', openModal);
-  closeBtn && closeBtn.addEventListener('click', closeModal);
-  saveBtn && saveBtn.addEventListener('click', function(){
-    const name = petNameInput.value || 'Biofluff';
-    const accent = petColorInput.value || '#00ffd1';
-    const neon = neonToggle.checked;
-
-    if(window.Pet){
-      window.Pet.name = name;
+    feed() {
+        if (this.credits < 10) {
+            this.toast('Not enough credits!');
+            return;
+        }
+        this.credits -= 10;
+        this.pet.hunger = Math.max(0, this.pet.hunger - 40);
+        this.pet.happiness = Math.min(100, this.pet.happiness + 10);
+        this.gainXP(5);
+        this.log('Fed pet. Hunger decreased!', 'action');
+        this.toast('+5 XP');
+        this.animatePet();
+        this.update();
+        this.save();
     }
+    
+    play() {
+        if (this.pet.energy < 20) {
+            this.toast('Pet is too tired!');
+            return;
+        }
+        this.pet.energy -= 20;
+        this.pet.happiness = Math.min(100, this.pet.happiness + 25);
+        this.pet.hunger = Math.min(100, this.pet.hunger + 10);
+        this.gainXP(10);
+        this.log('Played with pet! Happiness increased!', 'action');
+        this.toast('+10 XP');
+        this.animatePet();
+        this.update();
+        this.save();
+    }
+    
+    clean() {
+        this.pet.happiness = Math.min(100, this.pet.happiness + 15);
+        this.pet.health = Math.min(this.pet.maxHealth, this.pet.health + 5);
+        this.gainXP(3);
+        this.log('Cleaned pet. Health improved!', 'action');
+        this.toast('+3 XP');
+        this.animatePet();
+        this.update();
+        this.save();
+    }
+    
+    heal() {
+        if (this.credits < 25) {
+            this.toast('Not enough credits!');
+            return;
+        }
+        this.credits -= 25;
+        this.pet.health = this.pet.maxHealth;
+        this.log('Pet fully healed!', 'success');
+        this.toast('Full Health!');
+        this.animatePet();
+        this.update();
+        this.save();
+    }
+    
+    mutate() {
+        if (this.credits < 50) {
+            this.toast('Not enough credits!');
+            return;
+        }
+        this.credits -= 50;
+        this.toxins += 10;
+        
+        // Random mutation effects
+        const roll = Math.random();
+        if (roll < 0.3) {
+            this.pet.maxHealth += 10;
+            this.pet.health = this.pet.maxHealth;
+            this.log('MUTATION SUCCESS! Max health increased!', 'success');
+        } else if (roll < 0.6) {
+            this.gainXP(50);
+            this.log('MUTATION SUCCESS! Massive XP boost!', 'success');
+        } else if (roll < 0.8) {
+            this.credits += 30;
+            this.log('MUTATION: Found credits in the goo!', 'success');
+        } else {
+            this.pet.health = Math.max(10, this.pet.health - 20);
+            this.log('MUTATION FAILED! Pet took damage!', 'warning');
+        }
+        
+        this.toast('+10 Toxins');
+        this.animatePet();
+        this.update();
+        this.save();
+    }
+    
+    sleep() {
+        if (this.pet.energy > 80) {
+            this.toast('Pet is not tired!');
+            return;
+        }
+        this.pet.energy = 100;
+        this.pet.health = Math.min(this.pet.maxHealth, this.pet.health + 10);
+        this.gainXP(5);
+        this.log('Pet rested. Energy restored!', 'action');
+        this.toast('Energy Restored!');
+        this.update();
+        this.save();
+    }
+    
+    gainXP(amount) {
+        this.pet.xp += amount;
+        while (this.pet.xp >= this.pet.xpMax) {
+            this.pet.xp -= this.pet.xpMax;
+            this.pet.level++;
+            this.pet.xpMax = Math.floor(this.pet.xpMax * 1.5);
+            this.pet.maxHealth += 5;
+            this.pet.health = this.pet.maxHealth;
+            this.credits += 25;
+            this.log(`LEVEL UP! Now level ${this.pet.level}! +25 credits!`, 'success');
+            this.toast('LEVEL UP!');
+        }
+    }
+    
+    animatePet() {
+        const img = document.getElementById('pet-img');
+        img.style.animation = 'none';
+        img.offsetHeight; // Trigger reflow
+        img.style.animation = 'petBob 0.3s ease-in-out 3';
+    }
+    
+    tick() {
+        const now = Date.now();
+        const delta = (now - this.lastUpdate) / 1000;
+        this.lastUpdate = now;
+        
+        // Stats decay over time
+        this.pet.hunger = Math.min(100, this.pet.hunger + delta * 0.5);
+        this.pet.energy = Math.min(100, this.pet.energy + delta * 0.3);
+        this.pet.happiness = Math.max(0, this.pet.happiness - delta * 0.2);
+        
+        // Health affected by hunger
+        if (this.pet.hunger > 80) {
+            this.pet.health = Math.max(0, this.pet.health - delta * 0.5);
+        }
+        
+        // Passive credit gain
+        if (Math.random() < 0.001) {
+            this.credits += 1;
+            this.log('Found a credit!', 'success');
+        }
+        
+        this.update();
+    }
+    
+    update() {
+        document.getElementById('credits').textContent = this.credits;
+        document.getElementById('toxins').textContent = this.toxins;
+        
+        document.getElementById('pet-img').src = this.pet.img;
+        document.getElementById('pet-name').textContent = this.pet.name;
+        document.getElementById('pet-species').textContent = `${this.pet.species} // ${this.pet.rarity}`;
+        document.getElementById('pet-level').textContent = this.pet.level;
+        document.getElementById('pet-xp').textContent = Math.floor(this.pet.xp);
+        document.getElementById('pet-xp-max').textContent = this.pet.xpMax;
+        
+        document.getElementById('health-val').textContent = Math.floor(this.pet.health);
+        document.getElementById('health-bar').style.width = (this.pet.health / this.pet.maxHealth * 100) + '%';
+        
+        document.getElementById('happiness-val').textContent = Math.floor(this.pet.happiness);
+        document.getElementById('happiness-bar').style.width = this.pet.happiness + '%';
+        
+        document.getElementById('hunger-val').textContent = Math.floor(this.pet.hunger);
+        document.getElementById('hunger-bar').style.width = this.pet.hunger + '%';
+        
+        document.getElementById('energy-val').textContent = Math.floor(this.pet.energy);
+        document.getElementById('energy-bar').style.width = this.pet.energy + '%';
+        
+        // Update button states
+        document.getElementById('btn-feed').disabled = this.credits < 10;
+        document.getElementById('btn-play').disabled = this.pet.energy < 20;
+        document.getElementById('btn-heal').disabled = this.credits < 25;
+        document.getElementById('btn-mutate').disabled = this.credits < 50;
+        document.getElementById('btn-sleep').disabled = this.pet.energy > 80;
+    }
+    
+    log(msg, type = '') {
+        const console = document.getElementById('console');
+        const time = new Date().toLocaleTimeString();
+        const entry = document.createElement('div');
+        entry.className = 'log-entry ' + type;
+        entry.textContent = `[${time}] ${msg}`;
+        console.appendChild(entry);
+        console.scrollTop = console.scrollHeight;
+    }
+    
+    toast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+    
+    save() {
+        localStorage.setItem('bio_petz_save', JSON.stringify({
+            pet: this.pet,
+            credits: this.credits,
+            toxins: this.toxins
+        }));
+    }
+    
+    load() {
+        try {
+            const data = JSON.parse(localStorage.getItem('bio_petz_save'));
+            if (data) {
+                this.pet = { ...this.pet, ...data.pet };
+                this.credits = data.credits || 100;
+                this.toxins = data.toxins || 0;
+            }
+        } catch (e) {}
+    }
+    
+    startLoop() {
+        setInterval(() => this.tick(), 1000);
+        setInterval(() => this.save(), 30000);
+    }
+}
 
-    document.querySelector('#pet-name-display').textContent = name;
-    document.documentElement.style.setProperty('--neon-accent', accent);
-    document.documentElement.classList.toggle('neon-enabled', neon);
-
-    localStorage.setItem('bio_petz_settings', JSON.stringify({
-      petName: name,
-      accent: accent,
-      neonEnabled: neon
-    }));
-    closeModal();
-  });
-  resetBtn && resetBtn.addEventListener('click', function(){
-    petNameInput.value = 'Biofluff';
-    petColorInput.value = '#00ffd1';
-    neonToggle.checked = true;
-  });
-
-  // close modal on overlay click or ESC
-  modal.addEventListener('click', function(e){
-    if(e.target === modal) closeModal();
-  });
-  document.addEventListener('keydown', function(e){
-    if(e.key==='Escape') closeModal();
-  });
-})();
+const game = new BioPetzGame();
 </script>
-
 </body>
 </html>

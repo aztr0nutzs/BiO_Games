@@ -19,12 +19,20 @@ import javax.net.ssl.X509TrustManager;
 
 public class SSLPinner {
     private static final String TAG = "SSLPinner";
+    // Leave empty to disable pinning, or set actual pins for production
+    // Generate pins using: openssl s_client -connect api.biogames.com:443 | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
     private static final String[] EXPECTED_PINS = {
-        "sha256/YOUR_PUBLIC_KEY_PIN_1",
-        "sha256/YOUR_PUBLIC_KEY_PIN_2"
+        // "sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",  // Primary pin
+        // "sha256/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB="   // Backup pin
     };
 
     public static boolean validateSSLPinning(String urlString) {
+        // Skip pinning if no pins configured
+        if (EXPECTED_PINS.length == 0) {
+            Log.d(TAG, "SSL Pinning disabled (no pins configured)");
+            return true;
+        }
+        
         try {
             URL url = new URL(urlString);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -82,6 +90,11 @@ public class SSLPinner {
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType) throws java.security.cert.CertificateException {
             defaultTrustManager.checkServerTrusted(chain, authType);
+
+            // Skip pinning if no pins configured
+            if (EXPECTED_PINS.length == 0) {
+                return;
+            }
 
             if (chain.length > 0) {
                 try {
