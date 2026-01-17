@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiO-OS // CENTRAL COMMAND [V2]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="shared/memorybank.js"></script>
+    <style>
+        :root {
+            /* --- ENHANCED PALETTE --- */
+            --neon-cyan: #00f3ff;
+            --neon-purple: #bc13fe;
+            --neon-pink: #ff0055;
+            --mint-green: #00ff9d;
+            --deep-void: #010103;
+            --glass-panel: rgba(8, 8, 12, 0.9);
+            --border-glow: 1px solid rgba(0, 243, 255, 0.2);
+            --danger-glow: 0 0 10px rgba(255, 0, 85, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; scrollbar-width: thin; scrollbar-color: var(--neon-cyan) transparent; }
+        
+        body { 
+            background-color: var(--deep-void);
+            color: #fff; 
+            font-family: 'Share Tech Mono', monospace; 
+            height: 100vh; 
+            overflow: hidden; 
+            position: relative;
+        }
+
+        /* --- ELECTRICITY HEADER CONTAINER --- */
+        #power-rail {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 150px;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.6;
+            mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+        }
+
+        /* --- HOLOGRAPHIC CHIPS (Floating Background Assets) --- */
+        .holo-field {
+            position: fixed; inset: 0; pointer-events: none; z-index: 1;
+            overflow: hidden;
+        }
+        .holo-chip {
+            position: absolute;
+            width: 80px; height: 80px;
+            opacity: 0.15;
+            filter: sepia(100%) hue-rotate(190deg) saturate(300%) drop-shadow(0 0 10px var(--neon-cyan));
+            animation: floatHolo 20s infinite linear;
+        }
+        /* Custom animations for variety */
+        .holo-chip:nth-child(1) { top: 20%; left: 10%; animation-duration: 25s; filter: sepia(100%) hue-rotate(250deg) saturate(300%); } /* Purple */
+        .holo-chip:nth-child(2) { top: 60%; right: 15%; animation-duration: 30s; filter: sepia(100%) hue-rotate(90deg) saturate(300%); } /* Green */
+        .holo-chip:nth-child(3) { bottom: 10%; left: 30%; animation-duration: 22s; }
+        
+        @keyframes floatHolo {
+            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0; }
+            20% { opacity: 0.15; }
+            80% { opacity: 0.15; }
+            100% { transform: translateY(-100px) rotate(360deg) scale(1.2); opacity: 0; }
+        }
+
+        /* --- MAIN LAYOUT --- */
+        .main-hud {
+            display: grid;
+            grid-template-columns: 80px 320px 1fr;
+            grid-template-rows: 70px 1fr 40px;
+            height: 100vh;
+            gap: 15px;
+            padding: 15px;
+            opacity: 0;
+            transition: opacity 1s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- TOP BAR --- */
+        .top-bar { 
+            grid-column: 1 / -1; 
+            background: rgba(0,0,0,0.6); 
+            border-bottom: 2px solid var(--neon-cyan); 
+            display: flex; align-items: center; padding: 0 25px; justify-content: space-between; 
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.1);
+        }
+        .sys-title {
+            font-family: 'Orbitron'; font-weight: 900; letter-spacing: 6px; 
+            background: linear-gradient(90deg, #fff, var(--neon-cyan)); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px var(--neon-cyan);
+        }
+
+        /* --- NAV BUTTONS --- */
+        .nav-btn {
+            background: var(--glass-panel); border: 1px solid rgba(255,255,255,0.1);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.4); cursor: pointer; transition: 0.3s;
+            height: 70px; margin-bottom: 10px;
+            position: relative; overflow: hidden;
+        }
+        .nav-btn:hover, .nav-btn.active { 
+            color: var(--mint-green); 
+            border-color: var(--mint-green); 
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.2); 
+            background: rgba(0, 255, 157, 0.05);
+        }
+        .nav-btn::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 2px;
+            background: var(--mint-green); transition: 0.3s;
+        }
+        .nav-btn.active::after { width: 100%; }
+
+        /* --- PROFILE / BANNER SECTION --- */
+        .info-panel { 
+            grid-row: 2 / 3; 
+            background: var(--glass-panel); 
+            border: 1px solid var(--neon-purple); 
+            display: flex; flex-direction: column; 
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.15);
+        }
+
+        .holodeck-banner {
+            height: 140px;
+            width: 100%;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 2px solid var(--neon-purple);
+        }
+        .banner-slide {
+            height: 100%; width: 100%;
+            background-size: cover; background-position: center;
+            position: absolute; top: 0; left: 0;
+            opacity: 0; transition: opacity 1s ease;
+            filter: contrast(1.2) brightness(0.8);
+        }
+        .banner-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to top, black, transparent);
+            padding: 10px; text-align: center;
+        }
+
+        /* --- GAME CARDS --- */
+        .viewport { 
+            grid-row: 2 / 3; padding-right: 10px; overflow-y: auto; 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;
+            align-content: start;
+        }
+
+        .game-card {
+            height: 280px;
+            background: linear-gradient(160deg, rgba(20,20,30,0.95), rgba(0,0,0,0.98));
+            border: 1px solid #333;
+            position: relative; overflow: hidden; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column;
+            group: 1;
+        }
+        .game-card:hover { transform: translateY(-5px) scale(1.02); z-index: 5; }
+        
+        /* CARD: TOXIC SPIN (Featured) */
+        .card-toxic {
+            border: 1px solid var(--neon-pink);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.1);
+        }
+        .card-toxic:hover {
+            box-shadow: 0 0 40px rgba(255, 0, 85, 0.4);
+            border-color: #fff;
+        }
+        .card-toxic .card-img {
+            height: 140px; background: url('s11 (2).png') center/contain no-repeat;
+            background-color: #000;
+            filter: drop-shadow(0 0 10px var(--neon-pink));
+            transition: 0.5s;
+        }
+        .card-toxic:hover .card-img { filter: drop-shadow(0 0 25px var(--neon-pink)); transform: scale(1.1); }
+        
+        .pulse-badge {
+            position: absolute; top: 10px; right: 10px;
+            background: var(--neon-pink); color: #fff;
+            font-size: 10px; padding: 4px 8px; font-weight: bold;
+            animation: pulsePink 1.5s infinite;
+            z-index: 10;
+        }
+        @keyframes pulsePink { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 85, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0); } }
+
+        /* CARD: STANDARD */
+        .card-content { padding: 20px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-title { font-family: 'Orbitron'; font-size: 1.4rem; color: #fff; margin-bottom: 5px; }
+        .card-desc { font-size: 0.85rem; color: #888; line-height: 1.4; }
+
+        /* --- FOOTER --- */
+        .footer { grid-column: 1 / -1; background: #000; border-top: 1px solid #333; display: flex; align-items: center; padding: 0 20px; font-size: 11px; color: #555; justify-content: space-between; z-index: 20;}
+
+        /* --- UTILS --- */
+        .hidden { display: none; }
+        .boot-screen { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--mint-green); }
+
+    </style>
+</head>
+<body>
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.min.js'></script>
+    <script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/490192/GPUParticleSystem.js'></script>
+
+    <div id="boot-sequence" class="boot-screen">
+        <div style="font-family: 'Orbitron'; font-size: 2rem; margin-bottom: 20px; text-shadow: 0 0 15px var(--mint-green);">SYSTEM BOOT</div>
+        <div style="width: 300px; height: 2px; background: #111;">
+            <div id="progressBar" style="width: 0%; height: 100%; background: var(--mint-green); transition: width 0.1s;"></div>
+        </div>
+        <div id="bootText" style="margin-top: 10px; font-size: 12px; opacity: 0.7;">LOADING CORE ASSETS...</div>
+    </div>
+
+    <div id="power-rail"></div> <div class="holo-field">
+        <img src="s21.jpeg" class="holo-chip">
+        <img src="s34.jpg" class="holo-chip">
+        <img src="s32.jpeg" class="holo-chip">
+    </div>
+
+    <div class="main-hud" id="mainHud">
+        
+        <header class="top-bar">
+            <div class="sys-title"><i class="fas fa-biohazard"></i> CENTRAL COMMAND</div>
+            <div style="display: flex; gap: 20px; font-size: 12px; color: var(--mint-green);">
+                <span><i class="fas fa-signal"></i> LINK: 100%</span>
+                <span><i class="fas fa-server"></i> US-EAST-7</span>
+            </div>
+        </header>
+
+        <nav class="side-nav">
+            <div class="nav-btn active"><i class="fas fa-gamepad fa-lg"></i></div>
+            <div class="nav-btn"><i class="fas fa-users fa-lg"></i></div>
+            <div class="nav-btn"><i class="fas fa-trophy fa-lg"></i></div>
+            <div class="nav-btn" style="margin-top: auto;"><i class="fas fa-cog fa-lg"></i></div>
+        </nav>
+
+        <aside class="info-panel">
+            <div class="holodeck-banner" id="bannerBox">
+                <div class="banner-slide" style="background-image: url('s21.jpeg'); opacity: 1;"></div>
+                <div class="banner-slide" style="background-image: url('s11 (2).png');"></div>
+                <div class="banner-slide" style="background-image: url('s34.jpg');"></div>
+                
+                <div class="banner-overlay">
+                    <h3 style="font-family: 'Orbitron'; margin: 0; text-shadow: 0 2px 2px #000;">OPERATOR</h3>
+                    <div style="font-size: 10px; color: var(--neon-cyan);">LVL 99 MUTANT</div>
+                </div>
+            </div>
+            
+            <div style="padding: 20px; flex: 1;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                    <span style="color: #aaa; font-size: 12px;">CREDITS</span>
+                    <span id="creditsAmount" style="color: var(--mint-green); font-family: 'Orbitron';">14,200</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #aaa; font-size: 12px;">TICKETS</span>
+                    <span id="ticketsAmount" style="color: var(--neon-pink); font-family: 'Orbitron';">550</span>
+                </div>
+            </div>
+            
+            <div style="padding: 15px; background: rgba(0, 243, 255, 0.05);">
+                <div style="font-size: 10px; color: var(--neon-cyan);">DAILY OBJECTIVE</div>
+                <div style="font-size: 11px;">Spin the wheel 5 times</div>
+                <div style="height: 4px; background: #222; margin-top: 5px;"><div style="width: 60%; height: 100%; background: var(--neon-cyan);"></div></div>
+            </div>
+        </aside>
+
+        <main class="viewport">
+            
+            <div class="game-card card-toxic" onclick="window.location.href='index.html'">
+                <div class="pulse-badge">NEW PROTOCOL</div>
+                <div class="card-img"></div> <div class="card-content">
+                    <div>
+                        <div class="card-title" style="color: var(--neon-pink);">TOXIC SPIN</div>
+                        <div class="card-desc">High voltage mutation wheel. Risk contagion for massive multipliers.</div>
+                    </div>
+                    <div style="display: flex; gap: 5px; margin-top: 10px;">
+                        <span style="background: var(--neon-pink); color: #000; font-size: 9px; padding: 2px 6px; font-weight: bold;">JACKPOT</span>
+                        <span style="border: 1px solid var(--neon-pink); color: var(--neon-pink); font-size: 9px; padding: 2px 6px;">VOLATILE</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-card" style="border-color: var(--neon-purple);" onclick="alert('Module loading...')">
+                <div style="height: 120px; background: rgba(188, 19, 254, 0.1); display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-chess-board" style="font-size: 50px; color: var(--neon-purple);"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title" style="color: var(--neon-purple);">KNXT-4</div>
+                    <div class="card-desc">Strategic viral sequencing. Connect 4 mutations to breach the firewall.</div>
+                </div>
+            </div>
+
+            <div class="game-card" style="border-color: var(--neon-cyan);" onclick="alert('Module loading...')">
+                <div style="height: 120px; background: rgba(0, 243, 255, 0.1); display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-dna" style="font-size: 50px; color: var(--neon-cyan);"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title" style="color: var(--neon-cyan);">BIO-SLOTZ</div>
+                    <div class="card-desc">Standard issue genome spinner. Low risk, steady isotope yield.</div>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="footer">
+            <div>SYSTEM ID: 884-XJ</div>
+            <div style="color: var(--mint-green);">SECURE CONNECTION ESTABLISHED</div>
+        </footer>
+    </div>
+
+    <script>
+        // --- 1. BOOT SEQUENCE ---
+        const bar = document.getElementById('progressBar');
+        const bootText = document.getElementById('bootText');
+        let width = 0;
+        
+        const interval = setInterval(() => {
+            width += Math.random() * 5;
+            if(width > 100) width = 100;
+            bar.style.width = width + "%";
+            
+            if(width > 30) bootText.innerText = "INITIALIZING ELECTRICITY...";
+            if(width > 60) bootText.innerText = "LOADING HOLOGRAPHIC ASSETS...";
+            if(width > 90) bootText.innerText = "DECRYPTING USER PROFILE...";
+
+            if (width === 100) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    document.getElementById('boot-sequence').style.opacity = 0;
+                    document.getElementById('mainHud').style.opacity = 1;
+                    setTimeout(() => document.getElementById('boot-sequence').style.display = 'none', 500);
+                    initElectricity(); // Start particles only after boot
+                }, 500);
+            }
+        }, 50);
+
+        // --- 2. BANNER SLIDESHOW ---
+        const slides = document.querySelectorAll('.banner-slide');
+        let currentSlide = 0;
+        
+        setInterval(() => {
+            slides[currentSlide].style.opacity = 0;
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].style.opacity = 1;
+        }, 4000); // Change image every 4 seconds
+
+        // --- 3. ELECTRICITY ANIMATION (Header Only) ---
+        function initElectricity() {
+            const container = document.getElementById('power-rail');
+            const camera = new THREE.PerspectiveCamera(28, window.innerWidth/150, 1, 10000); // Aspect ratio adjusted for header height
+            camera.position.z = 100;
+
+            const scene = new THREE.Scene();
+            const particleSystem = new THREE.GPUParticleSystem({ maxParticles: 20000 });
+            scene.add(particleSystem);
+
+            // Alpha renderer for transparent background
+            const renderer = new THREE.WebGLRenderer({ alpha: true }); 
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, 150); // Fixed height
+            container.appendChild(renderer.domElement);
+
+            const clock = new THREE.Clock();
+            let tick = 0;
+            const options = {
+                position: new THREE.Vector3(),
+                positionRandomness: 0.3,
+                velocity: new THREE.Vector3(),
+                velocityRandomness: 0.5,
+                color: 0x00f3ff, // Cyan
+                colorRandomness: 0.2,
+                turbulence: 0.5,
+                lifetime: 2,
+                size: 2,
+                sizeRandomness: 1
+            };
+            const spawnerOptions = { spawnRate: 1500, timeScale: 1 };
+
+            function animate() {
+                requestAnimationFrame(animate);
+                const delta = clock.getDelta() * spawnerOptions.timeScale;
+                tick += delta;
+                if (tick < 0) tick = 0;
+                particleSystem.update(tick);
+
+                // Create a horizontal beam of energy
+                for (let x = 0; x < spawnerOptions.spawnRate * delta; x++) {
+                    options.position.x = (Math.random() * 150) - 75; // Spread wide
+                    options.position.y = (Math.random() * 10) - 5;   // Tight vertical
+                    
+                    // Color flicker between Cyan and Pink
+                    options.color = Math.random() > 0.5 ? 0x00f3ff : 0xff0055;
+                    
+                    particleSystem.spawnParticle(options);
+                }
+                renderer.render(scene, camera);
+            }
+            animate();
+            
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, 150);
+                camera.aspect = window.innerWidth / 150;
+                camera.updateProjectionMatrix();
+            });
+        }
+    </script>
+</body>
+</html>
