@@ -88,6 +88,40 @@
             gap: 30px;
             margin-top: 10px;
         }
+
+        .tab-nav {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            background: rgba(0,255,255,0.08);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
         
         .stat-item {
             display: flex;
@@ -335,6 +369,51 @@
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
+
+        .lab-panel,
+        .inventory-panel,
+        .shop-panel {
+            background: var(--bg-panel);
+            border: 2px solid var(--neon-pink);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .lab-actions,
+        .inventory-grid,
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .lab-action,
+        .inventory-item,
+        .shop-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #333;
+            padding: 10px;
+            color: #ccc;
+            font-size: 12px;
+        }
+
+        .shop-item button {
+            margin-top: 8px;
+            width: 100%;
+            background: var(--neon-green);
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .lab-log {
+            margin-top: 10px;
+            font-size: 11px;
+            color: #aaa;
+            max-height: 120px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -348,74 +427,112 @@
                 <div class="stat-item">🧪 <span id="toxins">0</span></div>
             </div>
         </div>
-        
-        <div class="pet-container">
-            <div class="pet-image">
-                <img id="pet-img" src="assets/pets/pet_frog1.png" alt="Pet">
-                <video id="pet-video" src="" autoplay muted loop playsinline preload="metadata" poster="">
-                    <img src="assets/pets/bio_cat1.png" alt="Pet video fallback">
-                </video>
+
+        <nav class="tab-nav" aria-label="Bio Petz tabs">
+            <button class="tab-btn active" data-screen="home-screen">Home</button>
+            <button class="tab-btn" data-screen="lab-screen">Lab</button>
+            <button class="tab-btn" data-screen="inventory-screen">Inventory</button>
+            <button class="tab-btn" data-screen="shop-screen">Shop</button>
+        </nav>
+
+        <section class="screen active" id="home-screen">
+            <div class="pet-container">
+                <div class="pet-image">
+                    <img id="pet-img" src="assets/pets/pet_frog1.png" alt="Pet">
+                    <video id="pet-video" src="" autoplay muted loop playsinline preload="metadata" poster="">
+                        <img src="assets/pets/bio_cat1.png" alt="Pet video fallback">
+                    </video>
+                </div>
+                <div class="pet-name" id="pet-name">BioFluff</div>
+                <div class="pet-species" id="pet-species">Proto-Slime // Common</div>
+                <div class="pet-level">Level <span id="pet-level">1</span> • XP: <span id="pet-xp">0</span>/<span id="pet-xp-max">100</span></div>
             </div>
-            <div class="pet-name" id="pet-name">BioFluff</div>
-            <div class="pet-species" id="pet-species">Proto-Slime // Common</div>
-            <div class="pet-level">Level <span id="pet-level">1</span> • XP: <span id="pet-xp">0</span>/<span id="pet-xp-max">100</span></div>
-        </div>
-        
-        <div class="status-bars">
-            <div class="status-bar">
-                <div class="status-label"><span>❤️ HEALTH</span><span id="health-val">100</span></div>
-                <div class="bar-container"><div class="bar-fill bar-health" id="health-bar" style="width:100%"></div></div>
+            
+            <div class="status-bars">
+                <div class="status-bar">
+                    <div class="status-label"><span>❤️ HEALTH</span><span id="health-val">100</span></div>
+                    <div class="bar-container"><div class="bar-fill bar-health" id="health-bar" style="width:100%"></div></div>
+                </div>
+                <div class="status-bar">
+                    <div class="status-label"><span>😊 HAPPINESS</span><span id="happiness-val">80</span></div>
+                    <div class="bar-container"><div class="bar-fill bar-happiness" id="happiness-bar" style="width:80%"></div></div>
+                </div>
+                <div class="status-bar">
+                    <div class="status-label"><span>🍖 HUNGER</span><span id="hunger-val">20</span></div>
+                    <div class="bar-container"><div class="bar-fill bar-hunger" id="hunger-bar" style="width:20%"></div></div>
+                </div>
+                <div class="status-bar">
+                    <div class="status-label"><span>⚡ ENERGY</span><span id="energy-val">100</span></div>
+                    <div class="bar-container"><div class="bar-fill bar-energy" id="energy-bar" style="width:100%"></div></div>
+                </div>
             </div>
-            <div class="status-bar">
-                <div class="status-label"><span>😊 HAPPINESS</span><span id="happiness-val">80</span></div>
-                <div class="bar-container"><div class="bar-fill bar-happiness" id="happiness-bar" style="width:80%"></div></div>
+            
+            <div class="actions">
+                <button class="action-btn" id="btn-feed" onclick="game.feed()">
+                    <span class="icon">🍖</span>
+                    <span>FEED (-10💰)</span>
+                </button>
+                <button class="action-btn" id="btn-play" onclick="game.play()">
+                    <span class="icon">🎮</span>
+                    <span>PLAY</span>
+                </button>
+                <button class="action-btn" id="btn-clean" onclick="game.clean()">
+                    <span class="icon">🚿</span>
+                    <span>CLEAN</span>
+                </button>
+                <button class="action-btn" id="btn-heal" onclick="game.heal()">
+                    <span class="icon">💊</span>
+                    <span>HEAL (-25💰)</span>
+                </button>
+                <button class="action-btn" id="btn-mutate" onclick="game.mutate()">
+                    <span class="icon">🧬</span>
+                    <span>MUTATE (-50💰)</span>
+                </button>
+                <button class="action-btn" id="btn-sleep" onclick="game.sleep()">
+                    <span class="icon">😴</span>
+                    <span>SLEEP</span>
+                </button>
             </div>
-            <div class="status-bar">
-                <div class="status-label"><span>🍖 HUNGER</span><span id="hunger-val">20</span></div>
-                <div class="bar-container"><div class="bar-fill bar-hunger" id="hunger-bar" style="width:20%"></div></div>
+            
+            <div class="pet-select">
+                <h3>// SELECT PET SPECIMEN</h3>
+                <div class="pet-grid" id="pet-grid"></div>
             </div>
-            <div class="status-bar">
-                <div class="status-label"><span>⚡ ENERGY</span><span id="energy-val">100</span></div>
-                <div class="bar-container"><div class="bar-fill bar-energy" id="energy-bar" style="width:100%"></div></div>
+            
+            <div class="console" id="console"></div>
+        </section>
+
+        <section class="screen" id="lab-screen">
+            <div class="lab-panel">
+                <h3>// LAB PROTOCOLS</h3>
+                <div class="lab-actions">
+                    <button class="lab-action" data-experiment="breeding">Breeding Trial</button>
+                    <button class="lab-action" data-experiment="radiation">Radiation Exposure</button>
+                    <button class="lab-action" data-experiment="chemical">Chemical Bath</button>
+                    <button class="lab-action" data-experiment="splicing">Genetic Splicing</button>
+                </div>
+                <div class="lab-log" id="lab-log">No experiments logged.</div>
             </div>
-        </div>
-        
-        <div class="actions">
-            <button class="action-btn" id="btn-feed" onclick="game.feed()">
-                <span class="icon">🍖</span>
-                <span>FEED (-10💰)</span>
-            </button>
-            <button class="action-btn" id="btn-play" onclick="game.play()">
-                <span class="icon">🎮</span>
-                <span>PLAY</span>
-            </button>
-            <button class="action-btn" id="btn-clean" onclick="game.clean()">
-                <span class="icon">🚿</span>
-                <span>CLEAN</span>
-            </button>
-            <button class="action-btn" id="btn-heal" onclick="game.heal()">
-                <span class="icon">💊</span>
-                <span>HEAL (-25💰)</span>
-            </button>
-            <button class="action-btn" id="btn-mutate" onclick="game.mutate()">
-                <span class="icon">🧬</span>
-                <span>MUTATE (-50💰)</span>
-            </button>
-            <button class="action-btn" id="btn-sleep" onclick="game.sleep()">
-                <span class="icon">😴</span>
-                <span>SLEEP</span>
-            </button>
-        </div>
-        
-        <div class="pet-select">
-            <h3>// SELECT PET SPECIMEN</h3>
-            <div class="pet-grid" id="pet-grid"></div>
-        </div>
-        
-        <div class="console" id="console"></div>
+        </section>
+
+        <section class="screen" id="inventory-screen">
+            <div class="inventory-panel">
+                <h3>// INVENTORY</h3>
+                <div class="inventory-grid" id="inventory-grid"></div>
+            </div>
+        </section>
+
+        <section class="screen" id="shop-screen">
+            <div class="shop-panel">
+                <h3>// BIO-SHOP</h3>
+                <div class="shop-grid" id="shop-grid"></div>
+            </div>
+        </section>
     </div>
     
     <div class="toast" id="toast"></div>
+
+    <script src="data/items.js"></script>
 
 <script>
 const PETS = [
@@ -448,6 +565,7 @@ class BioPetzGame {
         };
         this.credits = 100;
         this.toxins = 0;
+        this.inventory = {};
         this.lastUpdate = Date.now();
         
         this.load();
@@ -694,12 +812,22 @@ class BioPetzGame {
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 1500);
     }
+
+    addItem(itemId, quantity = 1) {
+        this.inventory[itemId] = (this.inventory[itemId] || 0) + quantity;
+        this.save();
+    }
+
+    getItemCount(itemId) {
+        return this.inventory[itemId] || 0;
+    }
     
     save() {
         localStorage.setItem('bio_petz_save', JSON.stringify({
             pet: this.pet,
             credits: this.credits,
-            toxins: this.toxins
+            toxins: this.toxins,
+            inventory: this.inventory
         }));
     }
     
@@ -710,6 +838,7 @@ class BioPetzGame {
                 this.pet = { ...this.pet, ...data.pet };
                 this.credits = data.credits || 100;
                 this.toxins = data.toxins || 0;
+                this.inventory = data.inventory || {};
             }
         } catch (e) {}
     }
@@ -721,6 +850,107 @@ class BioPetzGame {
 }
 
 const game = new BioPetzGame();
+
+const screens = document.querySelectorAll('.screen');
+const tabButtons = document.querySelectorAll('.tab-btn');
+
+function setActiveScreen(screenId) {
+    screens.forEach((screen) => {
+        screen.classList.toggle('active', screen.id === screenId);
+    });
+    tabButtons.forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.screen === screenId);
+    });
+    if (screenId === 'inventory-screen') {
+        renderInventory();
+    }
+    if (screenId === 'shop-screen') {
+        renderShop();
+    }
+}
+
+tabButtons.forEach((btn) => {
+    btn.addEventListener('click', () => setActiveScreen(btn.dataset.screen));
+});
+
+function renderInventory() {
+    const grid = document.getElementById('inventory-grid');
+    const entries = Object.entries(game.inventory || {}).filter(([, count]) => count > 0);
+    if (!entries.length) {
+        grid.innerHTML = '<div class="inventory-item">Inventory empty. Visit the shop to restock.</div>';
+        return;
+    }
+    grid.innerHTML = entries.map(([id, count]) => {
+        const item = window.ITEMS ? window.ITEMS[id] : null;
+        const name = item ? item.name : id;
+        const desc = item ? item.description : 'Unknown item';
+        return `
+            <div class="inventory-item">
+                <div><strong>${name}</strong></div>
+                <div>${desc}</div>
+                <div>Qty: ${count}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderShop() {
+    const grid = document.getElementById('shop-grid');
+    const shopItems = window.SHOP_INVENTORY || [];
+    grid.innerHTML = shopItems.map((id) => {
+        const item = window.ITEMS ? window.ITEMS[id] : null;
+        if (!item) {
+            return '';
+        }
+        return `
+            <div class="shop-item">
+                <div><strong>${item.name}</strong></div>
+                <div>${item.description}</div>
+                <div>Cost: ${item.cost}💰</div>
+                <button type="button" data-item="${id}">Buy</button>
+            </div>
+        `;
+    }).join('');
+    grid.querySelectorAll('button[data-item]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const itemId = btn.dataset.item;
+            const item = window.ITEMS[itemId];
+            if (!item) return;
+            if (game.credits < item.cost) {
+                game.toast('Not enough credits!');
+                return;
+            }
+            game.credits -= item.cost;
+            game.addItem(itemId, 1);
+            game.update();
+            renderInventory();
+        });
+    });
+}
+
+const labLog = document.getElementById('lab-log');
+function logLab(message) {
+    if (!labLog) return;
+    if (labLog.textContent === 'No experiments logged.') {
+        labLog.textContent = '';
+    }
+    const line = document.createElement('div');
+    line.textContent = message;
+    labLog.appendChild(line);
+    labLog.scrollTop = labLog.scrollHeight;
+}
+
+document.querySelectorAll('.lab-action').forEach((btn) => {
+    btn.addEventListener('click', () => {
+        const experiment = btn.dataset.experiment;
+        const timestamp = new Date().toLocaleTimeString();
+        game.mutate();
+        logLab(`[${timestamp}] ${experiment.toUpperCase()} protocol executed.`);
+    });
+});
+
+renderInventory();
+renderShop();
 </script>
 </body>
 </html>

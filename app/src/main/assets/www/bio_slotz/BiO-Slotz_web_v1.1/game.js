@@ -614,7 +614,7 @@
       const img = new Image();
       img.onload = () => resolve(img);
       img.onerror = reject;
-      img.src = src + "?v=3";
+      img.src = src;
     });
   }
 

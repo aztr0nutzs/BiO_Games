@@ -18,8 +18,8 @@
   --amber: #ffb14a;
   --mag:   #ff00ff;
   
-  --cell-size: min(11vw, 76px); /* Zoomed In */
-  --gap: 12px;
+  --cell-size: clamp(32px, 9.5vw, 76px); /* Responsive sizing */
+  --gap: clamp(6px, 1.6vw, 12px);
 }
 
 * { box-sizing: border-box; user-select: none; }
@@ -54,7 +54,7 @@ body {
 .ui-layer {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 30;
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -312,11 +312,11 @@ body {
   animation: dropIn 0.5s cubic-bezier(0.5, 0, 0.5, 1.2) forwards;
 }
 .chip.p1 {
-  background: radial-gradient(circle at 30% 30%, #fff 0%, var(--teal) 20%, #005f6b 100%);
+  background: url('assets/knxt4_chips/s03.png') center/cover no-repeat;
   box-shadow: 0 0 20px var(--teal);
 }
 .chip.p2 {
-  background: radial-gradient(circle at 30% 30%, #fff 0%, var(--toxic) 20%, #006b3f 100%);
+  background: url('assets/knxt4_chips/s04.png') center/cover no-repeat;
   box-shadow: 0 0 20px var(--toxic);
 }
 .chip::before { /* Thickness */
@@ -364,6 +364,15 @@ body {
 }
 .stat-label { font-size: 10px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
 .stat-val { font-size: 24px; font-weight: bold; margin-top: 5px; }
+
+@media (max-width: 480px) {
+  .stage {
+    padding: 10px;
+  }
+  .board-mesh {
+    padding: 12px;
+  }
+}
 
 </style>
 <script type="importmap">

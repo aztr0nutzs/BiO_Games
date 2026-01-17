@@ -1,3 +1,6 @@
+
+<img width="2224" height="1223" alt="lobby_top" src="https://github.com/user-attachments/assets/07b800f2-49f1-4c03-8a8f-1597ca8ccd8c" />
+
 # 📖 BiO GAMES - Documentation Index
 
 Welcome to the BiO Games Android App! This document serves as your guide to all project documentation.
