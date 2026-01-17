@@ -136,6 +136,15 @@
             animation: petBob 2s ease-in-out infinite;
         }
         
+        .pet-image video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px var(--neon-green));
+            animation: petBob 2s ease-in-out infinite;
+            display: none;
+        }
+        
         @keyframes petBob {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
@@ -273,6 +282,13 @@
             object-fit: contain;
         }
         
+        .pet-option video {
+            width: 100%;
+            height: 50px;
+            object-fit: contain;
+            display: block;
+        }
+        
         .pet-option .name {
             font-size: 10px;
             color: #888;
@@ -336,6 +352,9 @@
         <div class="pet-container">
             <div class="pet-image">
                 <img id="pet-img" src="assets/pets/pet_frog1.png" alt="Pet">
+                <video id="pet-video" src="" autoplay muted loop playsinline preload="metadata" poster="">
+                    <img src="assets/pets/bio_cat1.png" alt="Pet video fallback">
+                </video>
             </div>
             <div class="pet-name" id="pet-name">BioFluff</div>
             <div class="pet-species" id="pet-species">Proto-Slime // Common</div>
@@ -400,14 +419,14 @@
 
 <script>
 const PETS = [
-    { id: 'frog1', name: 'BioFrog', img: 'assets/pets/pet_frog1.png', species: 'Amphibian Mutant', rarity: 'Common' },
+    { id: 'frog1', name: 'BioFrog', img: 'assets/pets/bio_frog.mp4', poster: 'assets/pets/bio_frog1.png', species: 'Amphibian Mutant', rarity: 'Common' },
     { id: 'frog2', name: 'NeonFrog', img: 'assets/pets/pet_frog2.png', species: 'Glowing Amphibian', rarity: 'Uncommon' },
     { id: 'frog3', name: 'ToxiFrog', img: 'assets/pets/pet_frog3.gif', species: 'Toxic Specimen', rarity: 'Rare' },
-    { id: 'cat1', name: 'BioCat', img: 'assets/pets/pet_cat1.png', species: 'Feline Hybrid', rarity: 'Common' },
+    { id: 'cat1', name: 'BioCat', img: 'assets/pets/bio_cat.mp4', species: 'Feline Hybrid', rarity: 'Common' },
     { id: 'cat2', name: 'CyberCat', img: 'assets/pets/pet_cat2.png', species: 'Cyber Feline', rarity: 'Uncommon' },
     { id: 'cat3', name: 'VoidCat', img: 'assets/pets/pet_cat3.png', species: 'Shadow Entity', rarity: 'Rare' },
     { id: 'cat4', name: 'NeonCat', img: 'assets/pets/pet_cat4.png', species: 'Luminescent Feline', rarity: 'Epic' },
-    { id: 'rat1', name: 'BioRat', img: 'assets/pets/pet_rat1.png', species: 'Lab Specimen', rarity: 'Common' }
+    { id: 'rat1', name: 'BioRat', img: 'assets/pets/bio_rat.mp4', poster: 'assets/pets/bio_rat1.png', species: 'Lab Specimen', rarity: 'Common' }
 ];
 
 class BioPetzGame {
@@ -442,7 +461,7 @@ class BioPetzGame {
         const grid = document.getElementById('pet-grid');
         grid.innerHTML = PETS.map(p => `
             <div class="pet-option ${p.id === this.pet.id ? 'active' : ''}" onclick="game.selectPet('${p.id}')">
-                <img src="${p.img}" alt="${p.name}">
+                ${p.img.endsWith('.mp4') ? `<video src="${p.img}" muted loop autoplay playsinline preload="metadata" poster="${p.poster || ''}"></video>` : `<img src="${p.img}" alt="${p.name}">`}
                 <div class="name">${p.name}</div>
             </div>
         `).join('');
@@ -581,9 +600,11 @@ class BioPetzGame {
     
     animatePet() {
         const img = document.getElementById('pet-img');
-        img.style.animation = 'none';
-        img.offsetHeight; // Trigger reflow
-        img.style.animation = 'petBob 0.3s ease-in-out 3';
+        const video = document.getElementById('pet-video');
+        const target = video.style.display === 'block' ? video : img;
+        target.style.animation = 'none';
+        target.offsetHeight; // Trigger reflow
+        target.style.animation = 'petBob 0.3s ease-in-out 3';
     }
     
     tick() {
@@ -614,7 +635,23 @@ class BioPetzGame {
         document.getElementById('credits').textContent = this.credits;
         document.getElementById('toxins').textContent = this.toxins;
         
-        document.getElementById('pet-img').src = this.pet.img;
+        const img = document.getElementById('pet-img');
+        const video = document.getElementById('pet-video');
+        const isVideo = this.pet.img.endsWith('.mp4');
+        if (isVideo) {
+            video.src = this.pet.img;
+            video.poster = this.pet.poster || '';
+            video.style.display = 'block';
+            img.style.display = 'none';
+            video.play().catch(() => {});
+        } else {
+            img.src = this.pet.img;
+            img.style.display = 'block';
+            video.style.display = 'none';
+            if (!video.paused) {
+                video.pause();
+            }
+        }
         document.getElementById('pet-name').textContent = this.pet.name;
         document.getElementById('pet-species').textContent = `${this.pet.species} // ${this.pet.rarity}`;
         document.getElementById('pet-level').textContent = this.pet.level;

@@ -235,10 +235,17 @@
 
         <div class="profile-panel">
             <div class="glitch-banner">
-                <img src="assets/lobby_top.png"
+                <video src="assets/lobby_top.mp4"
      class="banner-img operator-avatar"
      id="bannerImg"
-     alt="Operator Avatar">
+     autoplay
+     muted
+     loop
+     playsinline
+     preload="metadata"
+     poster="assets/lobby_top.png">
+                    <img src="assets/lobby_top.png" alt="Operator Avatar">
+                </video>
                 <div style="position:absolute; bottom:5px; left:5px; background:var(--neon-pink); color:black; padding:2px 5px; font-size:9px; font-weight:bold;">LiVE</div>
             </div>
             
@@ -311,7 +318,9 @@
                 </div>
 
                 <div class="std-card" id="playBioPetzBtn">
-                    <img src="assets/bio_petz_icon.png" class="card-thumb" style="border-color:var(--neon-pink);">
+                    <video src="assets/bio_petz_icon.mp4" class="card-thumb" style="border-color:var(--neon-pink);" autoplay muted loop playsinline preload="metadata" poster="assets/bio_petz_icon.png">
+                        <img src="assets/bio_petz_icon.png" alt="BiO Petz">
+                    </video>
                     <div>
                         <div style="font-family:'Orbitron'; color:var(--neon-pink); font-size:1.2rem;">BiO PETZ</div>
                         <div style="font-size:0.85rem; color:#888;">Virtual Bio-Pet Simulation</div>
@@ -467,7 +476,7 @@
         let cIdx = 0;
         setInterval(() => {
             cIdx = (cIdx + 1) % colors.length;
-            bannerImg.src = `assets/lobby_top.png`;
+            bannerImg.src = `assets/lobby_top.mp4`;
         }, 4000);
     </script>
 
