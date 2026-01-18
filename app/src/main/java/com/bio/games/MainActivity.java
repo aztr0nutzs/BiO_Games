@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         ws.setDatabaseEnabled(true);
         ws.setGeolocationEnabled(false); // Disable for security
         ws.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        ws.setMediaPlaybackRequiresUserGesture(false);
 
         // Memory optimization
         webView.setLayerType(WebView.LAYER_TYPE_HARDWARE, null);

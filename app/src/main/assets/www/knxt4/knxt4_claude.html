@@ -18,8 +18,9 @@
   --amber: #ffb14a;
   --mag:   #ff00ff;
   
-  --cell-size: min(11vw, 76px); /* Zoomed In */
-  --gap: 12px;
+  --cell-size: clamp(30px, 9vw, 72px); /* Responsive sizing */
+  --gap: clamp(5px, 1.4vw, 10px);
+  --board-scale: 1;
 }
 
 * { box-sizing: border-box; user-select: none; }
@@ -54,7 +55,7 @@ body {
 .ui-layer {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 30;
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -67,9 +68,10 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 30px;
+  padding: calc(12px + env(safe-area-inset-top)) 20px 12px;
   background: linear-gradient(180deg, rgba(0,0,0,0.8), transparent);
   border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  z-index: 40;
 }
 
 .brand {
@@ -186,13 +188,15 @@ body {
   justify-content: center;
   perspective: 1000px; /* Stronger perspective */
   z-index: 10;
+  padding: 70px 12px 20px;
 }
 
 .board-container {
   position: relative;
   transform-style: preserve-3d;
   /* Straightened angle, zoomed in */
-  transform: rotateX(5deg) rotateY(0deg) translateZ(0px);
+  transform: scale(var(--board-scale)) rotateX(5deg) rotateY(0deg) translateZ(0px);
+  transform-origin: center top;
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -312,11 +316,11 @@ body {
   animation: dropIn 0.5s cubic-bezier(0.5, 0, 0.5, 1.2) forwards;
 }
 .chip.p1 {
-  background: radial-gradient(circle at 30% 30%, #fff 0%, var(--teal) 20%, #005f6b 100%);
+  background: url('assets/knxt4_chips/s03.png') center/cover no-repeat;
   box-shadow: 0 0 20px var(--teal);
 }
 .chip.p2 {
-  background: radial-gradient(circle at 30% 30%, #fff 0%, var(--toxic) 20%, #006b3f 100%);
+  background: url('assets/knxt4_chips/s04.png') center/cover no-repeat;
   box-shadow: 0 0 20px var(--toxic);
 }
 .chip::before { /* Thickness */
@@ -364,6 +368,24 @@ body {
 }
 .stat-label { font-size: 10px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
 .stat-val { font-size: 24px; font-weight: bold; margin-top: 5px; }
+
+@media (max-width: 480px) {
+  :root {
+    --board-scale: 0.9;
+  }
+  .stage {
+    padding: 10px;
+  }
+  .board-mesh {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --board-scale: 0.8;
+  }
+}
 
 </style>
 <script type="importmap">

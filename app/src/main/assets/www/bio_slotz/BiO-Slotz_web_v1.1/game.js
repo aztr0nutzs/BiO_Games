@@ -581,6 +581,10 @@
 
   function applyLayout() {
     const wrapRect = cabinetWrap.getBoundingClientRect();
+    if (!wrapRect.width || !wrapRect.height) {
+      requestAnimationFrame(applyLayout);
+      return;
+    }
 
     const s = rectToPx(LAYOUT.screen, wrapRect);
     screenWrap.style.left = s.left + "px";
@@ -609,18 +613,36 @@
   }
 
   // ===== Symbols =====
-  function preloadImage(src) {
-    return new Promise((resolve, reject) => {
+  function createFallbackSymbol(label) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 128;
+    canvas.height = 128;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#111";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "#00f3ff";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
+    ctx.fillStyle = "#39ff14";
+    ctx.font = "bold 28px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, canvas.width / 2, canvas.height / 2);
+    return canvas;
+  }
+
+  function preloadImage(src, label) {
+    return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = src + "?v=3";
+      img.onerror = () => resolve(createFallbackSymbol(label));
+      img.src = src;
     });
   }
 
   async function loadSymbols() {
     for (const s of SYMBOLS) {
-      const img = await preloadImage(s.file);
+      const img = await preloadImage(s.file, s.code || s.id);
       state.symbolById.set(s.id, { ...s, img });
     }
   }
@@ -1113,8 +1135,10 @@
     showToast("BiO-Slotz READY", 1000);
   }
 
-  init().catch((err) => {
-    console.error(err);
-    showToast("INIT ERROR", 2200);
+  window.addEventListener("load", () => {
+    init().catch((err) => {
+      console.error(err);
+      showToast("INIT ERROR", 2200);
+    });
   });
 })();
